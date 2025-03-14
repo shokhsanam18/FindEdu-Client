@@ -11,7 +11,7 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
     className={cn("border rounded-md p-2 w-full flex items-center justify-between", className)} 
     {...props}
   >
-    <SelectPrimitive.Value /> {/* ✅ Fix: Displays the selected value */}
+    <SelectPrimitive.Value /> 
     <SelectPrimitive.Icon>
       <ChevronDownIcon className="size-4 opacity-50" />
     </SelectPrimitive.Icon>
@@ -37,7 +37,7 @@ const SelectItem = ({ className, children, ...props }) => (
     className={cn("cursor-pointer p-2 hover:bg-gray-100 rounded-md flex items-center", className)} 
     {...props}
   >
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText> {/* ✅ Fix: Displays text inside the dropdown */}
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText> 
     <SelectPrimitive.ItemIndicator>
       <CheckIcon className="size-4 ml-2" />
     </SelectPrimitive.ItemIndicator>

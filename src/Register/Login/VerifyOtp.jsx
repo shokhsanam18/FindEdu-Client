@@ -1,3 +1,4 @@
+import { Toaster as Sonner, toast } from "sonner";
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -37,22 +38,24 @@ const VerifyOtp = () => {
   const resetPassword = async (values) => {
     try {
       await axios.post(`${API_BASE}/reset-password`, { email: state.email, ...values });
-      alert("Password reset successfully.");
-      navigate("/login");
+      toast.success("Password reset successfully.");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
       console.error("Reset Password Error:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Invalid OTP or error resetting password.");
+      toast.error(error.response?.data?.message || "Invalid OTP or error resetting password.");
     }
   };
 
   return (
+
     <div className="flex flex-col md:flex-row h-screen bg-white from-white to-purple-400">
+  <Sonner theme="light" position="top-right" richColors />
 
       <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold">
         F<img src={icon} alt="Logo" className="h-7 w-4 mx-1" />ndedu.uz
       </div>
 
-      <div className="w-full flex items-center justify-center p-6 bg-gradient-to-b from-white to-purple-100">
+      <div className="w-full flex items-center justify-center p-6 bg-gradient-to-b from-white to-purple-100  h-screen">
         <div className="w-full max-w-xl bg-white p-8 rounded-lg shadow-md">
           <h2 className="text-4xl font-bold text-[#461773] mb-6 text-center">Verify OTP</h2>
 
@@ -75,7 +78,7 @@ const VerifyOtp = () => {
 </FormItem>
 )} />
 
- <Button type="submit" className="h-[50px] w-full bg-[#461773] text-white font-semibold rounded-md hover:bg-purple-700 transition">Reset Password</Button>
+ <Button type="submit" className=" cursor-pointer h-[50px] w-full bg-[#461773] text-white font-semibold rounded-md hover:bg-purple-700 transition">Reset Password</Button>
             </form>
           </Form>
         </div>

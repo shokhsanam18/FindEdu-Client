@@ -21,7 +21,7 @@ function App() {
         <Route path="/Login" element={<Login />} />
         <Route path="/Forget" element={<Forget />} />
         <Route path="/VerifyOtp" element={<VerifyOtp />} />
-        <Route path="*" element={<h1>You logged in successfully.</h1>} />
+        <Route path="*" element={<h1 className="bg-green-500 text-5xl">You logged in successfully. YAY YAY!!!(Yes It Is 404 Error Page)</h1>} />
       </Routes>
     </div>
   );

@@ -1,3 +1,4 @@
+import { Toaster as Sonner, toast } from "sonner";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -35,20 +36,23 @@ const Forget = () => {
   const sendOtp = async (values) => {
     try {
       await axios.post(`${API_BASE}/send-otp`, values);
-      alert("OTP sent to your email.");
-      navigate("/verifyotp", { state: { email: values.email } });
+      toast.success("OTP sent to your email.");
+      setTimeout(() => navigate("/verifyotp", { state: { email: values.email } }), 2000);
     } catch (error) {
       console.error("OTP Request Error:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Failed to send OTP.");
+      toast.error(error.response?.data?.message || "Failed to send OTP.");
     }
   };
 
+
   return (
  <div className="flex flex-col md:flex-row h-screen bg-white from-white to-purple-400 m-0">
+  <Sonner theme="light" position="top-right" richColors />
+  
  <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold">
  F<img src={icon} alt="Logo" className="h-7 w-4 mx-1" />ndedu.uz
       </div>
-<div className="w-full flex items-center justify-center p-6 bg-gradient-to-b from-white to-purple-100">
+<div className="w-full flex items-center justify-center p-6 bg-gradient-to-b from-white to-purple-100  h-screen">
 <div className="w-full max-w-xl bg-white p-8 rounded-lg shadow-md">
 <h2 className="text-4xl font-bold text-[#461773] mb-6 text-center">Reset Password</h2>
 
@@ -60,7 +64,7 @@ const Forget = () => {
  </FormControl>  <FormMessage />
 </FormItem> )} />
 
- <Button type="submit" className="h-[50px] w-full bg-[#461773] text-white font-semibold rounded-md hover:bg-purple-700 transition">Send Code</Button>
+ <Button type="submit" className="cursor-pointer h-[50px] w-full bg-[#461773] text-white font-semibold rounded-md hover:bg-purple-700 transition">Send Code</Button>
 </form>
  </Form>
 
