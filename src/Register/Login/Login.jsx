@@ -4,9 +4,9 @@ import axios from "axios";
 import purple from "/public/purple.png";
 import icon from "/public/icon.png";
 import register from "/public/register.png";
-import google from "/public/google.png";
+// import google from "/public/google.png";
 
-const API_BASE = "http://3.37.19.181:4000/api/users";
+const API_BASE = "http://18.141.233.37:4000/api/users";
 
 const Login = () => {
   const [email, setEmail] = useState("");
