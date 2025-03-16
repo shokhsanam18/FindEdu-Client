@@ -4,7 +4,7 @@ import { Toaster as Sonner, toast } from "sonner";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -169,8 +169,18 @@ const FormTry = () => {
   <FormField control={form.control} name="image" render={({ field: { onChange, ...rest } }) => (
   <FormItem>
     <FormControl>
-  <input  type="file" accept="image/*" className="border p-2 rounded-md w-full cursor-pointer" onChange={(e) => onChange(e.target.files[0])} {...rest} />
-    </FormControl>
+    <Controller
+  name="image"
+  control={form.control}
+  defaultValue={null}
+  render={({ field }) => (
+    <input
+      type="file"
+      className=" h-10 p-2 border-gray-100 border-2 rounded"
+      onChange={(e) => field.onChange(e.target.files[0])}
+    />
+  )}
+/>    </FormControl>
     <FormMessage />
   </FormItem>
 )} />

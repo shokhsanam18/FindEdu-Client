@@ -43,7 +43,7 @@ const Login = () => {
       if (response.data && response.data.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
         toast.success("Login successful! Redirecting...");
-        setTimeout(() => navigate("/dashboard"), 2000);
+        setTimeout(() => navigate("/you"), 2000);
       } else {
         toast.error("Invalid credentials");
       }
