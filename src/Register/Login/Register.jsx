@@ -90,39 +90,42 @@ const FormTry = () => {
   };
 
   return (
-   <div className="h-screen  ">
-     <div className="flex flex-col md:flex-row from-white to-purple-100 w-full h-[100vh] sm:h-[100vh] md:h-[100vh] lg:h-[132vh] mt-[-100px]">
+<div className="h-full from-white to-purple-100 bg-gradient-to-b">
+<div className=" mx-10  mt-10 md:mx-20 md:mb-[-30px] md:mt-10 flex items-center text-[#461773] text-[32px] font-bold ">
+    F<img src={icon} alt="Logo" className="h-7 w-4 mx-1 " />ndedu.uz
+  </div>
+<div className=" h-[100%] ">
+     <div className="flex flex-col md:flex-row w-full ">
 <Sonner theme="light" position="top-right" richColors />
-        <div className="absolute top-10 md:top-22 left-14 flex items-center text-[#461773] text-[32px] font-bold mb-30 from-white to-purple-100 "> 
-  F<img src={icon} alt="Logo" className="h-7 w-4 mx-1" />ndedu.uz
-     </div>
 
-<div className="hidden md:flex md:w-2/5 bg-gradient-to-b from-white to-purple-100 items-center justify-center p-2 relative h-full ">
-  <div className="absolute top-30 left-14 flex items-center text-[#461773] text-[32px] font-bold from-white to-purple-100 ">
-    F<img src={icon} alt="Logo" className="h-7 w-4 mx-1" />ndedu.uz
-  </div>
-  <div className="text-[#461773] text-center relative ml-20 cursor-pointer  from-white to-purple-100 ">
-    <h2 className="text-4xl font-bold mb-15">Welcome to the page!</h2>
 
-    <motion.img
-      src={register}
-      alt="Illustration"
-      className="w-[500px] h-auto relative z-10"
-      whileHover={{ y: -20 }}
-      transition={{ type: "spring", stiffness: 50, damping: 20 }}
-    />
+<div className="">
+<div className="hidden md:flex  h-[100%]  items-center justify-center">
 
-    <img
-      className="z-0 absolute bottom-[-32px] left-1/2 transform -translate-x-1/2 w-[400px] h-[90px]"
-      src={purple}
-      alt="Shadow Effect"
-    /> 
-    
-  </div>
+<div className=" text-[#461773] text-center relative ml-20 cursor-pointer  ">
+  <h2 className="text-4xl font-bold mb-15">Welcome to the page!</h2>
+
+  <motion.img
+    src={register}
+    alt="Illustration"
+    className="w-[500px] h-auto relative z-10"
+    whileHover={{ y: -20 }}
+    transition={{ type: "spring", stiffness: 50, damping: 20 }}
+  />
+
+  <img
+    className="z-0 absolute bottom-[-32px] left-1/2 transform -translate-x-1/2 w-[400px] h-[90px]"
+    src={purple}
+    alt="Shadow Effect"
+  /> 
 </div>
 
-<div className=" w-full md:w-2/3 flex items-center justify-center p-6 md:p-16 md:flex bg-gradient-to-b from-white to-purple-100 mt-10 sm:mt-0 md:mt-0 ">
-    <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md ml-6 sm:mt-[0px] mt-42 mb-30 lg:mb-[-70px]">
+</div> 
+
+</div>
+
+<div className=" w-full md:w-2/3 flex items-center justify-center  md:p-16 md:flex bg-gradient-to-b">
+    <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md ml-6  ">
 
           <h2 className="text-4xl font-bold text-[#461773] mb-5 text-center ">Create Account</h2> 
   
@@ -203,6 +206,7 @@ const FormTry = () => {
       </div>
     </div>
    </div>
+</div>
   );
 };
 
