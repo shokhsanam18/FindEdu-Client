@@ -3,6 +3,7 @@ import { Button } from "./components/ui/button.jsx";
 import { Routes, Route, Link } from "react-router-dom";
 import Register from "./Register/Login/Register.jsx";
 import Login from "./Register/Login/Login.jsx";
+import { Footer } from "./components/footer.jsx";
 
 function App() {
   return (
