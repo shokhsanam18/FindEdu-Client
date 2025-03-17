@@ -1,15 +1,17 @@
 import React from "react";
-import { Button } from "./components/ui/button.jsx";
+
 import { Routes, Route, Link } from "react-router-dom";
 import Register from "./Register/Login/Register.jsx";
 import Login from "./Register/Login/Login.jsx";
-import { Footer } from "./components/footer.jsx";
+import { Layout } from "./components/Layout.jsx";
 
 function App() {
   return (
     <div>
       <Routes>
-        <Route path="/" />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<h1>Home page.</h1>} />
+        </Route>
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Forget" element={<h1>Forget password page.</h1>} />
