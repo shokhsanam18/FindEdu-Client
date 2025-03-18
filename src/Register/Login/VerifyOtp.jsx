@@ -51,9 +51,10 @@ const VerifyOtp = () => {
     <div className="flex flex-col md:flex-row h-screen bg-white from-white to-purple-400">
   <Sonner theme="light" position="top-right" richColors />
 
-      <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold">
-        F<img src={icon} alt="Logo" className="h-7 w-4 mx-1" />ndedu.uz
-      </div>
+  <Link to="/">
+<div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold cursor-pointer">
+ <p className="flex">F<img src={icon} alt="Logo" className="h-7 w-4 mx-1 mt-3" />ndedu.uz</p>
+      </div></Link>
 
       <div className="w-full flex items-center justify-center p-6 bg-gradient-to-b from-white to-purple-100  h-screen">
         <div className="w-full max-w-xl bg-white p-8 rounded-lg shadow-md">

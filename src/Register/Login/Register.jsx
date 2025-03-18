@@ -91,8 +91,8 @@ const FormTry = () => {
 
   return (
 <div className="h-full from-white to-purple-100 bg-gradient-to-b">
-<div className=" mx-10  mt-10 md:mx-20 md:mb-[-30px] md:mt-10 flex items-center text-[#461773] text-[32px] font-bold ">
-    F<img src={icon} alt="Logo" className="h-7 w-4 mx-1 " />ndedu.uz
+<div className=" mx-10  mt-10 md:mx-20 md:mb-[-30px] md:mt-10 flex items-center text-[#461773] text-[32px] font-bold cursor-pointer">
+    <Link to="/" ><p className="flex">F<img src={icon} alt="Logo" className="h-7  w-4 mx-1 mt-3 " />ndedu.uz</p></Link>
   </div>
 <div className=" h-[100%] ">
      <div className="flex flex-col md:flex-row w-full ">
