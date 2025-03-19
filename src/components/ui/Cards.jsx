@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Star } from "lucide-react";
 import axios from "axios";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./card.jsx";
 
 const API = "https://crudcrud.com/api/191e6a9427514b2eb082b840cb04c95f/users";
 const CategoriesAPI = 'https://crudcrud.com/api/191e6a9427514b2eb082b840cb04c95f/categories';
@@ -139,7 +139,7 @@ export const Modal = ({ isOpen, onClose, onSave }) => {
 };
 
 
-export const Cards_Filter = ({ checkedItems, selectedMajors, setSelectedMajors  }) => {
+export const Cards = ({ checkedItems, selectedMajors, setSelectedMajors  }) => {
 
     const Users = [
         { 
@@ -301,10 +301,10 @@ export const Cards_Filter = ({ checkedItems, selectedMajors, setSelectedMajors  
                 </div>
             )}
 
-            <div className="flex items-center justify-center mt-5 gap-4">
+            {/* <div className="flex items-center justify-center mt-5 gap-4">
                 <button className="px-4 py-2 bg-blue-600 text-white rounded-md" onClick={SaveUsers}>Save Users</button>
                 <button className="px-4 py-2 bg-green-600 text-white rounded-md" onClick={GetUsers}>Get Users</button>
-            </div>
+            </div> */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={onSaveMajors}  selectedMajors={values} 
     setSelectedMajors={setValues}/>
         </div>

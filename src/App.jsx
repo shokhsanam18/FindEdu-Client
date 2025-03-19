@@ -1,21 +1,32 @@
 import React from "react";
-import { Button } from "./components/ui/button.jsx";
 import { Routes, Route, Link } from "react-router-dom";
 import Register from "./Register/Login/Register.jsx";
 import Login from "./Register/Login/Login.jsx";
-import { IndexPage } from "./pages/index.jsx";
-
+import { Layout } from "./components/Layout.jsx";
+import Forget from "./Register/Login/Forget.jsx";
+import VerifyOtp from "./Register/Login/VerifyOtp.jsx";
+import ErrorPage from "./Register/Login/Error.jsx";
+import { Cards } from "./components/ui/Cards.jsx";
 function App() {
   return (
     <div>
       <Routes>
-        <Route
-          // path="/" element={}
-        />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Cards />} />
+        </Route>
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
-        <Route path="/Forget" element={<h1>Forget password page.</h1>} />
-        <Route path="*" element={<h1>You logged in successfully.</h1>} />
+        <Route path="/Forget" element={<Forget />} />
+        <Route path="/VerifyOtp" element={<VerifyOtp />} />
+        <Route path="*" element={<ErrorPage />} />
+        <Route
+          path="/you"
+          element={
+            <h1 className="bg-green-500 text-5xl">
+              You logged in successfully. YAY YAY!!!(Yes It Is 404 Error Page)
+            </h1>
+          }
+        />
       </Routes>
     </div>
   );
