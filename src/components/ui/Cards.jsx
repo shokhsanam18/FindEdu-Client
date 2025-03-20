@@ -5,9 +5,13 @@ import { ArrowRight, Star, ChevronDown } from "lucide-react";
 import axios from "axios";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./card.jsx";
 
-const API = "http://18.141.233.37:4000/api/centers";
-const CategoriesAPI = 'http://18.141.233.37:4000/api/categories';
-const MajorsApi = "http://18.141.233.37:4000/api/major";
+const API1 = "http://18.141.233.37:4000/api/centers";
+const MajorsApi1 = "http://18.141.233.37:4000/api/major";
+const CategoriesAPI1 = 'http://18.141.233.37:4000/api/categories';
+
+const API = "https://crudcrud.com/api/2a09b3c3eeb145739e3760f5bbf9355e/centers";
+const CategoriesAPI = 'https://crudcrud.com/api/2a09b3c3eeb145739e3760f5bbf9355e/categories';
+const MajorsApi = "https://crudcrud.com/api/2a09b3c3eeb145739e3760f5bbf9355e/major";
 
 const SaveMajors = () => {
     axios.post(MajorsApi, { selectedMajor })
@@ -175,8 +179,8 @@ export const Cards = ({ checkedItems, selectedMajors, setSelectedMajors  }) => {
     };    
 
 return (
-    <div className="my-15">
-        <div className="flex flex-col-reverse items-center justify-center gap-5 flex-wrap">
+    <div className="my-16">
+        <div className="flex items-center justify-center gap-5 flex-wrap">
             <h2 className="text-2xl text-center hover:cursor-pointer bg-blue-500 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-blue-500 hover:bg-white hover:text-blue-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center" onClick={() => setIsModalOpen(true)}>Choose<ChevronDown className="mt-2"/></h2>
             <h2 className="text-2xl text-gray-800 font-semibold">Categories:</h2>
                 {values.map((filter, id) => (
@@ -222,7 +226,3 @@ return (
 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={onSaveMajors}    selectedMajors={values} setSelectedMajors={setValues}/> 
   </div>
 )}
-
-
-
-
