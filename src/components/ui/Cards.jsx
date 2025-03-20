@@ -5,13 +5,9 @@ import { ArrowRight, Star, ChevronDown } from "lucide-react";
 import axios from "axios";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./card.jsx";
 
-const API1 = "http://18.141.233.37:4000/api/centers";
-const MajorsApi1 = "http://18.141.233.37:4000/api/major";
-const CategoriesAPI1 = 'http://18.141.233.37:4000/api/categories';
-
-const API = "https://crudcrud.com/api/2a09b3c3eeb145739e3760f5bbf9355e/centers";
-const CategoriesAPI = 'https://crudcrud.com/api/2a09b3c3eeb145739e3760f5bbf9355e/categories';
-const MajorsApi = "https://crudcrud.com/api/2a09b3c3eeb145739e3760f5bbf9355e/major";
+const API = "http://18.141.233.37:4000/api/centers";
+const MajorsApi = "http://18.141.233.37:4000/api/major";
+const CategoriesAPI = 'http://18.141.233.37:4000/api/categories';
 
 const SaveMajors = () => {
     axios.post(MajorsApi, { selectedMajor })
