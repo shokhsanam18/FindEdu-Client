@@ -182,7 +182,7 @@ return (
                 {values.map((filter, id) => (
             <button key={id} className={`border-[1px] border-black px-5 py-1 rounded-full text-xl font-normal transition duration-200 ${
                 selectedFilters.includes(filter) ? "bg-violet-900 text-white" : "hover:bg-violet-900 hover:text-white"
-            }`} onClick={() => handleFilterBtnClick(filter)}>{JSON.stringify(filter)}
+            }`} onClick={() => handleFilterBtnClick(filter)}>{typeof filter === "object" ? JSON.stringify(filter) : filter}
         </button>
     ))}
 </div>
@@ -222,3 +222,4 @@ return (
 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={onSaveMajors}    selectedMajors={values} setSelectedMajors={setValues}/> 
   </div>
 )}
+
