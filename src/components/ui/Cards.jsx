@@ -3,27 +3,16 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Star, ChevronDown } from "lucide-react";
 import axios from "axios";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./card.jsx";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/card.jsx";
 
 const API = "http://18.141.233.37:4000/api/centers";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
-const CategoriesAPI = 'http://18.141.233.37:4000/api/fields';
-
-const SaveMajors = () => {
-    axios.post(MajorsApi, { selectedMajor })
-        .then(() => {
-            console.log("Major saved successfully");
-        })
-        .catch(() => {
-            console.log("Error fetching major");
-        });
-};
+const FieldsAPI = 'http://18.141.233.37:4000/api/fields';
 
 export const Modal = ({ isOpen, onClose, onSave }) => {
     const [selectedMajors, setSelectedMajors] = useState(() => {
     return JSON.parse(localStorage.getItem("selectedMajors")) || [];
 });
-
 
 const handleMajorSelect = (major) => {
     if (selectedMajors.includes(major)) {
@@ -35,7 +24,7 @@ const handleMajorSelect = (major) => {
 useEffect(() => {
     axios.get(MajorsApi)
     .then((response) => {
-        const fetchedMajors = response.data.selectedMajors || [];
+        const fetchedMajors = response.data || [];
     setSelectedMajors(fetchedMajors);
         })
     .catch(() => console.log("Error getting majors"));
@@ -45,46 +34,19 @@ useEffect(() => {
     localStorage.setItem("selectedMajors", JSON.stringify(selectedMajors));
 }, [selectedMajors]);
 
-if (!isOpen) return null;
+if (!isOpen) return null;    
+    
+    const [categories, setCategories] = useState([]);
 
-const Filter = () => {
-    return [
-        { field: "IT", 
-            majors: [
-                "Frontend Development", 
-                "Backend Development", 
-                "Mobile Development"
-            ] },
-        { field: "Business", 
-            majors: [
-                "Digital Marketing", 
-                "Sales & E-commerce", 
-                "Public Relations"]
-             },
-        { field: "Engineering", 
-            majors: [
-                "Mechanical Engineering", 
-                "Robotics", 
-                "Chemical Engineering"
-        ] }]
-    }
-
-const save = () => {
-    axios.post(MajorsApi, { selectedMajors }, 
-        { 
-            headers: { "Content-Type": "application/json" } 
-        })
-        .then(() => {
-            console.log("Majors saved successfully");
-            localStorage.setItem("selectedMajors", JSON.stringify(selectedMajors));
-            onSave(selectedMajors); 
-            onClose(); 
-        })
-        .catch(() => console.log("Error fetching majors"));
-    };
-
-    if (!isOpen) return null;
-
+    useEffect(() => {
+        axios.get(FieldsAPI)
+            .then((response) => {
+                setCategories(response.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching categories:", error.response?.data || error.message);
+            });
+    }, []);
 
     const handleClose = () => {
         setSelectedMajors([]); 
@@ -93,7 +55,7 @@ const save = () => {
 
     return (
         <div className="bg-black bg-opacity-60 w-full h-full z-[1000000] fixed top-0 left-0 bottom-0 right-0 flex items-center justify-center">
-        <div className=" lg:w-1/3 md:w-1/2 w-7/12 h-auto px-5 py-5 bg-gray-200 border border-black z-50"> {Filter().map((category, index) => (
+        <div className=" lg:w-1/3 md:w-1/2 w-7/12 h-auto px-5 py-5 bg-gray-200 border border-black z-50"> {categories.map((category, index) => (
             <div className="Branches" key={index}>
                 <h2 className="text-2xl font-semibold">{category.field}</h2>
                 <form className="majors text-lg flex flex-wrap gap-2">
@@ -115,7 +77,8 @@ const save = () => {
 </div>
 )}
 
-export const Cards = ({ checkedItems, selectedMajors, setSelectedMajors  }) => {
+export const Cards_Filter = ({ checkedItems, selectedMajors, setSelectedMajors,SaveCategories}) => {
+
 
     const [selectedFilters, setSelectedFilters] = useState([]);
     const [selectedCards, setSelectedCards] = useState([]);
@@ -133,9 +96,9 @@ export const Cards = ({ checkedItems, selectedMajors, setSelectedMajors  }) => {
     //     }
     // };
 
-    // useEffect(() => {
-    //     filterItems();
-    // }, [selectedFilters, users]);
+    useEffect(() => {
+        filterItems();
+    }, [selectedFilters, users]);
 
     const handleFilterBtnClick = (selectedCategory) => {
         setSelectedFilters((prev) =>
@@ -143,7 +106,7 @@ export const Cards = ({ checkedItems, selectedMajors, setSelectedMajors  }) => {
         );
     };
 
-    const GetUsers = () => {
+    const GetCards = () => {
         setLoading(true);
         axios.get(API)
             .then((response) => {
@@ -160,7 +123,7 @@ export const Cards = ({ checkedItems, selectedMajors, setSelectedMajors  }) => {
     };
 
     useEffect(() => {
-        GetUsers();
+        GetCards();
     }, []);
 
 
@@ -177,16 +140,16 @@ export const Cards = ({ checkedItems, selectedMajors, setSelectedMajors  }) => {
 return (
     <div className="my-16">
         <div className="flex items-center justify-center gap-5 flex-wrap">
-            <h2 className="text-2xl text-center hover:cursor-pointer bg-blue-500 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-blue-500 hover:bg-white hover:text-blue-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center" onClick={() => setIsModalOpen(true)}>Choose<ChevronDown className="mt-2"/></h2>
+            <h2 className="text-2xl text-center hover:cursor-pointer bg-blue-500 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-blue-500 hover:bg-white hover:text-blue-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center" onClick={() => {setIsModalOpen(true); () => SaveCategories}} >Choose<ChevronDown className="mt-2"/></h2>
             <h2 className="text-2xl text-gray-800 font-semibold">Categories:</h2>
-                {values.map((filter, id) => (
+            {values.map((filter, id) => (
             <button key={id} className={`border-[1px] border-black px-5 py-1 rounded-full text-xl font-normal transition duration-200 ${
                 selectedFilters.includes(filter) ? "bg-violet-900 text-white" : "hover:bg-violet-900 hover:text-white"
             }`} onClick={() => handleFilterBtnClick(filter)}>{typeof filter === "object" ? JSON.stringify(filter) : filter}
         </button>
     ))}
 </div>
-{/* {loading ? (
+ {loading ? (
     <p className="text-center mt-10">Loading...</p>
         ) : selectedCards.length === 0 ? (
     <p className="text-center mt-10">Hech narsa topilmadi</p>
@@ -218,8 +181,8 @@ return (
             Show More
         </button>
     </div>
-)}*/}
+)}
+
 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={onSaveMajors}    selectedMajors={values} setSelectedMajors={setValues}/> 
   </div>
 )}
-
