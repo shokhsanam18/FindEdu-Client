@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -96,9 +97,10 @@ export default function Navbar() {
           <a href="#" className="hover:text-[#461773]">
             O‘quv markazlar
           </a>
-          <a href="#" className="hover:text-[#461773]">
-            Loyiha haqida
-          </a>
+          <Link to="/About" className="hover:text-[#461773]">
+  Loyiha haqida
+</Link>
+
         </div>
 
         <div className="flex gap-2 md:gap-6">
