@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./car
 
 const API = "http://18.141.233.37:4000/api/centers";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
-const CategoriesAPI = 'http://18.141.233.37:4000/api/categories';
+const CategoriesAPI = 'http://18.141.233.37:4000/api/fields';
 
 const SaveMajors = () => {
     axios.post(MajorsApi, { selectedMajor })
