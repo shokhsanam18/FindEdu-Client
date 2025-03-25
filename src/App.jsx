@@ -7,7 +7,7 @@ import Forget from "./Register/Login/Forget.jsx";
 import VerifyOtp from "./Register/Login/VerifyOtp.jsx";
 import ErrorPage from "./Register/Login/Error.jsx";
 import About from "./Register/Login/Aboutus.jsx"
-import { Index } from "./pages/Index-page.jsx";
+import { Index } from "./Pages/Index-page.jsx";
 function App() {
   return (
     <div>

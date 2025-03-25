@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Toaster as Sonner, toast } from "sonner";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import purple from "/public/purple.png";
@@ -18,6 +18,7 @@ import {
 } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
+import { AuthContext } from "../../context/auth";
 
 const API_BASE = "http://18.141.233.37:4000/api/users";
 
@@ -27,6 +28,7 @@ const formSchema = z.object({
 });
 
 const Login = () => {
+  const { fetchUserData } = useContext(AuthContext);
   const navigate = useNavigate();
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -43,11 +45,17 @@ const Login = () => {
       if (response.data && response.data.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
         toast.success("Login successful! Redirecting...");
-        setTimeout(() => navigate("/you"), 2000);
+        const userDataResponse = await fetchUserData();
+        if(userDataResponse.role === "CEO") {
+          setTimeout(() => navigate("/ceo"), 2000);
+        } else {
+          setTimeout(() => navigate("/you"), 2000);
+        }
       } else {
         toast.error("Invalid credentials");
       }
     } catch (error) {
+      console.error("Login failed:", error);
       toast.error(error.response?.data?.message || "Invalid credentials");
     }
   };
