@@ -6,7 +6,8 @@ import { Layout } from "./components/Layout.jsx";
 import Forget from "./Register/Login/Forget.jsx";
 import VerifyOtp from "./Register/Login/VerifyOtp.jsx";
 import ErrorPage from "./Register/Login/Error.jsx";
-import { Cards } from "./components/Cards.jsx";
+import About from "./Register/Login/Aboutus.jsx"
+import { Cards } from "./components/ui/Cards.jsx";
 import CeoPage from "./Pages/CeoPage.jsx";
 import { AuthProvider } from "./context/auth.jsx";
 
@@ -17,6 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Cards />} />
+          <Route path="/About" element={<About />} />
             <Route path="/ceo" element={<CeoPage />} />
           </Route>
           <Route path="/Register" element={<Register />} />
