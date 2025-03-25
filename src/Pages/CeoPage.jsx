@@ -19,7 +19,6 @@ export default function CeoPage() {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(centerSchema),
@@ -30,48 +29,86 @@ export default function CeoPage() {
   const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
     axios
       .get("http://18.141.233.37:4000/api/regions/search?page=1&limit=500", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setRegions(res.data.data));
+
     axios
       .get("http://18.141.233.37:4000/api/major", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setMajors(res.data.data));
   }, []);
 
   const handleImageChange = (e) => {
-    setImageFile(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setImageFile(file);
+    } else {
+      alert("Please select a valid image file!");
+    }
+  };
+
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const token = localStorage.getItem("accessToken");
+
+    try {
+      const response = await axios.post(
+        "http://18.141.233.37:4000/api/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data.url;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Failed to upload image");
+      return null;
+    }
   };
 
   const onSubmit = async (data) => {
     try {
+      let imageUrl = "default.jpg";
+
+      if (imageFile) {
+        const uploadedUrl = await uploadImage(imageFile);
+        if (uploadedUrl) imageUrl = uploadedUrl;
+      }
+
       const formData = {
         name: data.name,
         regionId: data.regionId,
         address: data.address,
         phone: data.phone,
         majorsId: data.majorsId,
-        image: "1742904550490.jpg",
+        image: imageUrl,
       };
 
-      console.log("Form Data:", formData);
+      const token = localStorage.getItem("accessToken");
 
       await axios.post("http://18.141.233.37:4000/api/centers", formData, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
+
       alert("Learning Center added successfully!");
     } catch (error) {
       console.error("Error adding Learning Center:", error);
+      alert("Failed to add Learning Center");
     }
   };
 
@@ -86,7 +123,11 @@ export default function CeoPage() {
             <label className="block font-semibold text-gray-700">
               Center Name
             </label>
-            <Input placeholder="Enter center name" {...register("name")} />
+            <input
+              placeholder="Enter center name"
+              {...register("name")}
+              className="w-full p-2 border rounded"
+            />
             {errors.name && (
               <p className="text-red-500 text-sm">{errors.name.message}</p>
             )}
@@ -95,7 +136,7 @@ export default function CeoPage() {
             <label className="block font-semibold text-gray-700">Region</label>
             <select
               {...register("regionId")}
-              className="w-full p-2 border rounded bg-white focus:ring focus:ring-blue-300"
+              className="w-full p-2 border rounded bg-white"
             >
               <option value="">Select Region</option>
               {regions.map((region) => (
@@ -110,7 +151,11 @@ export default function CeoPage() {
           </div>
           <div>
             <label className="block font-semibold text-gray-700">Address</label>
-            <Input placeholder="Enter address" {...register("address")} />
+            <input
+              placeholder="Enter address"
+              {...register("address")}
+              className="w-full p-2 border rounded"
+            />
             {errors.address && (
               <p className="text-red-500 text-sm">{errors.address.message}</p>
             )}
@@ -119,18 +164,20 @@ export default function CeoPage() {
             <label className="block font-semibold text-gray-700">Image</label>
             <input
               type="file"
+              accept="image/*"
               onChange={handleImageChange}
-              className="block w-full text-sm text-gray-700 border rounded-lg cursor-pointer"
+              className="flex justify-center p-1 w-full text-sm text-gray-700 border rounded-sm h-8  cursor-pointer"
             />
-            {errors.image && (
-              <p className="text-red-500 text-sm">{errors.image.message}</p>
-            )}
           </div>
           <div>
             <label className="block font-semibold text-gray-700">
               Phone Number
             </label>
-            <Input placeholder="Enter phone number" {...register("phone")} />
+            <input
+              placeholder="Enter phone number"
+              {...register("phone")}
+              className="w-full p-2 border rounded"
+            />
             {errors.phone && (
               <p className="text-red-500 text-sm">{errors.phone.message}</p>
             )}
@@ -140,7 +187,7 @@ export default function CeoPage() {
             <select
               multiple
               {...register("majorsId")}
-              className="w-full p-2 border rounded bg-white focus:ring focus:ring-blue-300"
+              className="w-full p-2 border rounded bg-white"
             >
               {majors.map((major) => (
                 <option key={major.id} value={major.id}>
@@ -152,12 +199,12 @@ export default function CeoPage() {
               <p className="text-red-500 text-sm">{errors.majorsId.message}</p>
             )}
           </div>
-          <Button
+          <button
             type="submit"
             className="w-full bg-blue-800 hover:bg-blue-900 text-white py-2 rounded-lg"
           >
             Add Center
-          </Button>
+          </button>
         </form>
       </div>
     </div>
