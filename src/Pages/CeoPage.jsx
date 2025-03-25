@@ -52,20 +52,20 @@ export default function CeoPage() {
 
   const onSubmit = async (data) => {
     try {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("regionId", data.regionId);
-      formData.append("address", data.address);
-      formData.append("phone", data.phone);
-      data.majorsId.forEach((id) => formData.append("majorsId[]", id));
+      const formData = {
+        name: data.name,
+        regionId: data.regionId,
+        address: data.address,
+        phone: data.phone,
+        majorsId: data.majorsId,
+        image: "1742904550490.jpg",
+      };
 
-      if (imageFile) {
-        formData.append("image", imageFile);
-      }
+      console.log("Form Data:", formData);
 
       await axios.post("http://18.141.233.37:4000/api/centers", formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
