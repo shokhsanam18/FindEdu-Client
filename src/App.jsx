@@ -6,14 +6,14 @@ import { Layout } from "./components/Layout.jsx";
 import Forget from "./Register/Login/Forget.jsx";
 import VerifyOtp from "./Register/Login/VerifyOtp.jsx";
 import ErrorPage from "./Register/Login/Error.jsx";
-import About from "./Register/Login/Aboutus.jsx"
-import { Cards } from "./components/ui/Cards.jsx";
+import About from "./Register/Login/Aboutus.jsx";
+import { Index } from "./Pages/Index-temp.jsx";
 function App() {
   return (
     <div>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Cards />} />
+          <Route index element={<Index />} />
           <Route path="/About" element={<About />} />
         </Route>
         <Route path="/Register" element={<Register />} />
