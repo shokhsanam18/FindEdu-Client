@@ -1,13 +1,17 @@
 import React from "react";
 import { Facebook, Instagram, Send, Youtube } from "lucide-react";
 import icon from "/public/icon.png";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
     <div className="bg-purple-900 text-white py-8 px-36">
-      <div className="text-2xl font-bold flex ">
-        F<img src={icon} alt="Logo" className="h-7 w-4 mx-1" />
-        ndedu.uz
+      <div className="text-2xl font-bold flex">
+        <Link to="/" className="flex items-center">
+          {" "}
+          F<img src={icon} alt="Logo" className="h-7 w-4 mx-1" />
+          ndedu.uz
+        </Link>
       </div>
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-start space-x-18">
         <div className="mb-6 md:mb-0">
@@ -107,17 +111,17 @@ export const Footer = () => {
             © 2023 Findedu. All Rights Reserved.
           </p>
         </div>
-        <div className="flex space-x-6 mt-4 md:mt-0">
-          <a href="#" className="hover:text-gray-300">
+        <div className="flex gap-5 mt-4 md:mt-0">
+          <a href="/" className="hover:text-gray-300">
             <Facebook size={24} />
           </a>
-          <a href="#" className="hover:text-gray-300">
+          <a href="/" className="hover:text-gray-300">
             <Instagram size={24} />
           </a>
-          <a href="#" className="hover:text-gray-300">
+          <a href="/" className="hover:text-gray-300">
             <Send size={24} />
           </a>
-          <a href="#" className="hover:text-gray-300">
+          <a href="/" className="hover:text-gray-300">
             <Youtube size={24} />
           </a>
         </div>
