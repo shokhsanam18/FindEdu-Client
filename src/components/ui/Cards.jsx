@@ -14,6 +14,8 @@ export const Modal = ({ isOpen, onClose, onSave }) => {
     return JSON.parse(localStorage.getItem("selectedMajors")) || [];
 });
 
+    const [categories, setCategories] = useState([]);
+
 const handleMajorSelect = (major) => {
     if (selectedMajors.includes(major)) {
         setSelectedMajors(selectedMajors.filter(m => m !== major));
@@ -24,19 +26,16 @@ const handleMajorSelect = (major) => {
 useEffect(() => {
     axios.get(MajorsApi)
     .then((response) => {
-        const fetchedMajors = response.data || [];
-    setSelectedMajors(fetchedMajors);
-        })
+        const fetchedMajors = response.data.map(major => major.name); 
+        setSelectedMajors(fetchedMajors);
+    })
     .catch(() => console.log("Error getting majors"));
 }, []);
+
 
 useEffect(() => {
     localStorage.setItem("selectedMajors", JSON.stringify(selectedMajors));
 }, [selectedMajors]);
-
-if (!isOpen) return null;    
-    
-    const [categories, setCategories] = useState([]);
 
     useEffect(() => {
         axios.get(FieldsAPI)
@@ -49,20 +48,38 @@ if (!isOpen) return null;
     }, []);
 
     const handleClose = () => {
-        setSelectedMajors([]); 
+        setSelectedMajors(JSON.parse(localStorage.getItem("selectedMajors")) || []);
         onClose();
-    }
+    };
+    
+
+
+    const save = () => {
+        axios.post(MajorsApi, { selectedMajors }, 
+            { 
+                headers: { "Content-Type": "application/json" } 
+            })
+            .then(() => {
+                console.log("Majors saved successfully");
+                localStorage.setItem("selectedMajors", JSON.stringify(selectedMajors));
+                onSave(selectedMajors); 
+                onClose(); 
+            })
+            .catch(() => console.log("Error fetching majors"));
+        };
+
+        if (!isOpen) return null; 
 
     return (
         <div className="bg-black bg-opacity-60 w-full h-full z-[1000000] fixed top-0 left-0 bottom-0 right-0 flex items-center justify-center">
-        <div className=" lg:w-1/3 md:w-1/2 w-7/12 h-auto px-5 py-5 bg-gray-200 border border-black z-50"> {categories.map((category, index) => (
+        <div className=" lg:w-1/3 md:w-1/2 w-7/12 h-auto px-5 py-5 bg-gray-200 border border-black z-50"> {Array.isArray(categories) && categories.map((category, index) => (
             <div className="Branches" key={index}>
                 <h2 className="text-2xl font-semibold">{category.field}</h2>
                 <form className="majors text-lg flex flex-wrap gap-2">
                     {category.majors.map((major, id) => (
                 <label key={id} className="flex gap-1">
                 <input type="checkbox" name={`major-${index}-${id}`}
-                    value={major} checked={selectedMajors.includes(major)}
+                    value={major.name} checked={selectedMajors.includes(major.name)}
                     onChange={() => handleMajorSelect(major)}/>{major}</label>
             ))}
     </form>
@@ -77,7 +94,7 @@ if (!isOpen) return null;
 </div>
 )}
 
-export const Cards_Filter = ({ checkedItems, selectedMajors, setSelectedMajors,SaveCategories}) => {
+export const Cards = ({ checkedItems, selectedMajors, setSelectedMajors,SaveCategories, categories}) => {
 
 
     const [selectedFilters, setSelectedFilters] = useState([]);
@@ -85,6 +102,11 @@ export const Cards_Filter = ({ checkedItems, selectedMajors, setSelectedMajors,S
     const [visibleCards, setVisibleCards] = useState(5);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
+    const [values, setValues] = useState([]);
 
     
     // const filterItems = () => {
@@ -96,9 +118,9 @@ export const Cards_Filter = ({ checkedItems, selectedMajors, setSelectedMajors,S
     //     }
     // };
 
-    useEffect(() => {
-        filterItems();
-    }, [selectedFilters, users]);
+    // useEffect(() => {
+    //     filterItems();
+    // }, [selectedFilters, users]);
 
     const handleFilterBtnClick = (selectedCategory) => {
         setSelectedFilters((prev) =>
@@ -106,30 +128,26 @@ export const Cards_Filter = ({ checkedItems, selectedMajors, setSelectedMajors,S
         );
     };
 
+
     const GetCards = () => {
-        setLoading(true);
+        setLoading(true)
         axios.get(API)
-            .then((response) => {
-            setUsers(response.data);
-            setSelectedCards(response.data);
-            console.log("Users fetched successfully");
-            })
-            .catch((error) => {
-                console.log("Error fetching users", error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        .then((response) => {
+            if (response.data) {
+                setUsers(response.data);
+                setSelectedCards(response.data);
+            } else {
+                console.error("API response is not an array:", response.data);
+                setSelectedCards([]);
+            }
+        })
+    
     };
 
     useEffect(() => {
         GetCards();
     }, []);
 
-
-    const [isModalOpen, setIsModalOpen] = useState(false)
-
-    const [values, setValues] = useState([]);
 
     const onSaveMajors = (majors) => {
         console.log("Saved majors:", majors); 

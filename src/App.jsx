@@ -6,6 +6,7 @@ import { Layout } from "./components/Layout.jsx";
 import Forget from "./Register/Login/Forget.jsx";
 import VerifyOtp from "./Register/Login/VerifyOtp.jsx";
 import ErrorPage from "./Register/Login/Error.jsx";
+import About from "./Register/Login/Aboutus.jsx"
 import { Cards } from "./components/ui/Cards.jsx";
 function App() {
   return (
