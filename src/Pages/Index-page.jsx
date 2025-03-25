@@ -1,5 +1,6 @@
 import React from "react";
-import { Cards } from "components/Cards";
+import { Cards } from "../components/ui/Cards";
+
 
 export const Index = () => {
   return (
@@ -8,3 +9,5 @@ export const Index = () => {
     </div>
   );
 };
+
+
