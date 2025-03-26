@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-// import Img from "../assets/images/img.jpg";
 import { Link } from "react-router-dom";
 import { ArrowRight, Star, ChevronDown } from "lucide-react";
 import axios from "axios";
@@ -9,198 +8,166 @@ const API = "http://18.141.233.37:4000/api/centers";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
 const FieldsAPI = 'http://18.141.233.37:4000/api/fields';
 
-export const Modal = ({ isOpen, onClose, onSave }) => {
-    const [selectedMajors, setSelectedMajors] = useState(() => {
-    return JSON.parse(localStorage.getItem("selectedMajors")) || [];
-});
+export const Modal = ({ isOpen, onClose, onSave, selectedMajors, setSelectedMajors }) => {
+  const [fields, setFields] = useState([]);
 
-    const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchFields = async () => {
+      try {
+        const response = await axios.get(FieldsAPI);
+        setFields(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching fields:", error);
+      }
+    };
+    fetchFields();
+  }, []);
 
-const handleMajorSelect = (major) => {
-    if (selectedMajors.includes(major)) {
-        setSelectedMajors(selectedMajors.filter(m => m !== major));
-    } else {
-        setSelectedMajors([...selectedMajors, major]);
-}};
-    
-useEffect(() => {
+  const handleMajorSelect = (major) => {
+    setSelectedMajors((prev) =>
+      prev.includes(major.name)
+        ? prev.filter((m) => m !== major.name)
+        : [...prev, major.name]
+    );
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="bg-black bg-opacity-60 fixed inset-0 flex items-center justify-center">
+      <div className="w-[35%] px-5 py-5 bg-gray-200 border border-black">
+        {fields.map((category) => (
+          <div key={category.id} className="flex flex-col items-start">
+            <label className="text-2xl font-medium">{category.name}</label>
+            <form className="majors text-xl flex flex-wrap gap-2">
+              {category.majors?.map((major) => (
+                <label key={major.id} className="flex gap-1">
+                  <input type="checkbox" value={major.name} checked={selectedMajors.includes(major.name)} onChange={() => handleMajorSelect(major)}
+                  />
+                  {major.name}
+                </label>
+              ))}
+            </form>
+          </div>
+        ))}
+        <div className="flex justify-between mt-4">
+          <button className="bg-green-600 text-white px-4 py-1 rounded-lg" onClick={() => onSave(selectedMajors)}>
+            OK
+          </button>
+          <button className="bg-rose-600 text-white px-4 py-1 rounded-lg" onClick={onClose}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+export const Cards = ({ SaveCategories, categories }) => {
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [selectedCards, setSelectedCards] = useState([]);
+  const [visibleCards, setVisibleCards] = useState(5);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMajors, setSelectedMajors] = useState([]); 
+
+  const GetCards = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(API);
+      if (Array.isArray(response.data.data)) {
+        setUsers(response.data.data);
+        setSelectedCards(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    GetCards();
+  }, []);
+
+  const onSaveMajors = (selectedMajors) => {
+    setIsModalOpen(false);
+    setSelectedMajors(selectedMajors); 
+    setSelectedFilters(selectedMajors); 
+  };
+
+  const GetMajors = () => {
     axios.get(MajorsApi)
     .then((response) => {
-        const fetchedMajors = response.data.map(major => major.name); 
-        setSelectedMajors(fetchedMajors);
+      console.log(response.data);
+    }).catch((error) => {
+      console.log(error.data);
     })
-    .catch(() => console.log("Error getting majors"));
-}, []);
+  }
 
+  const Filter = (filter) => {
+    setSelectedFilters((prev) =>
+      prev.includes(filter) ? prev.filter((el) => el !== filter) : [...prev, filter]
+    );
+  };
 
-useEffect(() => {
-    localStorage.setItem("selectedMajors", JSON.stringify(selectedMajors));
-}, [selectedMajors]);
+  
 
-    useEffect(() => {
-        axios.get(FieldsAPI)
-            .then((response) => {
-                setCategories(response.data);
-            })
-            .catch((error) => {
-                console.error("Error fetching categories:", error.response?.data || error.message);
-            });
-    }, []);
-
-    const handleClose = () => {
-        setSelectedMajors(JSON.parse(localStorage.getItem("selectedMajors")) || []);
-        onClose();
-    };
-    
-
-
-    const save = () => {
-        axios.post(MajorsApi, { selectedMajors }, 
-            { 
-                headers: { "Content-Type": "application/json" } 
-            })
-            .then(() => {
-                console.log("Majors saved successfully");
-                localStorage.setItem("selectedMajors", JSON.stringify(selectedMajors));
-                onSave(selectedMajors); 
-                onClose(); 
-            })
-            .catch(() => console.log("Error fetching majors"));
-        };
-
-        if (!isOpen) return null; 
-
-    return (
-        <div className="bg-black bg-opacity-60 w-full h-full z-[1000000] fixed top-0 left-0 bottom-0 right-0 flex items-center justify-center">
-        <div className=" lg:w-1/3 md:w-1/2 w-7/12 h-auto px-5 py-5 bg-gray-200 border border-black z-50"> {Array.isArray(categories) && categories.map((category, index) => (
-            <div className="Branches" key={index}>
-                <h2 className="text-2xl font-semibold">{category.field}</h2>
-                <form className="majors text-lg flex flex-wrap gap-2">
-                    {category.majors.map((major, id) => (
-                <label key={id} className="flex gap-1">
-                <input type="checkbox" name={`major-${index}-${id}`}
-                    value={major.name} checked={selectedMajors.includes(major.name)}
-                    onChange={() => handleMajorSelect(major)}/>{major}</label>
-            ))}
-    </form>
-</div>
-))}
-
-<div className="flex items-center justify-between">
-   <button onClick={save} className="bg-green-600 text-white px-4 py-1 text-lg rounded-lg font-normal mt-4">OK</button>
-   <button className="bg-rose-600 text-white px-4 py-1 text-lg rounded-lg font-normal mt-4" onClick={handleClose}>Cancel</button>
-    </div>
-  </div>
-</div>
-)}
-
-export const Cards = ({ checkedItems, selectedMajors, setSelectedMajors,SaveCategories, categories}) => {
-
-
-    const [selectedFilters, setSelectedFilters] = useState([]);
-    const [selectedCards, setSelectedCards] = useState([]);
-    const [visibleCards, setVisibleCards] = useState(5);
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    
-    const [isModalOpen, setIsModalOpen] = useState(false)
-
-    const [values, setValues] = useState([]);
-
-    
-    // const filterItems = () => {
-    //     if (selectedFilters.length > 0) {
-    //         let filtered = card.filter((item) => selectedFilters.includes(item.category));
-    //         setSelectedCards(filtered);
-    //     } else {
-    //         setSelectedCards([...Cards, ...card]);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     filterItems();
-    // }, [selectedFilters, users]);
-
-    const handleFilterBtnClick = (selectedCategory) => {
-        setSelectedFilters((prev) =>
-            prev.includes(selectedCategory) ? prev.filter((el) => el !== selectedCategory) : [...prev, selectedCategory]
-        );
-    };
-
-
-    const GetCards = () => {
-        setLoading(true)
-        axios.get(API)
-        .then((response) => {
-            if (response.data) {
-                setUsers(response.data);
-                setSelectedCards(response.data);
-            } else {
-                console.error("API response is not an array:", response.data);
-                setSelectedCards([]);
-            }
-        })
-    
-    };
-
-    useEffect(() => {
-        GetCards();
-    }, []);
-
-
-    const onSaveMajors = (majors) => {
-        console.log("Saved majors:", majors); 
-        setIsModalOpen(false);
-        setValues(majors);
-    };    
-
-return (
+  return (
     <div className="my-16">
-        <div className="flex items-center justify-center gap-5 flex-wrap">
-            <h2 className="text-2xl text-center hover:cursor-pointer bg-blue-500 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-blue-500 hover:bg-white hover:text-blue-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center" onClick={() => {setIsModalOpen(true); () => SaveCategories}} >Choose<ChevronDown className="mt-2"/></h2>
-            <h2 className="text-2xl text-gray-800 font-semibold">Categories:</h2>
-            {values.map((filter, id) => (
-            <button key={id} className={`border-[1px] border-black px-5 py-1 rounded-full text-xl font-normal transition duration-200 ${
-                selectedFilters.includes(filter) ? "bg-violet-900 text-white" : "hover:bg-violet-900 hover:text-white"
-            }`} onClick={() => handleFilterBtnClick(filter)}>{typeof filter === "object" ? JSON.stringify(filter) : filter}
+      <div className="flex items-center justify-center gap-5 flex-wrap">
+        <h2 className="text-2xl text-center hover:cursor-pointer bg-blue-500 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-blue-500 hover:bg-white hover:text-blue-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center" onClick={() => setIsModalOpen(true)}>Choose
+          <ChevronDown className="mt-2" />
+        </h2>
+        <h2 className="text-2xl text-gray-800 font-semibold">Categories:</h2>
+        {selectedMajors.map((filter, id) => (
+        <button key={id} className={`border-[1px] border-black px-5 py-1 rounded-full text-xl font-normal transition duration-200 bg-white text-black hover:bg-violet-900 hover:text-white`}
+        onClick={() => Filter(filter)}>{filter}
         </button>
-    ))}
-</div>
- {loading ? (
-    <p className="text-center mt-10">Loading...</p>
-        ) : selectedCards.length === 0 ? (
-    <p className="text-center mt-10">Hech narsa topilmadi</p>
-        ) : (
-    <div className="relative border-r-[1px] border-violet-900 sm:mr-20 m mb-20">
-       <div className={`w-8 h-8 bg-violet-900 rounded-full fixed sm:flex hidden top-[50%] xl:right-[4%] lg:right-[6%] md:right-[7%] sm:right-[9%] right-[11%] before:content-[''] before:absolute before:w-2 before:h-2 before:bg-white before:top-2 before:left-2 before:rounded-full ${selectedCards.length !== 0 ? '' : "hidden"}`}></div>
-        <div className="Main_Cards flex flex-wrap justify-center gap-6 mt-10">
-            {selectedCards.slice(0, visibleCards).map((card, index) => (
-    <Card key={index} className="relative w-80 h-72 rounded-xl hover:">
-    <CardHeader>
-        <CardTitle>{card.title}</CardTitle>
-            <CardDescription>{card.paragraph}</CardDescription>
-            </CardHeader>
-            <h3 className="border-[1px] rounded-full border-black p-1 absolute top-5 right-7"><Link to="/smth"><ArrowRight /></Link></h3>
-            <CardContent>
-            <div className="flex items-center justify-between">
-              <img className="w-28 h-28 absolute bottom-2 left-4" src={card.img} alt="Card" />
-            <h3 className="flex text-yellow-400 font-semibold items-center gap-1 absolute bottom-7 right-7"><Star fill="yellow" color="yellow" /> {card.rating}</h3>
+        ))}
+      </div>
+      {loading ? (
+        <p className="text-center mt-10">Loading...</p>
+      ) : selectedCards.length === 0 ? (
+        <p className="text-center mt-10">Hech narsa topilmadi</p>
+      ) : (
+        <div className="relative border-r-[1px] border-violet-900 sm:mr-20 mb-20">
+           <div className={`w-8 h-8 bg-violet-900 rounded-full fixed sm:flex hidden top-[50%] xl:right-[4%] lg:right-[6%] md:right-[7%] sm:right-[9%] right-[11%] before:content-[''] before:absolute before:w-2 before:h-2 before:bg-white before:top-2 before:left-2 before:rounded-full ${selectedCards.length !== 0 ? '' : "hidden"}`}></div>
+          <div className="Main_Cards flex flex-wrap justify-center xl:gap-8 gap-6 mt-10">
+            {users.map((card) => (
+              <Card key={card.id} className="relative xl:w-80 w-[270px] xl:h-72 h-60 rounded-xl">
+                <CardHeader>
+                  <CardTitle>{card.name}</CardTitle>
+                </CardHeader>
+                <h3 className="border-[1px] rounded-full border-black p-1 absolute top-5 right-7">
+                  <Link to="/smth">
+                    <ArrowRight />
+                  </Link>
+                </h3>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <img className="w-28 h-28 absolute bottom-2 left-4" src={card.image} alt="Card" />
+                    <h3 className="flex text-yellow-400 font-semibold items-center gap-1 absolute bottom-7 right-7">
+                      <Star fill="yellow" color="yellow" /> {card.rating}
+                    </h3>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-     </CardContent>
-    </Card>    
-   ))}
-  </div>
- </div>
-)}
-{visibleCards < selectedCards.length && (
-    <div className="flex items-center justify-center mt-5">
-        <button className="px-6 py-2 bg-violet-900 text-white rounded-full text-lg hover:bg-violet-700" onClick={() => setVisibleCards(visibleCards + 10)}>
+      )}
+      {visibleCards < selectedCards.length && (
+        <div className="flex items-center justify-center mt-5">
+          <button className="px-6 py-2 bg-violet-900 text-white rounded-full text-lg hover:bg-violet-700" onClick={() => setVisibleCards(visibleCards + 10)}>
             Show More
-        </button>
+          </button>
+        </div>
+      )}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={onSaveMajors} selectedMajors={selectedMajors} setSelectedMajors={setSelectedMajors} />
     </div>
-)}
-
-<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={onSaveMajors}    selectedMajors={values} setSelectedMajors={setValues}/> 
-  </div>
-)}
+  );
+};
