@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Star, ChevronDown } from "lucide-react";
 import axios from "axios";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card.jsx";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./card.jsx";
 
 const API = "http://18.141.233.37:4000/api/centers";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
