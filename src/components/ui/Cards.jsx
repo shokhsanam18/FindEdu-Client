@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Star, ChevronDown } from "lucide-react";
+import { ArrowRight, Heart, ChevronDown } from "lucide-react";
 import axios from "axios";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./card.jsx";
+
+import { motion } from "framer-motion";   
+import home from "/public/home.png";
 
 const API = "http://18.141.233.37:4000/api/centers";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
@@ -118,6 +121,44 @@ export const Cards = ({ SaveCategories, categories }) => {
 
   return (
     <div className="my-16">
+      <motion.div initial={{ opacity: 0, y: 50 }} 
+  animate={{ opacity: 1, y: 0 }} 
+  transition={{ duration: 1, ease: "easeOut" }} 
+  className="relative py-25 flex items-center justify-center bg-cover bg-center mb-15 -z-20"
+  style={{ backgroundImage: `url(${home})` }}>
+<div className="absolute inset-0 bg-black bg-opacity-50"></div>
+
+<div className="relative max-w-6xl mx-auto flex flex-col md:flex-row items-center px-6 text-white">
+
+<div className="md:w-1/2 text-center md:text-left">
+<motion.h1
+ initial={{ opacity: 0, x: -50 }}
+animate={{ opacity: 1, x: 0 }}
+transition={{ duration: 1, delay: 0.3 }}
+className="text-5xl font-bold mt-2 leading-tight">
+Empowering Students, <br /> One Search at a Time.
+</motion.h1>
+
+<motion.p
+initial={{ opacity: 0 }}
+animate={{ opacity: 1 }}
+transition={{ duration: 1, delay: 0.6 }}
+className="text-gray-300 mt-4"> We help students discover the best courses, universities, andlearning opportunities worldwide. With expert insights and real
+student reviews, we make your education journey effortless.
+</motion.p>
+
+<motion.div
+initial={{ opacity: 0, scale: 0.8 }}   
+ animate={{ opacity: 1, scale: 1 }}
+transition={{ duration: 0.8, delay: 0.9 }}
+className="mt-6 flex justify-center md:justify-start items-center gap-4" >
+<Link to="/"> <button className="flex items-center text-white px-6 py-3 rounded-full font-semibold shadow-lg bg-[#461773] hover:bg-[#533d75] transition">
+ <span className="text-xl font-bold mr-2">+</span> EXPLORE COURSES
+ </button></Link>
+</motion.div>
+</div>
+  </div>
+</motion.div>;
       <div className="flex items-center justify-center gap-5 flex-wrap">
         <h2 className="text-2xl text-center hover:cursor-pointer bg-blue-500 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-blue-500 hover:bg-white hover:text-blue-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center" onClick={() => setIsModalOpen(true)}>Choose
           <ChevronDown className="mt-2" />
@@ -134,8 +175,8 @@ export const Cards = ({ SaveCategories, categories }) => {
       ) : selectedCards.length === 0 ? (
         <p className="text-center mt-10">Hech narsa topilmadi</p>
       ) : (
-        <div className="relative border-r-[1px] border-violet-900 sm:mr-20 mb-20">
-           <div className={`w-8 h-8 bg-violet-900 rounded-full fixed sm:flex hidden top-[50%] xl:right-[4%] lg:right-[6%] md:right-[7%] sm:right-[9%] right-[11%] before:content-[''] before:absolute before:w-2 before:h-2 before:bg-white before:top-2 before:left-2 before:rounded-full ${selectedCards.length !== 0 ? '' : "hidden"}`}></div>
+        <div className="relative border-r-[1px] border-violet-900 sm:mr-20 mb-20 -z-40">
+           <div className={`w-8 h-8 bg-violet-900 rounded-full fixed sm:flex hidden top-[70%] xl:right-[4%] lg:right-[6%] md:right-[7%] sm:right-[9%] right-[11%] before:content-[''] before:absolute before:w-2 before:h-2 before:bg-white before:top-2 before:left-2 before:rounded-full ${selectedCards.length !== 0 ? '' : "hidden"}`}></div>
           <div className="Main_Cards flex flex-wrap justify-center xl:gap-8 gap-6 mt-10">
             {users.map((card) => (
               <Card key={card.id} className="relative xl:w-80 w-[270px] xl:h-72 h-60 rounded-xl">
@@ -151,7 +192,7 @@ export const Cards = ({ SaveCategories, categories }) => {
                   <div className="flex items-center justify-between">
                     <img className="w-28 h-28 absolute bottom-2 left-4" src={card.image} alt="Card" />
                     <h3 className="flex text-yellow-400 font-semibold items-center gap-1 absolute bottom-7 right-7">
-                      <Star fill="yellow" color="yellow" /> {card.rating}
+                      <Heart color="gray" /> {card.rating}
                     </h3>
                   </div>
                 </CardContent>
