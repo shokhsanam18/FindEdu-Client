@@ -46,7 +46,7 @@ const Forget = () => {
 
 
   return (
- <div className="flex flex-col md:flex-row h-screen bg-white from-white to-purple-400 m-0">
+ <div className="flex flex-col md:flex-row h-screen bg-[#6d24b719] m-0">
   <Sonner theme="light" position="top-right" richColors />
   
 <Link to="/">

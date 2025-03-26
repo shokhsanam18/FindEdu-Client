@@ -61,34 +61,39 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-white from-white to-purple-400 ">
+    <div className="flex flex-col md:flex-row h-screen bg-[#6d24b719] ">
 <Sonner theme="light" position="top-right" richColors />
 <Link to="/">
 <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold cursor-pointer">
  <p className="flex">F<img src={icon} alt="Logo" className="h-7 w-4 mx-1 mt-3" />ndedu.uz</p>
-      </div></Link>
-      <div className="hidden md:flex md:w-2/5 bg-gradient-to-b from-white to-purple-100 items-center justify-center p-8 relative ">
-        <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold">
-  F<img src={icon} alt="Logo" className="h-7 w-4 mx-1" />ndedu.uz
-     </div>
-     <div className="text-[#461773] text-center relative ml-20 cursor-pointer">
-    <h2 className="text-4xl font-bold mb-15">Welcome Back!</h2>
+</div></Link>
 
-    <motion.img
-      src={register}
-      alt="Illustration"
-      className="w-[500px] h-auto relative z-10"
-      whileHover={{ y: -20 }}
-      transition={{ type: "spring", stiffness: 50, damping: 20 }}
-    />
 
-    <img
-      className="z-0 absolute bottom-[-32px] left-1/2 transform -translate-x-1/2 w-[400px] h-[90px]"
-      src={purple}
-      alt="Shadow Effect"
-    />
-  </div>
-    </div>
+
+
+   
+
+<div className="hidden md:flex  h-[100%]  items-center justify-center">
+
+<div className=" text-[#461773] text-center relative ml-20 cursor-pointer  ">
+  <h2 className="text-4xl font-bold mb-20">Welcome to the page!</h2>
+
+  <motion.img
+    src={register}  alt="Illustration"
+    className="w-[500px] h-auto relative z-10 1 "
+whileHover={{ y: -20 }} transition={{ type: "spring", stiffness: 50, damping: 20 }}/>
+{/* -translate-x-1/2 */}
+  <img className="z-0 absolute bottom-[-32px] left-1/15  transform  w-[400px] h-[90px]" src={purple} alt="Shadow Effect"/> 
+</div>
+
+</div> 
+
+
+
+
+
+
+
 
   <div className="w-full md:w-2/3 flex items-center justify-center p-6 md:p-16 bg-gradient-to-b from-white to-purple-100 h-screen">
    <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md">
