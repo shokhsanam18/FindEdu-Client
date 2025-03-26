@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
-    <div className="bg-purple-900 text-white py-8 px-36">
+    <div className="bg-purple-900 text-white py-8 px-20 lg:px-36">
       <div className="text-2xl font-bold flex">
         <Link to="/" className="flex items-center">
           {" "}
@@ -13,8 +13,49 @@ export const Footer = () => {
           ndedu.uz
         </Link>
       </div>
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-start space-x-18">
-        <div className="mb-6 md:mb-0">
+      <div className="max-w-6xl mx-auto flex flex-row md:flex-row justify-start  space-x-18">
+        <div className="flex flex-col md:flex-row md:space-x-6 gap-4">
+          <div className="mb-6 md:mb-0">
+            <ul className="mt-4 space-y-4 ">
+              <li>
+                <a href="#" className="hover:underline">
+                  Asosiy
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:underline">
+                  O‘quv markazlar
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:underline">
+                  Loyiha haqida
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div className="mb-6 md:mb-0">
+            <ul className=" mt-4 space-y-4">
+              <li>
+                <a href="#" className="hover:underline">
+                  Bog‘lanish
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:underline">
+                  Izoh qoldirish
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:underline">
+                  Boshqa loyihalar
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        {/* <div className="mb-6 md:mb-0">
           <ul className="mt-4 space-y-4 ">
             <li>
               <a href="#" className="hover:underline">
@@ -52,7 +93,7 @@ export const Footer = () => {
               </a>
             </li>
           </ul>
-        </div>
+        </div> */}
 
         <div className="flex flex-col md:flex-row md:space-x-6 gap-4">
           <div className="mb-6 md:mb-0">
@@ -108,7 +149,7 @@ export const Footer = () => {
       <div className="flex flex-col md:flex-row justify-between items-center mt-8 text-sm opacity-75">
         <div className="flex space-x-4 mt-4 md:mt-0">
           <p className="text-center md:text-left">
-            © 2023 Findedu. All Rights Reserved.
+            © 2025 Findedu. All Rights Reserved. Best IT girls
           </p>
         </div>
         <div className="flex gap-5 mt-4 md:mt-0">

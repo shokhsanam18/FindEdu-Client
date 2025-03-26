@@ -83,7 +83,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="flex flex-col w-full shadow-md">
+    <nav className="flex sticky top-0 flex-col w-full shadow-md">
       {/* Top Navigation */}
       <div className="bg-white h-16 md:h-20 p-4 pl-6 md:pl-12 flex items-center justify-between ml-4 mr-4 md:ml-6 md:mr-6 lg:ml-10 lg:mr-10 xl:ml-16 xl:mr-16">
         <div className="text-2xl md:text-4xl font-bold text-[#461773] flex items-center">
@@ -98,9 +98,8 @@ export default function Navbar() {
             O‘quv markazlar
           </a>
           <Link to="/About" className="hover:text-[#461773]">
-  Loyiha haqida
-</Link>
-
+            Loyiha haqida
+          </Link>
         </div>
 
         <div className="flex gap-2 md:gap-6">
