@@ -120,8 +120,8 @@ export const Cards = ({ SaveCategories, categories }) => {
   
 
   return (
-    <div className="my-16">
-      <motion.div initial={{ opacity: 0, y: 50 }} 
+    <div className="mb-16 mt-[11%]">
+  <motion.div initial={{ opacity: 0, y: 50 }} 
   animate={{ opacity: 1, y: 0 }} 
   transition={{ duration: 1, ease: "easeOut" }} 
   className="relative py-25 flex items-center justify-center bg-cover bg-center mb-15 -z-20"
