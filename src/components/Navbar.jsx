@@ -83,14 +83,14 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md backdrop-blur-md">
+    <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-5 w-full z-50 bg-white shadow-md backdrop-blur-md">
       {/* Top Navigation */}
-      <div className="bg-white h-16 md:h-20 p-4 pl-6 md:pl-12 flex items-center justify-between ml-4 mr-4 md:ml-6 md:mr-6 lg:ml-10 lg:mr-10 xl:ml-16 xl:mr-16">
+      <div className="bg-white flex items-center justify-between ">
         <div className="text-2xl md:text-4xl font-bold text-[#461773] flex items-center">
-          <a href="/" className="flex items-center">
+          <Link to='/' className="flex items-center">
             F <span className="text-yellow-500 text-2xl md:text-4xl">i</span>
             ndedu.uz
-          </a>
+          </Link>
         </div>
 
         <div className="hidden md:flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
@@ -120,8 +120,8 @@ export default function Navbar() {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="bg-white flex items-center py-2 md:py-4">
-        <div className="container  flex items-center rounded-full border-2 border-[#461773] mx-4 md:mx-6 lg:mx-10 xl:mx-20 px-2 md:px-4 py-1 md:py-2 text-[#000000]">
+      <div className="bg-white flex justify-center items-center">
+        <div className="container  flex items-center rounded-full border-2 border-[#461773] text-[#000000]">
           <div className="flex-grow">
             <Input
               type="text"
@@ -209,7 +209,7 @@ export default function Navbar() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="border-l border-r border-[#000000]">
+            <div className="border-l border-[#000000]">
               <Select onValueChange={handlePriceChange} value={price}>
                 <SelectTrigger
                   className="w-[60px] md:w-[80px] lg:w-[100px] border-none bg-transparent text-left rounded-none focus-visible:ring-0 pl-2 md:pl-4"
