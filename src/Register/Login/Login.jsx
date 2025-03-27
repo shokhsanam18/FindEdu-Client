@@ -38,40 +38,35 @@ const Login = () => {
     },
   });
 
-  // Refresh token function
+
   const refreshToken = async () => {
     try {
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) throw new Error("No refresh token available");
+const refreshToken = localStorage.getItem("refreshToken");
+if (!refreshToken) throw new Error("No refresh token available");
       
-      const response = await axios.post(`${API_BASE}/refresh`, { refreshToken });
-      localStorage.setItem("accessToken", response.data.accessToken);
-      return response.data.accessToken;
-    } catch (error) {
-      // Handle refresh token failure (typically logout the user)
-      console.error("Refresh token failed:", error);
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      // Optionally redirect to login
-      navigate("/login");
-      throw error;
-    }
+const response = await axios.post(`${API_BASE}/refresh`, { refreshToken });
+localStorage.setItem("accessToken", response.data.accessToken);
+return response.data.accessToken;} catch (error) {
+
+console.error("Refresh token failed:", error); localStorage.removeItem("accessToken"); localStorage.removeItem("refreshToken");
+
+navigate("/login"); throw error;
+}
   };
 
   const loginUser = async (values) => {
     try {
       const response = await axios.post(`${API_BASE}/login`, values);
       if (response.data?.accessToken) {
-        // Store both tokens
-        localStorage.setItem("accessToken", response.data.accessToken);
-        if (response.data.refreshToken) {
-          localStorage.setItem("refreshToken", response.data.refreshToken);
-        }
 
-        toast.success("Login successful! Redirecting...");
-        const userDataResponse = await fetchUserData();
+localStorage.setItem("accessToken", response.data.accessToken);
+if (response.data.refreshToken) {
+localStorage.setItem("refreshToken", response.data.refreshToken);}
+
+toast.success("Login successful! Redirecting...");
+const userDataResponse = await fetchUserData();
         
-        if (userDataResponse.role === "CEO") {
+if (userDataResponse.role === "CEO") {
           setTimeout(() => navigate("/ceo"), 2000);
         } else {
           setTimeout(() => navigate("/you"), 2000);
@@ -113,10 +108,7 @@ src={register} alt="Illustration" className="w-[500px] h-auto relative z-10" whi
 
 <Form {...form}>
 <form onSubmit={form.handleSubmit(loginUser)} className="space-y-4">
-<FormField
-control={form.control}
-name="email"
-render={({ field }) => (
+<FormField control={form.control} name="email" render={({ field }) => (
 <FormItem>
 <FormControl>
 <Input placeholder="Email" {...field} />
@@ -124,14 +116,10 @@ render={({ field }) => (
 <FormMessage />
 </FormItem>)}/>
 
-<FormField
-control={form.control}
-name="password"
-render={({ field }) => (
+<FormField control={form.control} name="password" render={({ field }) => (
 <FormItem>
 <FormControl>
-<Input
-type="password" placeholder="Password" {...field}/>
+<Input type="password" placeholder="Password" {...field}/>
 </FormControl>{" "}
 <FormMessage />
 </FormItem>)}/>
