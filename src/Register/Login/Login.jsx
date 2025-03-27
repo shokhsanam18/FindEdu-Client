@@ -48,7 +48,7 @@ const Login = () => {
         if (userDataResponse.role === "CEO") {
           setTimeout(() => navigate("/ceo"), 2000);
         } else {
-          setTimeout(() => navigate("/you"), 2000);
+          setTimeout(() => navigate("/"), 2000);
         }
       } else {
         toast.error("Invalid credentials");

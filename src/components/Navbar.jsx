@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
@@ -82,18 +82,20 @@ export default function Navbar() {
     { value: "paid", label: "Paid" },
   ];
 
+
+  
+
   return (
-    <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-5 w-full z-50 bg-white shadow-md backdrop-blur-md">
+    <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-7 w-full z-50 bg-white shadow-md backdrop-blur-md">
       {/* Top Navigation */}
       <div className="bg-white flex items-center justify-between ">
-        <div className="text-2xl md:text-4xl font-bold text-[#461773] flex items-center">
+        <div className="md:w-52 w-48  text-[#461773] flex items-center">
           <Link to='/' className="flex items-center">
-            F <span className="text-yellow-500 text-2xl md:text-4xl">i</span>
-            ndedu.uz
+          <img src="./logo.png" alt="" />
           </Link>
         </div>
 
-        <div className="hidden md:flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
+        <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
           <a href="#" className="hover:text-[#461773]">
             O‘quv markazlar
           </a>
@@ -108,13 +110,13 @@ export default function Navbar() {
             className="border-[#461773] text-[#461773] text-sm md:text-xl p-2 md:p-4 rounded-full"
             asChild
           >
-            <a href="../Login">Kirish</a>
+            <a href="../Login">Login</a>
           </Button>
           <Button
             className="bg-[#461773] text-white text-sm md:text-xl p-2 md:p-4 rounded-full"
             asChild
           >
-            <a href="../Register">Ro‘yhatdan o‘tish</a>
+            <a href="../Register">Register</a>
           </Button>
         </div>
       </div>
