@@ -5,6 +5,8 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast, Toaster } from "sonner";
 
 const centerSchema = z.object({
   name: z.string().min(3, "Center name is required"),
@@ -24,6 +26,8 @@ export default function CeoPage() {
   } = useForm({
     resolver: zodResolver(centerSchema),
   });
+
+  const navigate = useNavigate();
 
   const [regions, setRegions] = useState([]);
   const [majors, setMajors] = useState([]);
@@ -58,10 +62,26 @@ export default function CeoPage() {
         address: data.address,
         phone: data.phone,
         majorsId: data.majorsId,
-        image: "1742904550490.jpg",
+        image: "",
       };
 
       console.log("Form Data:", formData);
+
+      const uploadData = new FormData();
+      uploadData.append("image", imageFile);
+
+      const response = await axios.post(
+        "http://18.141.233.37:4000/api/upload",
+        uploadData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      formData.image = response.data.data;
 
       await axios.post("http://18.141.233.37:4000/api/centers", formData, {
         headers: {
@@ -69,14 +89,17 @@ export default function CeoPage() {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
-      alert("Learning Center added successfully!");
+      toast.success("Learning Center added successfully!");
+      setTimeout(() => navigate("/"), 2000);
     } catch (error) {
-      console.error("Error adding Learning Center:", error);
+      toast.error("Error adding Learning Center:", error);
     }
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
+      <Toaster theme="light" position="top-right" richColors />
+
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full">
         <h2 className="text-3xl font-bold text-center text-blue-800 mb-6">
           Create Learning Center
@@ -130,7 +153,19 @@ export default function CeoPage() {
             <label className="block font-semibold text-gray-700">
               Phone Number
             </label>
-            <Input placeholder="Enter phone number" {...register("phone")} />
+            {/*  */}
+            <Input
+              placeholder="Enter phone number"
+              {...register("phone")}
+              onChange={(e) => {
+                let value = e.target.value;
+                if (!value.startsWith("+998")) {
+                  value = "+998" + value.replace(/^\+998/, ""); // Ensures +998 is always added
+                }
+                setValue("phone", value);
+              }}
+            />
+
             {errors.phone && (
               <p className="text-red-500 text-sm">{errors.phone.message}</p>
             )}
