@@ -83,7 +83,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="flex sticky top-0 flex-col w-full shadow-md">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md backdrop-blur-md">
       {/* Top Navigation */}
       <div className="bg-white h-16 md:h-20 p-4 pl-6 md:pl-12 flex items-center justify-between ml-4 mr-4 md:ml-6 md:mr-6 lg:ml-10 lg:mr-10 xl:ml-16 xl:mr-16">
         <div className="text-2xl md:text-4xl font-bold text-[#461773] flex items-center">
