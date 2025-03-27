@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Toaster as Sonner, toast } from "sonner";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import purple from "/public/purple.png";
@@ -18,7 +18,6 @@ import {
 } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import { AuthContext } from "../../context/auth";
 
 const API_BASE = "http://18.141.233.37:4000/api/users";
 
@@ -28,7 +27,6 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-  const { fetchUserData } = useContext(AuthContext);
   const navigate = useNavigate();
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -45,17 +43,11 @@ const Login = () => {
       if (response.data && response.data.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
         toast.success("Login successful! Redirecting...");
-        const userDataResponse = await fetchUserData();
-        if(userDataResponse.role === "CEO") {
-          setTimeout(() => navigate("/ceo"), 2000);
-        } else {
-          setTimeout(() => navigate("/you"), 2000);
-        }
+        setTimeout(() => navigate("/you"), 2000);
       } else {
         toast.error("Invalid credentials");
       }
     } catch (error) {
-      console.error("Login failed:", error);
       toast.error(error.response?.data?.message || "Invalid credentials");
     }
   };
@@ -66,34 +58,25 @@ const Login = () => {
 <Link to="/">
 <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold cursor-pointer">
  <p className="flex">F<img src={icon} alt="Logo" className="h-7 w-4 mx-1 mt-3" />ndedu.uz</p>
-</div></Link>
+      </div></Link>
+      <div className="hidden md:flex md:w-2/5 bg-gradient-to-b from-white to-purple-100 items-center justify-center p-8 relative ">
+        <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold">
+  F<img src={icon} alt="Logo" className="h-7 w-4 mx-1" />ndedu.uz
+     </div>
+     <div className="text-[#461773] text-center relative ml-20 cursor-pointer">
+    <h2 className="text-4xl font-bold mb-20">Welcome Back!</h2>
 
+    <motion.img
+      src={register}
+      alt="Illustration"
+      className="w-[500px] h-auto relative z-10"
+      whileHover={{ y: -20 }}
+      transition={{ type: "spring", stiffness: 50, damping: 20 }}
+    />
 
-
-
-   
-
-<div className="hidden md:flex  h-[100%]  items-center justify-center">
-
-<div className=" text-[#461773] text-center relative ml-20 cursor-pointer  ">
-  <h2 className="text-4xl font-bold mb-20">Welcome to the page!</h2>
-
-  <motion.img
-    src={register}  alt="Illustration"
-    className="w-[500px] h-auto relative z-10 1 "
-whileHover={{ y: -20 }} transition={{ type: "spring", stiffness: 50, damping: 20 }}/>
-{/* -translate-x-1/2 */}
-  <img className="z-0 absolute bottom-[-32px] left-1/15  transform  w-[400px] h-[90px]" src={purple} alt="Shadow Effect"/> 
-</div>
-
-</div> 
-
-
-
-
-
-
-
+ <img className="z-0 absolute bottom-[-32px] left-1/15  transform  w-[400px] h-[90px]" src={purple} alt="Shadow Effect"/> 
+  </div>
+    </div>
 
   <div className="w-full md:w-2/3 flex items-center justify-center p-6 md:p-16 bg-gradient-to-b from-white to-purple-100 h-screen">
    <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md">

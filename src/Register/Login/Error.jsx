@@ -19,7 +19,7 @@ const ErrorPage = () => {
           </button>
         </div>
       </div>
-      {/* hello */}
+
       <div className="absolute bottom-10 text-gray-400 text-sm">
         <p>
           Need help?{" "}
