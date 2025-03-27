@@ -204,7 +204,7 @@ className="mt-6 flex justify-center md:justify-start items-center gap-4" >
       {visibleCards < selectedCards.length && (
         <div className="flex items-center justify-center mt-5">
           <button className="px-6 py-2 bg-violet-900 text-white rounded-full text-lg hover:bg-violet-700" onClick={() => setVisibleCards(visibleCards + 10)}>
-            Show More
+            Show Moree
           </button>
         </div>
       )}
