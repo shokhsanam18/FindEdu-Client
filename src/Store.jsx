@@ -68,7 +68,7 @@ export const useAuthStore = create((set, get) => ({
         set({ accessToken: data.accessToken, refreshToken: data.refreshToken });
 
         const user = await get().fetchUserData();
-
+        set({ user });
         toast.success("Login successful!");
         return { success: true, role: user?.role };
       } else {
