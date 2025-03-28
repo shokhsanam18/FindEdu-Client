@@ -27,6 +27,44 @@ const formSchema = z.object({
   password: z.string().min(6, { message: "Min 6 characters" }),
 });
 
+const axiosInstance = axios.create({
+  baseURL: API_BASE,
+});
+
+const refreshAccessToken = async (navigate) => {
+  try {
+    const storedRefreshToken = localStorage.getItem("refreshToken");
+    if (!storedRefreshToken) throw new Error("No refresh token available");
+
+    const response = await axios.post(`${API_BASE}/refresh`, { refreshToken: storedRefreshToken });
+    
+    localStorage.setItem("accessToken", response.data.accessToken);
+    return response.data.accessToken;
+  } catch (error) {
+    console.error("Refresh token failed:", error);
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    navigate("/login");
+    throw error;
+  }
+};
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      try {
+        const newAccessToken = await refreshAccessToken();
+        error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
+        return axiosInstance(error.config);
+      } catch {
+        console.error("Token refresh failed, redirecting to login.");
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 const Login = () => {
   const { fetchUserData } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -38,39 +76,22 @@ const Login = () => {
     },
   });
 
-
-  const refreshToken = async () => {
-    try {
-const refreshToken = localStorage.getItem("refreshToken");
-if (!refreshToken) throw new Error("No refresh token available");
-      
-const response = await axios.post(`${API_BASE}/refresh`, { refreshToken });
-localStorage.setItem("accessToken", response.data.accessToken);
-return response.data.accessToken;} catch (error) {
-
-console.error("Refresh token failed:", error); localStorage.removeItem("accessToken"); localStorage.removeItem("refreshToken");
-
-navigate("/login"); throw error;
-}
-  };
-
   const loginUser = async (values) => {
     try {
-      const response = await axios.post(`${API_BASE}/login`, values);
+      const response = await axiosInstance.post("/login", values);
+
       if (response.data?.accessToken) {
-
-localStorage.setItem("accessToken", response.data.accessToken);
-if (response.data.refreshToken) {
-localStorage.setItem("refreshToken", response.data.refreshToken);}
-
-toast.success("Login successful! Redirecting...");
-const userDataResponse = await fetchUserData();
-        
-if (userDataResponse.role === "CEO") {
-          setTimeout(() => navigate("/ceo"), 2000);
-        } else {
-          setTimeout(() => navigate("/you"), 2000);
+        localStorage.setItem("accessToken", response.data.accessToken);
+        if (response.data.refreshToken) {
+          localStorage.setItem("refreshToken", response.data.refreshToken);
         }
+
+        toast.success("Login successful! Redirecting...");
+        const userDataResponse = await fetchUserData();
+
+        setTimeout(() => {
+          navigate(userDataResponse.role === "CEO" ? "/ceo" : "/you");
+        }, 2000);
       } else {
         toast.error("Invalid credentials");
       }
@@ -124,7 +145,7 @@ src={register} alt="Illustration" className="w-[500px] h-auto relative z-10" whi
 <FormMessage />
 </FormItem>)}/>
 
-<Button type="submit" className="w-full bg-[#461773] text-white font-bold rounded-md hover:bg-purple-700 transition h-[50px] cursor-pointer">
+<Button type="submit" onClick={form.handleSubmit(loginUser)} className="w-full bg-[#461773] text-white font-bold rounded-md hover:bg-purple-700 transition h-[50px] cursor-pointer">
 Login</Button></form>{" "}
 </Form>
 
