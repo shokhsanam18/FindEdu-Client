@@ -49,16 +49,56 @@ const FormTry = () => {
 
   const onSubmit = async (values) => {
     try {
-      const { otp, ...userData } = values;
-      await axios.post(`${API_BASE}/register`, { ...userData, image: "image.jpg" });
+      let imageFilename = "default.jpg"; // fallback if no image uploaded
+  
+      // Step 1: Upload image if present
+      if (values.image) {
+        const formData = new FormData();
+        formData.append("image", values.image); // ✅ key must match backend
+      
+        const uploadResponse = await axios.post(
+          "http://18.141.233.37:4000/api/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      
+        // console.log("✅ Upload response:", uploadResponse.data.data);
+      
+        // Corrected: assign imageFilename directly from .data
+        imageFilename = uploadResponse.data?.data; // Access the actual string value
+      }
+      
+  
+      // Step 2: Register user with image filename
+      const { image, otp, ...userData } = values;
+
+      // console.log("📦 Sending user data to register:", {
+      //   ...userData,
+      //   image: imageFilename,
+      // });
+  
+      await axios.post(`${API_BASE}/register`, {
+        ...userData,
+        image: imageFilename, // pass filename from /upload response
+      });
+  
       toast.success("User registered successfully! Please check your email for OTP.", {
         style: { backgroundColor: "#4CAF50", color: "white" },
       });
-      navigate("");
+  
+      navigate("/login");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Registration failed. Please try again.", {
-        style: { backgroundColor: "#D32F2F", color: "white" },
-      });
+      console.error("❌ Registration Error:", error);
+      toast.error(
+        error.response?.data?.message || "Registration failed. Please try again.",
+        {
+          style: { backgroundColor: "#D32F2F", color: "white" },
+        }
+      );
     }
   };
 
