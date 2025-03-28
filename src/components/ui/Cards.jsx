@@ -4,7 +4,7 @@ import axios from "axios";
 import { Card, CardHeader, CardTitle } from "./card.jsx";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
-
+import { Link } from "react-router-dom";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
 const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
 const CentersApi = "http://18.141.233.37:4000/api/centers";
@@ -172,6 +172,7 @@ export const Cards = () => {
         style={{ backgroundImage: `url(${home})` }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+
         <div className="relative max-w-6xl mx-auto flex flex-col md:flex-row items-center px-6 text-white">
           <div className="md:w-1/2 text-center md:text-left">
             <motion.h1
@@ -182,10 +183,37 @@ export const Cards = () => {
             >
               Empowering Students, <br /> One Search at a Time.
             </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.6 }}
+              className="text-gray-300 mt-4"
+            >
+              {" "}
+              We help students discover the best courses, universities,
+              andlearning opportunities worldwide. With expert insights and real
+              student reviews, we make your education journey effortless.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+              className="mt-6 flex justify-center md:justify-start items-center gap-4"
+            >
+              <Link to="/">
+                {" "}
+                <button className="flex items-center text-white px-6 py-3 rounded-full font-semibold shadow-lg bg-[#461773] hover:bg-[#533d75] transition">
+                  <span className="text-xl font-bold mr-2">+</span> EXPLORE
+                  COURSES
+                </button>
+              </Link>
+            </motion.div>
           </div>
         </div>
       </motion.div>
-
+      ;
       <div className="flex items-center justify-center gap-5 flex-wrap">
         <h2
           className="text-2xl text-center hover:cursor-pointer bg-blue-500 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-blue-500 hover:bg-white hover:text-blue-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center"
@@ -195,11 +223,13 @@ export const Cards = () => {
           <ChevronDown className="mt-2" />
         </h2>
       </div>
-
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={() => {}}
+        onSave={() => {
+          setIsModalOpen(false);
+          console.log("Saved selections:", { selectedMajors, selectedRegions });
+        }}
         selectedMajors={selectedMajors}
         setSelectedMajors={setSelectedMajors}
         selectedRegions={selectedRegions}
@@ -207,7 +237,6 @@ export const Cards = () => {
         majors={majors}
         regions={regions}
       />
-
       {loading ? (
         <p className="text-center mt-10">Loading...</p>
       ) : (
