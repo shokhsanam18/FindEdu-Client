@@ -27,6 +27,44 @@ const formSchema = z.object({
   password: z.string().min(6, { message: "Min 6 characters" }),
 });
 
+const axiosInstance = axios.create({
+  baseURL: API_BASE,
+});
+
+const refreshAccessToken = async (navigate) => {
+  try {
+    const storedRefreshToken = localStorage.getItem("refreshToken");
+    if (!storedRefreshToken) throw new Error("No refresh token available");
+
+    const response = await axios.post(`${API_BASE}/refresh`, { refreshToken: storedRefreshToken });
+    
+    localStorage.setItem("accessToken", response.data.accessToken);
+    return response.data.accessToken;
+  } catch (error) {
+    console.error("Refresh token failed:", error);
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    navigate("/login");
+    throw error;
+  }
+};
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      try {
+        const newAccessToken = await refreshAccessToken();
+        error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
+        return axiosInstance(error.config);
+      } catch {
+        console.error("Token refresh failed, redirecting to login.");
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 const Login = () => {
   const navigate = useNavigate();
   const form = useForm({
@@ -108,10 +146,7 @@ src={register} alt="Illustration" className="w-[500px] h-auto relative z-10" whi
 
 <Form {...form}>
 <form onSubmit={form.handleSubmit(loginUser)} className="space-y-4">
-<FormField
-control={form.control}
-name="email"
-render={({ field }) => (
+<FormField control={form.control} name="email" render={({ field }) => (
 <FormItem>
 <FormControl>
 <Input placeholder="Email" {...field} />
@@ -119,19 +154,15 @@ render={({ field }) => (
 <FormMessage />
 </FormItem>)}/>
 
-<FormField
-control={form.control}
-name="password"
-render={({ field }) => (
+<FormField control={form.control} name="password" render={({ field }) => (
 <FormItem>
 <FormControl>
-<Input
-type="password" placeholder="Password" {...field}/>
+<Input type="password" placeholder="Password" {...field}/>
 </FormControl>{" "}
 <FormMessage />
 </FormItem>)}/>
 
-<Button type="submit" className="w-full bg-[#461773] text-white font-bold rounded-md hover:bg-purple-700 transition h-[50px] cursor-pointer">
+<Button type="submit" onClick={form.handleSubmit(loginUser)} className="w-full bg-[#461773] text-white font-bold rounded-md hover:bg-purple-700 transition h-[50px] cursor-pointer">
 Login</Button></form>{" "}
 </Form>
 
