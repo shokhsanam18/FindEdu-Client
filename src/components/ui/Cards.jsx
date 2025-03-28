@@ -250,6 +250,23 @@ export const Cards = () => {
                 <CardHeader>
                   <CardTitle>{center.name}</CardTitle>
                 </CardHeader>
+                <h3 className="border-[1px] rounded-full border-black p-1 absolute top-5 right-7">
+                  <Link to="/smth">
+                    <ArrowRight />
+                  </Link>
+                </h3>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <img
+                      className="w-28 h-28 absolute bottom-2 left-4"
+                      src={center.image}
+                      alt="Card"
+                    />
+                    <h3 className="flex text-yellow-400 font-semibold items-center gap-1 absolute bottom-7 right-7">
+                      <Heart color="gray" /> {center.rating}
+                    </h3>
+                  </div>
+                </CardContent>
               </Card>
             ))
           ) : (
