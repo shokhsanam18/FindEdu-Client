@@ -27,7 +27,8 @@ const formSchema = z.object({
   email: z.string().email({ message: "Invalid email" }),
   phone: z.string().min(12, { message: "Invalid phone" }),
   password: z.string().min(6, { message: "Min 6 characters" }),
-  role: z.enum(["USER", "CEO", "Admin", "Super"]),
+  role: z.enum(["USER", "CEO", "Admin", "Super Admin"]),  // Change here
+
   image: z.any().optional(),
 });
 
@@ -157,9 +158,9 @@ flex flex-col justify-center bg-white rounded-lg shadow-lg p-6 sm:p-10 md:p-9 mr
 <SelectTrigger className="w-full">{field.value || "Select Role"}
 </SelectTrigger> <SelectContent>
 <SelectItem value="CEO">CEO</SelectItem>
- <SelectItem value="USER">User</SelectItem>
+ <SelectItem value="USER">USER</SelectItem>
 <SelectItem value="Admin">Admin</SelectItem>
-<SelectItem value="Super">Super Admin</SelectItem>
+<SelectItem value="Super Admin">Super Admin</SelectItem>
  </SelectContent></Select>
  </FormControl>
  <FormMessage />

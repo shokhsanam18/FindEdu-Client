@@ -120,7 +120,7 @@ export const Cards = ({ SaveCategories, categories }) => {
   
 
   return (
-    <div className="mb-16 mt-[11%]">
+    <div className="mb-16 mt-25 sm:mt-35 md:mt-35">
   <motion.div initial={{ opacity: 0, y: 50 }} 
   animate={{ opacity: 1, y: 0 }} 
   transition={{ duration: 1, ease: "easeOut" }} 

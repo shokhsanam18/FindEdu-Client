@@ -44,68 +44,42 @@ const Counter = ({ target, label, icon: Icon }) => {
   return (
     <motion.div
       className="flex flex-col items-center bg-gray-100 p-6 rounded-lg shadow-lg"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      viewport={{ once: true }}
-    >
+      initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
       <Icon className="text-[#461773] text-4xl mb-3" />
-      <motion.h3
-        className="text-4xl font-bold text-gray-900"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 0.2 }}
-      >
-        {count.toLocaleString()}+
-      </motion.h3>
-      <p className="text-gray-600">{label}</p>
+<motion.h3
+className="text-4xl font-bold text-gray-900" 
+initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}  transition={{ duration: 1, delay: 0.2 }}> {count.toLocaleString()}+
+</motion.h3>
+<p className="text-gray-600">{label}</p>
     </motion.div>
   );
 };
 
 const About = () => {
   return (
-    <div className="mt-45">
-      <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-6 min-h-[60vh] text-white bg-cover bg-center"
-        style={{ backgroundImage: "url('/aboutus.png')" }}
-      >
-        <div className="absolute inset-0 bg-[#6e69728d]"></div>
+<div className="mt-25 sm:mt-35 md:mt-35">
+<motion.div
+initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-6 min-h-[60vh] text-white bg-cover bg-center"
+style={{ backgroundImage: "url('/aboutus.png')" }}>
+<div className="absolute inset-0 bg-[#6e69728d]"></div>
 
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative z-10 max-w-3xl px-6 md:p-8 text-start mt-50 md:mt-0"
-        >
-          <p className="text-l md:text-xl  mt-6 md:mt-0">
-            {" "}
-            Helping You Find the Best Education Centers!
-          </p>
-          <h1 className="text-4xl md:text-7xl font-bold "> About Us</h1>
-        </motion.div>
+ <motion.div
+initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
+className="relative z-10 max-w-3xl px-6 md:p-8 text-start mt-50 md:mt-0" >
+<p className="text-l md:text-xl  mt-6 md:mt-0"> {" "}Helping You Find the Best Education Centers!</p>
+<h1 className="text-4xl md:text-7xl font-bold "> About Us</h1>
+ </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-xl  mt-4 md:mt-0"
-        >
-          <div className="flex gap-2">
-            <Link to="/" className="no-underline hover:underline text-white">
-              Home
-            </Link>
-            <p>|</p>
-            <Link
-              to="/"
-              className="text-[#bbbbbb] no-underline hover:underline"
-            >
-              About Us
-            </Link>
-          </div>
+<motion.div
+initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.6 }}
+className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-xl  mt-4 md:mt-0">
+ <div className="flex gap-2">
+<Link to="/" className="no-underline hover:underline text-white"> Home</Link>
+<p>|</p>
+<Link to="/" className="text-[#bbbbbb] no-underline hover:underline" >
+About Us </Link>
+ </div>
         </motion.div>
       </motion.div>
 

@@ -9,30 +9,45 @@ export const useAuthStore = create((set, get) => ({
   accessToken: localStorage.getItem("accessToken") || null,
   refreshToken: localStorage.getItem("refreshToken") || null,
 
-  // Fetch user data (GET /users/me)
+  // Fetch user data (GET /users/mydata)
   fetchUserData: async () => {
     try {
-      // Step 4: Always refresh token before calling /me
+      // 🔄 Always refresh token before calling /mydata
       let token = await get().refreshTokenFunc();
       if (!token) {
-        console.warn("No access token after refresh.");
+        console.warn("❌ No access token after refresh.");
         return null;
       }
 
-      // Step 1 & 2: Log token and headers
-      console.log("Using token for /mydata:", token);
-      console.log("GET", `${API_BASE}/users/mydata`, {
+      console.log("🔍 Fetching user with token:", token);
+
+      const { data } = await axios.get(`${API_BASE}/users/mydata`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const { data } = await axios.get(`${API_BASE}/users/mydata`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      let role = data?.role; // Check if API response has role
 
-      set({ user: data });
-      return data;
+      // 🛠 Extract role from JWT token if missing from API
+      if (!role && token) {
+        try {
+          const decoded = JSON.parse(atob(token.split(".")[1]));
+          role = decoded?.role || "USER"; // Default to "USER" if undefined
+          console.log("🛠 Extracted role from token:", role);
+        } catch (error) {
+          console.warn("❌ Failed to decode token:", error);
+        }
+      }
+
+      if (!role) {
+        console.warn("❌ Role still missing. Defaulting to USER.");
+        role = "USER"; // Fallback role
+      }
+
+      const userData = { ...data, role }; // Attach extracted role to user data
+      set({ user: userData });
+
+      console.log("✅ User data fetched:", userData);
+      return userData;
     } catch (error) {
       console.error("❌ Error fetching user:", error?.response?.data || error);
       return null;
@@ -45,7 +60,6 @@ export const useAuthStore = create((set, get) => ({
       const response = await axios.post(`${API_BASE}/users/login`, values);
       const data = response.data;
 
-      // Step 3: Log raw response
       console.log("🟢 Login response data:", data);
 
       if (data.accessToken && data.refreshToken) {
@@ -65,10 +79,7 @@ export const useAuthStore = create((set, get) => ({
     } catch (error) {
       console.error("❌ Login error:", error);
       toast.error(error.response?.data?.message || "Something went wrong");
-      return {
-        success: false,
-        message: error.response?.data?.message,
-      };
+      return { success: false, message: error.response?.data?.message };
     }
   },
 
@@ -79,7 +90,7 @@ export const useAuthStore = create((set, get) => ({
       const refreshToken = get().refreshToken;
 
       if (!refreshToken) {
-        console.warn("No refresh token available. Logging out.");
+        console.warn("❌ No refresh token available. Logging out.");
         return get().logout();
       }
 
@@ -93,7 +104,7 @@ export const useAuthStore = create((set, get) => ({
         set({ accessToken: data.accessToken });
         return data.accessToken;
       } else {
-        console.warn("Refresh response missing accessToken. Logging out.");
+        console.warn("❌ Refresh response missing accessToken. Logging out.");
         get().logout();
       }
     } catch (error) {
@@ -125,7 +136,7 @@ export const useAuthStore = create((set, get) => ({
           get().refreshTokenFunc();
         }
       } catch {
-        console.warn("Token could not be decoded, logging out.");
+        console.warn("❌ Token could not be decoded, logging out.");
         get().logout();
       }
     };
