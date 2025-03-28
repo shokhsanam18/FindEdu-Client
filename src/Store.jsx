@@ -8,6 +8,7 @@ export const useAuthStore = create((set, get) => ({
   user: null,
   accessToken: localStorage.getItem("accessToken") || null,
   refreshToken: localStorage.getItem("refreshToken") || null,
+  profileImageUrl: null,
 
   // Fetch user data (GET /users/mydata)
   fetchUserData: async () => {
@@ -68,7 +69,7 @@ export const useAuthStore = create((set, get) => ({
         set({ accessToken: data.accessToken, refreshToken: data.refreshToken });
 
         const user = await get().fetchUserData();
-        set({ user });
+
         toast.success("Login successful!");
         return { success: true, role: user?.role };
       } else {
@@ -144,5 +145,23 @@ export const useAuthStore = create((set, get) => ({
     };
 
     checkTokenExpiry();
+  },
+
+
+  // 🔥 Fetch profile image by filename and store as blob URL
+  fetchProfileImage: async (filename) => {
+    try {
+      const response = await axios.get(`http://18.141.233.37:4000/api/image/${filename}`, {
+        responseType: "blob",
+      });
+
+      // console.log("Fetched image blob:", response.data);
+
+      const blobUrl = URL.createObjectURL(response.data);
+      set({ profileImageUrl: blobUrl });
+    } catch (error) {
+      console.error("🛑 Failed to fetch profile image:", error);
+      set({ profileImageUrl: null });
+    }
   },
 }));
