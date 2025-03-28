@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import Register from "./Register/Login/Register.jsx";
 import Login from "./Register/Login/Login.jsx";
@@ -10,7 +10,16 @@ import About from "./Register/Login/Aboutus.jsx";
 import { Index } from "./Pages/Index-page.jsx";
 import CeoPage from "./Pages/CeoPage.jsx";
 import { AuthProvider } from "./context/auth";
+import { useAuthStore } from "./Store.jsx";
 function App() {
+
+
+  const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
+
+  useEffect(() => {
+    autoRefreshToken();
+  }, [autoRefreshToken]);
+
   return (
     <AuthProvider>
       <div>
