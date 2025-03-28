@@ -7,6 +7,7 @@ import home from "/public/home.png";
 
 const MajorsApi = "http://18.141.233.37:4000/api/major";
 const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
+const CentersApi = "http://18.141.233.37:4000/api/centers";
 
 export const Modal = ({
   isOpen,
@@ -112,46 +113,54 @@ export const Cards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMajors, setSelectedMajors] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
-
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [majorsResponse, regionsResponse] = await Promise.all([
-          axios.get(MajorsApi),
-          axios.get(RegionsApi),
-        ]);
+        const [majorsResponse, regionsResponse, centersResponse] =
+          await Promise.all([
+            axios.get(MajorsApi),
+            axios.get(RegionsApi),
+            axios.get(CentersApi),
+          ]);
+
         setMajors(majorsResponse.data.data || []);
         setRegions(regionsResponse.data.data || []);
+        setCenters(centersResponse.data.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
   useEffect(() => {
     if (selectedMajors.length === 0 && selectedRegions.length === 0) {
-      setCenters([]);
+      axios
+        .get(CentersApi)
+        .then((response) => setCenters(response.data.data || []))
+        .catch((error) =>
+          console.error("Error loading default centers:", error)
+        );
       return;
     }
 
-    const filteredCenters = majors.flatMap((major) =>
-      major.centers
-        ? major.centers.filter(
-            (center) =>
-              (selectedMajors.length === 0 ||
-                selectedMajors.includes(major.id)) &&
-              (selectedRegions.length === 0 ||
-                selectedRegions.includes(center.regionId))
-          )
-        : []
+    const filteredCenters = majors.flatMap(
+      (major) =>
+        major.centers?.filter(
+          (center) =>
+            (selectedMajors.length === 0 ||
+              selectedMajors.includes(major.id)) &&
+            (selectedRegions.length === 0 ||
+              selectedRegions.includes(center.regionId))
+        ) || []
     );
 
     setCenters(filteredCenters);
-  }, [selectedMajors, selectedRegions, majors]);
+  }, [selectedMajors, selectedRegions]);
 
   return (
     <div className="mb-16 mt-[11%]">
