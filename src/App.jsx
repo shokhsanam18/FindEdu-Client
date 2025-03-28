@@ -11,6 +11,7 @@ import { Index } from "./Pages/Index-page.jsx";
 import CeoPage from "./Pages/CeoPage.jsx";
 import { AuthProvider } from "./context/auth";
 import { useAuthStore } from "./Store.jsx";
+import { Resources } from "./Pages/Resources.jsx";
 function App() {
 
 
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Index />} />
             <Route path="/About" element={<About />} />
+            <Route path="/Resources" element={<Resources />} />
           </Route>
           <Route path="/Register" element={<Register />} />
           <Route path="/Login" element={<Login />} />

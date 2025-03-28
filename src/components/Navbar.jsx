@@ -163,11 +163,11 @@ export default function Navbar() {
         </div>
 
         <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
-          <a href="#" className="hover:text-[#461773]">
-            Learning Centers
-          </a>
           <Link to="/About" className="hover:text-[#461773]">
             About Us
+          </Link>
+          <Link to="/Resources" className="hover:text-[#461773]">
+            Resources
           </Link>
           </div>
         {isLoggedIn ? 
