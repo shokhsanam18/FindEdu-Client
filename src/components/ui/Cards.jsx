@@ -215,7 +215,7 @@ export const Cards = () => {
       </motion.div>
       <div className="flex items-center justify-center gap-5 flex-wrap">
         <h2
-          className="text-2xl text-center hover:cursor-pointer bg-blue-500 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-blue-500 hover:bg-white hover:text-blue-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center"
+          className="text-2xl text-center hover:cursor-pointer bg-purple-900 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-purple-800 hover:bg-white hover:text-purple-900 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center"
           onClick={() => setIsModalOpen(true)}
         >
           Majors & Regions
