@@ -8,7 +8,8 @@ import VerifyOtp from "./Register/Login/VerifyOtp.jsx";
 import ErrorPage from "./Register/Login/Error.jsx";
 import About from "./Register/Login/Aboutus.jsx";
 import { Index } from "./Pages/Index-page.jsx";
-import CeoPage from "./Pages/CeoPage.jsx";
+import CeoPage from "./Pages/CeoPage.jsx"; // Matching your actual filename
+import CenterDetailPage from "./Pages/CenterDetail.jsx"; // Matching your actual filename
 import { AuthProvider } from "./context/auth";
 import { useAuthStore } from "./Store.jsx";
 import { Resources } from "./Pages/Resources.jsx";
@@ -28,13 +29,15 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Index />} />
             <Route path="/About" element={<About />} />
+            <Route path="/centers/:id" element={<CenterDetailPage />} />
+            <Route path="/CEO" element={<CeoPage />} />
             <Route path="/Resources" element={<Resources />} />
           </Route>
           <Route path="/Register" element={<Register />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Forget" element={<Forget />} />
           <Route path="/VerifyOtp" element={<VerifyOtp />} />
-          <Route path="/CEO" element={<CeoPage />} />
+         
           <Route path="*" element={<ErrorPage />} />
           <Route
             path="/you"
