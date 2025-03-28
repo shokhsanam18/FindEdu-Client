@@ -7,6 +7,7 @@ import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useRef } from 'react';
 import {
   Form,
   FormField,
@@ -27,7 +28,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Invalid email" }),
   phone: z.string().min(12, { message: "Invalid phone" }),
   password: z.string().min(6, { message: "Min 6 characters" }),
-  role: z.enum(["USER", "CEO", "Admin"]),
+  role: z.enum(["USER", "CEO"]),
   image: z.any().optional(),
 });
 
@@ -45,6 +46,7 @@ const FormTry = () => {
       image: null,
     },
   });
+
 
   const onSubmit = async (values) => {
     try {
@@ -74,20 +76,68 @@ const FormTry = () => {
       });
     }
   };
+  const [otp, setOtp] = useState(["", "", "", "", ""]);
 
-  const verifyOtp = async () => {
- try {
- await axios.post(`${API_BASE}/verify-otp`, { email: form.getValues("email"), otp: form.getValues("otp") });
-toast.success("OTP Verified Successfully!", {
-style: { backgroundColor: "#4CAF50", color: "white" },
-});
-navigate("/login");
-} catch (error) {
-toast.error("Invalid OTP.", {
- style: { backgroundColor: "#D32F2F", color: "white" },
-});
-}
+  // Reference to input fields
+  const inputRefs = useRef([]);
+  
+  const handleOtpChange = (e, index) => {
+    const value = e.target.value;
+    if (/[^0-9]/.test(value)) return; // Only allow numbers
+  
+    // Update OTP state with the new value
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+  
+    // Move focus to the next input if the current input is filled
+    if (value && index < 4) {
+      inputRefs.current[index + 1].focus();
+    }
   };
+  
+  // const verifyOtp = async () => {
+  //   const otpString = otp.join(""); // Join the OTP array into a single string
+  //   try {
+  //     await axios.post(`${API_BASE}/verify-otp`, {
+  //       email: form.getValues("email"),
+  //       otp: otpString,
+  //     });
+  //     toast.success("OTP Verified Successfully!", {
+  //       style: { backgroundColor: "#4CAF50", color: "white" },
+  //     });
+  //     navigate("/login");
+  //   } catch (error) {
+  //     toast.error("Invalid OTP.", {
+  //       style: { backgroundColor: "#D32F2F", color: "white" },
+  //     });
+  //   }
+  // };
+  const verifyOtp = async () => {
+    const otpString = otp.join(""); // Join the OTP array into a single string
+    try {
+      await axios.post(`${API_BASE}/verify-otp`, {
+        email: form.getValues("email"),
+        otp: otpString,
+      });
+      // Show success toast
+      toast.success("OTP Verified Successfully!", {
+        style: { backgroundColor: "#4CAF50", color: "white" },
+      });
+      
+      // Delay navigation to allow the toast to be visible
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000); // Adjust the delay (in milliseconds) as needed (2 seconds here)
+      
+    } catch (error) {
+      toast.error("Invalid OTP.", {
+        style: { backgroundColor: "#D32F2F", color: "white" },
+      });
+    }
+  };
+  
+  
   // bg-indigo-200
   return (
 <div className="h-full  bg-[#6d24b719]">
@@ -147,7 +197,7 @@ flex flex-col justify-center bg-white rounded-lg shadow-lg p-6 sm:p-10 md:p-9 mr
 <FormItem> <FormControl><Input type="password" placeholder="Password" {...field} /></FormControl>
  <FormMessage /></FormItem>)} />
               
-<FormField control={form.control} name="phone" render={({ field }) => (
+ <FormField control={form.control} name="phone" render={({ field }) => (
 <FormItem> <FormControl><Input placeholder="Phone Number"
   {...form.register("phone")}
   onChange={(e) => {
@@ -167,7 +217,6 @@ flex flex-col justify-center bg-white rounded-lg shadow-lg p-6 sm:p-10 md:p-9 mr
 </SelectTrigger> <SelectContent>
 <SelectItem value="CEO">CEO</SelectItem>
  <SelectItem value="USER">User</SelectItem>
-<SelectItem value="Admin">Admin</SelectItem>
  </SelectContent></Select>
  </FormControl>
  <FormMessage />
@@ -189,14 +238,38 @@ flex flex-col justify-center bg-white rounded-lg shadow-lg p-6 sm:p-10 md:p-9 mr
 )} />
  <button type="submit" className="w-full bg-[#461773] text-white p-3 rounded-md font-semibold hover:bg-purple-700 cursor-pointer">Create Account</button>
 <button type="button" onClick={sendOtp} className="w-full bg-gray-300 text-black p-3 rounded-md font-semibold hover:bg-gray-200 cursor-pointer">Send OTP</button>
-<div className="flex gap-4"> 
-<FormField control={form.control} name="otp" render={({ field }) => (
-<FormItem className="w-full md:w-2/3 ">
-<FormControl><Input placeholder="Enter OTP" {...field} /></FormControl>
-<FormMessage /> </FormItem> )} />
+
+      {/* Your other JSX code */}
+
+      {/* OTP Section */}
+      <div className="flex gap-4">
+  {otp.map((digit, index) => (
+    <FormItem key={index} className="w-15 ">
+      <FormControl>
+        <Input
+          type="text"
+          maxLength={1}
+          value={digit}
+          onChange={(e) => handleOtpChange(e, index)}
+          ref={(el) => (inputRefs.current[index] = el)}
+          placeholder={''}
+          className="text-center px-4 py-6  border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  ))}
   
-<button type="button" onClick={verifyOtp} className="w-full md:w-1/3 bg-green-600 text-white p-3 rounded-md font-semibold hover:bg-green-700 cursor-pointer">Verify OTP</button>
-</div> </form>
+  <button 
+    type="button" 
+    onClick={verifyOtp} 
+    className="w-full md:w-1/2 bg-green-600 text-white p-3 rounded-md font-semibold hover:bg-green-700 cursor-pointer"
+  >
+    Verify OTP
+  </button>
+</div>
+
+</form>
 </Form>
   
 <p className="text-gray-600 mt-4 text-center">Already have an account? 
