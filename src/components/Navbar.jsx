@@ -1,7 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button as Buton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
+import {
+  MobileNav,
+  Typography,
+  Button,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  Avatar,
+  Spinner
+  // Card,
+  // IconButton,
+} from "@material-tailwind/react";
+import {
+  // CubeTransparentIcon,
+  UserCircleIcon,
+  // CodeBracketSquareIcon,
+  // Square3Stack3DIcon,
+  ChevronDownIcon,
+  Cog6ToothIcon,
+  // InboxArrowDownIcon,
+  // LifebuoyIcon,
+  PowerIcon,
+  // RocketLaunchIcon,
+  // Bars2Icon,
+} from "@heroicons/react/24/solid";
 import {
   Select,
   SelectContent,
@@ -9,8 +35,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuthStore } from "../Store";
+
+
+
+// profile menu component
+const profileMenuItems = [
+  {
+    label: "My Profile",
+    icon: UserCircleIcon,
+    link: '/MyProfile'
+  },
+  {
+    label: "Sign Out",
+    icon: PowerIcon,
+    // link: '/MyProfile'
+  },
+];
+
+
+
 
 export default function Navbar() {
+
+  const user = useAuthStore((state) => state.user);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn());
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  
+  const closeMenu = () => setIsMenuOpen(false);
+
+  const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  if (!user) {
+    useAuthStore.getState().fetchUserData().finally(() => setLoading(false));
+  } else {
+    setLoading(false);
+  }
+}, []);
+
+
+
+
+
   const [region, setRegion] = useState("");
   const [level, setLevel] = useState("");
   const [studyType, setStudyType] = useState("");
@@ -91,34 +158,98 @@ export default function Navbar() {
       <div className="bg-white flex items-center justify-between ">
         <div className="md:w-52 w-48  text-[#461773] flex items-center">
           <Link to='/' className="flex items-center">
-          <img src="./logo.png" alt="" />
+          <img src="./logo.png" alt="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80" />
           </Link>
         </div>
 
-        <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
+        {/* <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
           <a href="#" className="hover:text-[#461773]">
             O‘quv markazlar
           </a>
           <Link to="/About" className="hover:text-[#461773]">
             Loyiha haqida
           </Link>
-        </div>
+        </div> */}
+        {loading ? (
+        <Spinner />
+        ) :  isLoggedIn ? 
+        
+      (
 
         <div className="flex gap-2 md:gap-6">
-          <Button
+          <Buton
             variant="outline"
             className="border-[#461773] text-[#461773] text-sm md:text-xl p-2 md:p-4 rounded-full"
             asChild
           >
             <a href="../Login">Login</a>
-          </Button>
-          <Button
+          </Buton>
+          <Buton
             className="bg-[#461773] text-white text-sm md:text-xl p-2 md:p-4 rounded-full"
             asChild
           >
             <a href="../Register">Register</a>
-          </Button>
+          </Buton>
         </div>
+        )
+        :
+        (
+          <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
+          <MenuHandler>
+            <Button
+              variant="text"
+              color="blue-gray"
+              className="flex items-center hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff] gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto"
+            >
+              <Avatar
+                variant="circular"
+                size="sm"
+                alt="tania andrew"
+                className="border border-purple-900  p-0.5"
+                src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+              />
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`h-3 w-3 text-[#290a3f] transition-transform ${
+                  isMenuOpen ? "rotate-180" : ""
+                }`}
+              />
+            </Button>
+          </MenuHandler>
+          <MenuList className="p-1">
+            {profileMenuItems.map(({ label, icon, link }, key) => {
+              const isLastItem = key === profileMenuItems.length - 1;
+              return (
+                <Link to={`${isLastItem
+                    ? "#"
+                    : link}`}
+                    key={label}>
+                <MenuItem
+                onClick={closeMenu}
+                className={`flex items-center  gap-2 rounded ${
+                  isLastItem
+                        ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
+                        : "hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff]"
+                    }`}
+                    >
+                    {React.createElement(icon, {
+                      className: `h-4 w-4 ${isLastItem ? "text-red-500" : "text-[#290a3f]"}`,
+                      strokeWidth: 2,
+                    })}
+                    <Typography
+                      as="span"
+                      variant="small"
+                      className={`font-normal ${isLastItem ? "text-red-500" : "text-[#290a3f]"}`}
+                    >
+                      {label}
+                    </Typography>
+                  </MenuItem>
+                    </Link>
+              );
+            })}
+          </MenuList>
+        </Menu>) 
+        }
       </div>
 
       {/* Bottom Navigation */}
@@ -236,3 +367,7 @@ export default function Navbar() {
     </nav>
   );
 }
+
+
+
+

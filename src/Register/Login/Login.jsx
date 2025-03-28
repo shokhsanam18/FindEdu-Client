@@ -95,21 +95,26 @@ const Login = () => {
     }
   };
 
+
   const loginUser = async (values) => {
     const login = useAuthStore.getState().login;
     try {
       const result = await login(values);
   
       if (result.success) {
-        toast.success("Login successful! Redirecting...");
+        
         setTimeout(() => {
           if (result.role === "CEO") {
-            navigate("/ceo");
+            toast.success("Login successful! Redirecting...");
+            navigate("/ceo");  // Redirect CEO correctly
           } else {
+            toast.success("Login successful! Redirecting...");
             navigate("/");
           }
         }, 1500);
-      } else {
+        
+      } else if (!result.message.includes("Password or email is wrong")) {
+        // Only show generic errors here if the specific message is not already shown
         toast.error(result.message || "Invalid credentials");
       }
     } catch (err) {

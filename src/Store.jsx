@@ -19,8 +19,7 @@ export const useAuthStore = create((set, get) => ({
         return null;
       }
 
-      // Step 1 & 2: Log token and headers
-      console.log("Using token for /mydata:", token);
+      
       console.log("GET", `${API_BASE}/users/mydata`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -35,7 +34,7 @@ export const useAuthStore = create((set, get) => ({
       console.log(data)
       return data;
     } catch (error) {
-      console.error("❌ Error fetching user:", error?.response?.data || error);
+      console.error("Error fetching user:", error?.response?.data || error);
       return null;
     }
   },
@@ -46,8 +45,7 @@ export const useAuthStore = create((set, get) => ({
       const response = await axios.post(`${API_BASE}/users/login`, values);
       const data = response.data;
 
-      // Step 3: Log raw response
-      console.log("🟢 Login response data:", data);
+      
 
       if (data.accessToken && data.refreshToken) {
         localStorage.setItem("accessToken", data.accessToken);
@@ -64,7 +62,7 @@ export const useAuthStore = create((set, get) => ({
         return { success: false };
       }
     } catch (error) {
-      console.error("❌ Login error:", error);
+      console.error("Login error:", error);
       toast.error(error.response?.data?.message || "Something went wrong");
       return {
         success: false,
@@ -76,7 +74,6 @@ export const useAuthStore = create((set, get) => ({
   // Refresh token (POST /users/refreshToken)
   refreshTokenFunc: async () => {
     try {
-      console.log("🔄 Refreshing token...");
       const refreshToken = get().refreshToken;
 
       if (!refreshToken) {
@@ -89,7 +86,6 @@ export const useAuthStore = create((set, get) => ({
       });
 
       if (data.accessToken) {
-        console.log("✅ Token refreshed:", data.accessToken);
         localStorage.setItem("accessToken", data.accessToken);
         set({ accessToken: data.accessToken });
         return data.accessToken;
@@ -101,6 +97,11 @@ export const useAuthStore = create((set, get) => ({
       console.error("❌ Token refresh failed:", error?.response?.data || error);
       get().logout();
     }
+  },
+
+  isLoggedIn: () => {
+    const user = get().user;
+    return !!user && user.isActive;
   },
 
   // Logout
@@ -119,7 +120,6 @@ export const useAuthStore = create((set, get) => ({
       try {
         const { exp } = JSON.parse(atob(token.split(".")[1]));
         const expiryTime = exp * 1000 - Date.now() - 30000;
-        console.log(expiryTime)
 
         if (expiryTime > 0) {
           setTimeout(() => get().refreshTokenFunc(), expiryTime);
