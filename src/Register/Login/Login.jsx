@@ -8,14 +8,9 @@ import icon from "/public/icon.png";
 import register from "/public/register.png";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useAuthStore } from "../../Store"; // update path if needed
+import { useAuthStore } from "../../Store"; 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormControl,
-  FormMessage,
+import {Form, FormField, FormItem, FormControl, FormMessage,
 } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
@@ -28,8 +23,7 @@ const formSchema = z.object({
 });
 
 const axiosInstance = axios.create({
-  baseURL: API_BASE,
-});
+  baseURL: API_BASE,});
 
 const refreshAccessToken = async (navigate) => {
   try {
@@ -75,7 +69,6 @@ const Login = () => {
     },
   });
 
-  // Refresh token function
   const refreshToken = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
@@ -85,11 +78,10 @@ const Login = () => {
       localStorage.setItem("accessToken", response.data.accessToken);
       return response.data.accessToken;
     } catch (error) {
-      // Handle refresh token failure (typically logout the user)
+
       console.error("Refresh token failed:", error);
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      // Optionally redirect to login
       navigate("/login");
       throw error;
     }
@@ -98,34 +90,41 @@ const Login = () => {
 
   const loginUser = async (values) => {
     const login = useAuthStore.getState().login;
+  
     try {
       const result = await login(values);
   
       if (result.success) {
-        
-        setTimeout(() => {
-          if (result.role === "CEO") {
-            toast.success("Login successful! Redirecting...");
-            navigate("/ceo");  // Redirect CEO correctly
-          } else {
-            toast.success("Login successful! Redirecting...");
-            navigate("/");
-          }
-        }, 1500);
-        
-      } else if (!result.message.includes("Password or email is wrong")) {
-        // Only show generic errors here if the specific message is not already shown
-        toast.error(result.message || "Invalid credentials");
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      toast.error("Something went wrong. Please try again.");
+        const role = result.role ? result.role.toUpperCase() : "USER";
+  
+        console.log("Debug: Raw role received:", result.role);
+        console.log(" Debug: Processed role after cleanup:", role);
+  
+setTimeout(() => {
+if (role === "USER") {
+toast.success("Login successful! Redirecting...");
+ navigate("/"); 
+} else if (role === "CEO") {
+toast.success("Login successful! Redirecting...");
+            navigate("/ceo"); 
+} else {
+ console.error(" Unexpected role received:", role);
+  toast.error("Unknown role, please contact support.");
+}}, 1500);
+} else {
+ if (!result.message?.includes("Password or email is wrong")) {
+  toast.error(result.message || "Invalid credentials");}
+  }
+  } catch (err) {
+  console.error(" Login error:", err);
+  toast.error("Something went wrong. Please try again.");
     }
   };
+  
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-[#6d24b719] ">
-      <Sonner theme="light" position="top-right" richColors />
+  <Sonner theme="light" position="top-right" richColors />
       <Link to="/">
 <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold cursor-pointer">
 <p className="flex">F<img src={icon} alt="Logo" className="h-7 w-4 mx-1 mt-3" />ndedu.uz</p>
