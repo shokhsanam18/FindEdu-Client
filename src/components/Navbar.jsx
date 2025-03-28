@@ -64,6 +64,7 @@ export default function Navbar() {
     (state) => !!state.user?.data?.isActive
   );
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const fetchImage = useAuthStore((state) => state.fetchProfileImage);
   
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -71,6 +72,11 @@ export default function Navbar() {
     useAuthStore.getState().fetchUserData();
   }, []);
   
+  useEffect(() => {
+    if (user?.data?.image) {
+      fetchImage(user.data.image);
+    }
+  }, [user]);
 
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
@@ -79,6 +85,9 @@ export default function Navbar() {
     logout(); // Clear tokens + user state
     navigate("/Login"); // Redirect to login
   };
+
+  const profileImageUrl = useAuthStore((state) => state.profileImageUrl);
+  console.log("Profile image URL:", profileImageUrl);
 
 
 
@@ -168,14 +177,14 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
+        <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
           <a href="#" className="hover:text-[#461773]">
             O‘quv markazlar
           </a>
           <Link to="/About" className="hover:text-[#461773]">
           Loyiha haqida
           </Link>
-          </div> */}
+          </div>
         {isLoggedIn ? 
           (
             <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
@@ -188,9 +197,9 @@ export default function Navbar() {
                 <Avatar
                   variant="circular"
                   size="sm"
-                  alt="tania andrew"
-                  className="border border-purple-900  p-0.5"
-                  src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+                  alt="User profile"
+                  className="border border-purple-900 p-0.5"
+                  src={profileImageUrl || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80'} // fallback if image fails
                 />
                 <motion.p className="text-[#290a3f]">{user?.data?.firstName} {user?.data?.lastName}</motion.p>
                 <ChevronDownIcon
@@ -201,7 +210,7 @@ export default function Navbar() {
                 />
               </Button>
             </MenuHandler>
-            <MenuList className="p-1">
+            {/* <MenuList className="p-1">
               {profileMenuItems.map(({ label, icon, link }, key) => {
                 const isLastItem = key === profileMenuItems.length - 1;
                 return (
@@ -232,8 +241,9 @@ export default function Navbar() {
                       </Link>
                 );
               })}
-            </MenuList>
-          </Menu>) :
+            </MenuList> */}
+          </Menu>) 
+          :
         
       (
 
