@@ -49,13 +49,13 @@ const FormTry = () => {
 
   const onSubmit = async (values) => {
     try {
-      let imageFilename = "default.jpg"; // fallback if no image uploaded
+      let imageFilename = "default.jpg";
   
       // Step 1: Upload image if present
       if (values.image) {
         const formData = new FormData();
-        formData.append("image", values.image); // ✅ key must match backend
-      
+        formData.append("image", values.image);
+  
         const uploadResponse = await axios.post(
           "http://18.141.233.37:4000/api/upload",
           formData,
@@ -65,32 +65,30 @@ const FormTry = () => {
             },
           }
         );
-      
-        // console.log("✅ Upload response:", uploadResponse.data.data);
-      
-        // Corrected: assign imageFilename directly from .data
-        imageFilename = uploadResponse.data?.data; // Access the actual string value
+  
+        imageFilename = uploadResponse.data?.data; // just the filename string
       }
-      
   
-      // Step 2: Register user with image filename
       const { image, otp, ...userData } = values;
-
-      // console.log("📦 Sending user data to register:", {
-      //   ...userData,
-      //   image: imageFilename,
-      // });
   
+      // Step 2: Register user
       await axios.post(`${API_BASE}/register`, {
         ...userData,
-        image: imageFilename, // pass filename from /upload response
+        image: imageFilename,
       });
   
+      // Step 3: Send OTP to user's email
+      await axios.post(`${API_BASE}/send-otp`, {
+        email: userData.email,
+      });
+  
+      // Show success message
       toast.success("User registered successfully! Please check your email for OTP.", {
         style: { backgroundColor: "#4CAF50", color: "white" },
       });
   
-      navigate("/login");
+      // Optional: navigate to OTP verification page (or stay)
+      // navigate("/login");
     } catch (error) {
       console.error("❌ Registration Error:", error);
       toast.error(
@@ -101,6 +99,7 @@ const FormTry = () => {
       );
     }
   };
+  
 
 
   const sendOtp = async () => {
