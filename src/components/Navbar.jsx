@@ -12,7 +12,7 @@ import {
   MenuList,
   MenuItem,
   Avatar,
-  Spinner
+  Spinner,
   // Card,
   // IconButton,
 } from "@material-tailwind/react";
@@ -38,8 +38,6 @@ import {
 } from "@/components/ui/select";
 import { useAuthStore } from "../Store";
 
-
-
 // profile menu component
 const profileMenuItems = [
   // {
@@ -54,24 +52,18 @@ const profileMenuItems = [
   },
 ];
 
-
-
-
 export default function Navbar() {
-
   const user = useAuthStore((state) => state.user);
-  const isLoggedIn = useAuthStore(
-    (state) => !!state.user?.data?.isActive
-  );
+  const isLoggedIn = useAuthStore((state) => !!state.user?.data?.isActive);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const fetchImage = useAuthStore((state) => state.fetchProfileImage);
-  
+
   const closeMenu = () => setIsMenuOpen(false);
 
   useEffect(() => {
     useAuthStore.getState().fetchUserData();
   }, []);
-  
+
   useEffect(() => {
     if (user?.data?.image) {
       fetchImage(user.data.image);
@@ -88,10 +80,6 @@ export default function Navbar() {
 
   const profileImageUrl = useAuthStore((state) => state.profileImageUrl);
   console.log("Profile image URL:", profileImageUrl);
-
-
-
-
 
   const [region, setRegion] = useState("");
   const [level, setLevel] = useState("");
@@ -164,25 +152,22 @@ export default function Navbar() {
     { value: "paid", label: "Paid" },
   ];
 
-
-  
-
   return (
     <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-7 w-full z-50 bg-white shadow-md backdrop-blur-md">
       {/* Top Navigation */}
       <div className="bg-white flex items-center justify-between ">
         <div className="md:w-52 w-48  text-[#461773] flex items-center">
-          <Link to='/' className="flex items-center">
-          <img src="./logo.png" />
+          <Link to="/" className="flex items-center">
+            <img src="./logo.png" />
           </Link>
         </div>
 
         <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
           <a href="#" className="hover:text-[#461773]">
-            O‘quv markazlar
+            Learning Centers
           </a>
           <Link to="/About" className="hover:text-[#461773]">
-          Loyiha haqida
+            About Us
           </Link>
           </div>
         {isLoggedIn ? 
@@ -199,9 +184,14 @@ export default function Navbar() {
                   size="sm"
                   alt="User profile"
                   className="border border-purple-900 p-0.5"
-                  src={profileImageUrl || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80'} // fallback if image fails
+                  src={
+                    profileImageUrl ||
+                    "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+                  } // fallback if image fails
                 />
-                <p className="text-[#290a3f]">{user?.data?.firstName} {user?.data?.lastName}</p>
+                <motion.p className="text-[#290a3f]">
+                  {user?.data?.firstName} {user?.data?.lastName}
+                </motion.p>
                 <ChevronDownIcon
                   strokeWidth={2.5}
                   className={`h-3 w-3 text-[#290a3f] transition-transform ${
@@ -214,56 +204,53 @@ export default function Navbar() {
               {profileMenuItems.map(({ label, icon, link }, key) => {
                 const isLastItem = key === profileMenuItems.length - 1;
                 return (
-                  <Link to={`${isLastItem
-                      ? "#"
-                      : link}`}
-                      key={label}>
-                  <MenuItem
-                  onClick={isLastItem ? handleLogout: closeMenu}
-                  className={`flex items-center  gap-2 rounded ${
-                    isLastItem
+                  <Link to={`${isLastItem ? "#" : link}`} key={label}>
+                    <MenuItem
+                      onClick={isLastItem ? handleLogout : closeMenu}
+                      className={`flex items-center  gap-2 rounded ${
+                        isLastItem
                           ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
                           : "hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff]"
                       }`}
-                      >
+                    >
                       {React.createElement(icon, {
-                        className: `h-4 w-4 ${isLastItem ? "text-red-500" : "text-[#290a3f]"}`,
+                        className: `h-4 w-4 ${
+                          isLastItem ? "text-red-500" : "text-[#290a3f]"
+                        }`,
                         strokeWidth: 2,
                       })}
                       <Typography
                         as="span"
                         variant="small"
-                        className={`font-normal ${isLastItem ? "text-red-500" : "text-[#290a3f]"}`}
+                        className={`font-normal ${
+                          isLastItem ? "text-red-500" : "text-[#290a3f]"
+                        }`}
                       >
                         {label}
                       </Typography>
                     </MenuItem>
-                      </Link>
+                  </Link>
                 );
               })}
             </MenuList>
-          </Menu>) 
-          :
-        
-      (
-
-        <div className="flex gap-2 md:gap-6">
-          <Buton
-            variant="outline"
-            className="border-[#461773] text-[#461773] text-sm md:text-xl p-2 md:p-4 rounded-full"
-            asChild
-          >
-            <Link to='/Login'>Login</Link>
-          </Buton>
-          <Buton
-            className="bg-[#461773] text-white text-sm md:text-xl p-2 md:p-4 rounded-full"
-            asChild
-          >
-            <Link to="/Register">Register</Link>
-          </Buton>
-        </div>
-        ) 
-        }
+          </Menu>
+        ) : (
+          <div className="flex gap-2 md:gap-6">
+            <Buton
+              variant="outline"
+              className="border-[#461773] text-[#461773] text-sm md:text-xl p-2 md:p-4 rounded-full"
+              asChild
+            >
+              <Link to="/Login">Login</Link>
+            </Buton>
+            <Buton
+              className="bg-[#461773] text-white text-sm md:text-xl p-2 md:p-4 rounded-full"
+              asChild
+            >
+              <Link to="/Register">Register</Link>
+            </Buton>
+          </div>
+        )}
       </div>
 
       {/* Bottom Navigation */}
@@ -381,7 +368,3 @@ export default function Navbar() {
     </nav>
   );
 }
-
-
-
-

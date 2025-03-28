@@ -27,8 +27,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Invalid email" }),
   phone: z.string().min(12, { message: "Invalid phone" }),
   password: z.string().min(6, { message: "Min 6 characters" }),
-  role: z.enum(["USER", "CEO", "Admin", "Super Admin"]),  // Change here
-
+  role: z.enum(["USER", "CEO", "Admin"]),
   image: z.any().optional(),
 });
 
@@ -49,57 +48,18 @@ const FormTry = () => {
 
   const onSubmit = async (values) => {
     try {
-      let imageFilename = "default.jpg";
-  
-      // Step 1: Upload image if present
-      if (values.image) {
-        const formData = new FormData();
-        formData.append("image", values.image);
-  
-        const uploadResponse = await axios.post(
-          "http://18.141.233.37:4000/api/upload",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-  
-        imageFilename = uploadResponse.data?.data; // just the filename string
-      }
-  
-      const { image, otp, ...userData } = values;
-  
-      // Step 2: Register user
-      await axios.post(`${API_BASE}/register`, {
-        ...userData,
-        image: imageFilename,
-      });
-  
-      // Step 3: Send OTP to user's email
-      await axios.post(`${API_BASE}/send-otp`, {
-        email: userData.email,
-      });
-  
-      // Show success message
+      const { otp, ...userData } = values;
+      await axios.post(`${API_BASE}/register`, { ...userData, image: "image.jpg" });
       toast.success("User registered successfully! Please check your email for OTP.", {
         style: { backgroundColor: "#4CAF50", color: "white" },
       });
-  
-      // Optional: navigate to OTP verification page (or stay)
-      // navigate("/login");
+      navigate("");
     } catch (error) {
-      console.error("❌ Registration Error:", error);
-      toast.error(
-        error.response?.data?.message || "Registration failed. Please try again.",
-        {
-          style: { backgroundColor: "#D32F2F", color: "white" },
-        }
-      );
+      toast.error(error.response?.data?.message || "Registration failed. Please try again.", {
+        style: { backgroundColor: "#D32F2F", color: "white" },
+      });
     }
   };
-  
 
 
   const sendOtp = async () => {
@@ -188,7 +148,16 @@ flex flex-col justify-center bg-white rounded-lg shadow-lg p-6 sm:p-10 md:p-9 mr
  <FormMessage /></FormItem>)} />
               
 <FormField control={form.control} name="phone" render={({ field }) => (
-<FormItem> <FormControl><Input placeholder="Phone Number" {...field} /></FormControl>
+<FormItem> <FormControl><Input placeholder="Phone Number"
+  {...form.register("phone")}
+  onChange={(e) => {
+    let value = e.target.value.replace(/[^\d]/g, ""); // Remove non-numeric characters
+    if (!value.startsWith("998")) {
+      value = "998" + value.replace(/^998/, "");
+    }
+    form.setValue("phone", `+${value}`); // Ensures "+998" always stays
+  }}
+/></FormControl>
  <FormMessage /> </FormItem>)} />
   
  <FormField control={form.control} name="role" render={({ field }) => (
@@ -197,9 +166,8 @@ flex flex-col justify-center bg-white rounded-lg shadow-lg p-6 sm:p-10 md:p-9 mr
 <SelectTrigger className="w-full">{field.value || "Select Role"}
 </SelectTrigger> <SelectContent>
 <SelectItem value="CEO">CEO</SelectItem>
- <SelectItem value="USER">USER</SelectItem>
+ <SelectItem value="USER">User</SelectItem>
 <SelectItem value="Admin">Admin</SelectItem>
-<SelectItem value="Super Admin">Super Admin</SelectItem>
  </SelectContent></Select>
  </FormControl>
  <FormMessage />
