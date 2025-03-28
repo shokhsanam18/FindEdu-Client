@@ -177,14 +177,14 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
+        <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
           <a href="#" className="hover:text-[#461773]">
             O‘quv markazlar
           </a>
           <Link to="/About" className="hover:text-[#461773]">
           Loyiha haqida
           </Link>
-          </div> */}
+          </div>
         {isLoggedIn ? 
           (
             <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
@@ -210,7 +210,7 @@ export default function Navbar() {
                 />
               </Button>
             </MenuHandler>
-            <MenuList className="p-1">
+            {/* <MenuList className="p-1">
               {profileMenuItems.map(({ label, icon, link }, key) => {
                 const isLastItem = key === profileMenuItems.length - 1;
                 return (
@@ -241,8 +241,9 @@ export default function Navbar() {
                       </Link>
                 );
               })}
-            </MenuList>
-          </Menu>) :
+            </MenuList> */}
+          </Menu>) 
+          :
         
       (
 
