@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Heart, ArrowRight } from "lucide-react";
 import axios from "axios";
-import { Card, CardHeader, CardTitle } from "./card.jsx";
+import { Card, CardHeader, CardTitle, CardContent } from "./card.jsx";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
