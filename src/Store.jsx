@@ -32,6 +32,7 @@ export const useAuthStore = create((set, get) => ({
       });
 
       set({ user: data });
+      console.log(data)
       return data;
     } catch (error) {
       console.error("❌ Error fetching user:", error?.response?.data || error);
@@ -118,6 +119,7 @@ export const useAuthStore = create((set, get) => ({
       try {
         const { exp } = JSON.parse(atob(token.split(".")[1]));
         const expiryTime = exp * 1000 - Date.now() - 30000;
+        console.log(expiryTime)
 
         if (expiryTime > 0) {
           setTimeout(() => get().refreshTokenFunc(), expiryTime);
