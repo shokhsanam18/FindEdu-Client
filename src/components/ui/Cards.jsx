@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import home from "/public/home.png";
 
 const MajorsApi = "http://18.141.233.37:4000/api/major";
-const RegionsApi = "http://18.141.233.37:4000/api/regions/search"; 
+const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
 
 export const Modal = ({
   isOpen,
@@ -39,38 +39,42 @@ export const Modal = ({
 
   return (
     <div
-      className="bg-black bg-opacity-60 fixed inset-0 flex items-center justify-center"
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
       onClick={onClose}
     >
       <div
-        className="w-[35%] px-5 py-5 bg-gray-200 border border-black"
+        className="w-[40%] max-w-[500px] max-h-[80vh] overflow-y-auto px-6 py-6 bg-[#A88CC0] text-white border border-white rounded-lg shadow-lg z-50"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col items-start">
-          <label className="text-2xl font-medium">Select Majors</label>
-          <form className="majors text-xl flex flex-wrap gap-2">
+        <div className="flex flex-col">
+          <label className="text-2xl font-semibold mb-2">Select Majors</label>
+          <form className="text-lg flex flex-wrap gap-3">
             {majors.map((major) => (
-              <label key={major.id} className="flex gap-1">
+              <label key={major.id} className="flex items-center gap-2 w-1/2">
                 <input
                   type="checkbox"
                   value={major.id}
                   checked={selectedMajors.includes(major.id)}
                   onChange={() => handleMajorSelect(major.id)}
+                  className="w-5 h-5 accent-[#4B2E64]"
                 />
                 {major.name}
               </label>
             ))}
           </form>
 
-          <label className="text-2xl font-medium mt-4">Select Regions</label>
-          <form className="regions text-xl flex flex-wrap gap-2">
+          <label className="text-2xl font-semibold mt-5 mb-2">
+            Select Regions
+          </label>
+          <form className="text-lg flex flex-wrap gap-3">
             {regions.map((region) => (
-              <label key={region.id} className="flex gap-1">
+              <label key={region.id} className="flex items-center gap-2 w-1/2">
                 <input
                   type="checkbox"
                   value={region.id}
                   checked={selectedRegions.includes(region.id)}
                   onChange={() => handleRegionSelect(region.id)}
+                  className="w-5 h-5 accent-[#4B2E64]"
                 />
                 {region.name}
               </label>
@@ -78,9 +82,9 @@ export const Modal = ({
           </form>
         </div>
 
-        <div className="flex justify-between mt-4">
+        <div className="flex justify-between mt-5">
           <button
-            className="bg-green-600 text-white px-4 py-1 rounded-lg"
+            className="bg-[#9270B0] text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-[#7C5B99]"
             onClick={() => {
               onSave();
               onClose();
@@ -89,7 +93,7 @@ export const Modal = ({
             OK
           </button>
           <button
-            className="bg-rose-600 text-white px-4 py-1 rounded-lg"
+            className="bg-[#C47FB6] text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-[#A96DA4]"
             onClick={onClose}
           >
             Cancel
@@ -134,24 +138,17 @@ export const Cards = () => {
       return;
     }
 
-    const filteredCenters = majors
-      .filter(
-        (major) =>
-          selectedMajors.includes(major.id) ||
-          (major.centers &&
-            major.centers.some((center) =>
-              selectedRegions.includes(center.regionId)
-            ))
-      )
-      .flatMap((major) =>
-        major.centers
-          ? major.centers.filter((center) =>
-              selectedRegions.length > 0
-                ? selectedRegions.includes(center.regionId)
-                : true
-            )
-          : []
-      );
+    const filteredCenters = majors.flatMap((major) =>
+      major.centers
+        ? major.centers.filter(
+            (center) =>
+              (selectedMajors.length === 0 ||
+                selectedMajors.includes(major.id)) &&
+              (selectedRegions.length === 0 ||
+                selectedRegions.includes(center.regionId))
+          )
+        : []
+    );
 
     setCenters(filteredCenters);
   }, [selectedMajors, selectedRegions, majors]);
@@ -176,16 +173,6 @@ export const Cards = () => {
             >
               Empowering Students, <br /> One Search at a Time.
             </motion.h1>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.6 }}
-              className="text-gray-300 mt-4"
-            >
-              We help students discover the best courses, universities, and
-              learning opportunities worldwide. With expert insights and real
-              student reviews, we make your education journey effortless.
-            </motion.p>
           </div>
         </div>
       </motion.div>
@@ -199,6 +186,18 @@ export const Cards = () => {
           <ChevronDown className="mt-2" />
         </h2>
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={() => {}}
+        selectedMajors={selectedMajors}
+        setSelectedMajors={setSelectedMajors}
+        selectedRegions={selectedRegions}
+        setSelectedRegions={setSelectedRegions}
+        majors={majors}
+        regions={regions}
+      />
 
       {loading ? (
         <p className="text-center mt-10">Loading...</p>
@@ -220,18 +219,6 @@ export const Cards = () => {
           )}
         </div>
       )}
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={() => setIsModalOpen(false)}
-        selectedMajors={selectedMajors}
-        setSelectedMajors={setSelectedMajors}
-        selectedRegions={selectedRegions}
-        setSelectedRegions={setSelectedRegions}
-        majors={majors}
-        regions={regions}
-      />
     </div>
   );
 };
