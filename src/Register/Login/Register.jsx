@@ -48,18 +48,57 @@ const FormTry = () => {
 
   const onSubmit = async (values) => {
     try {
-      const { otp, ...userData } = values;
-      await axios.post(`${API_BASE}/register`, { ...userData, image: "image.jpg" });
+      let imageFilename = "default.jpg";
+  
+      // Step 1: Upload image if present
+      if (values.image) {
+        const formData = new FormData();
+        formData.append("image", values.image);
+  
+        const uploadResponse = await axios.post(
+          "http://18.141.233.37:4000/api/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+  
+        imageFilename = uploadResponse.data?.data; // just the filename string
+      }
+  
+      const { image, otp, ...userData } = values;
+  
+      // Step 2: Register user
+      await axios.post(`${API_BASE}/register`, {
+        ...userData,
+        image: imageFilename,
+      });
+  
+      // Step 3: Send OTP to user's email
+      await axios.post(`${API_BASE}/send-otp`, {
+        email: userData.email,
+      });
+  
+      // Show success message
       toast.success("User registered successfully! Please check your email for OTP.", {
         style: { backgroundColor: "#4CAF50", color: "white" },
       });
-      navigate("");
+  
+      // Optional: navigate to OTP verification page (or stay)
+      // navigate("/login");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Registration failed. Please try again.", {
-        style: { backgroundColor: "#D32F2F", color: "white" },
-      });
+      console.error("❌ Registration Error:", error);
+      toast.error(
+        error.response?.data?.message || "Registration failed. Please try again.",
+        {
+          style: { backgroundColor: "#D32F2F", color: "white" },
+        }
+      );
     }
   };
+  
 
 
   const sendOtp = async () => {

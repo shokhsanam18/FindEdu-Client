@@ -36,7 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuthStore } from "../Store";
+import { useAuthStore, useCategoryStore } from "../Store";
 
 // profile menu component
 const profileMenuItems = [
@@ -79,7 +79,18 @@ export default function Navbar() {
   };
 
   const profileImageUrl = useAuthStore((state) => state.profileImageUrl);
-  console.log("Profile image URL:", profileImageUrl);
+
+
+
+  useEffect(() => {
+    const fetchInitialCategories = async () => {
+      const { fetchCategories } = useCategoryStore.getState();
+      await fetchCategories(); // fetch with default params
+    };
+  
+    fetchInitialCategories();
+  }, []);
+  // console.log("Profile image URL:", profileImageUrl);
 
   const [region, setRegion] = useState("");
   const [level, setLevel] = useState("");
