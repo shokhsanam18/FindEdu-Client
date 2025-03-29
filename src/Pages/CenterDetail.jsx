@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -12,7 +11,6 @@ import {
   MessageSquare,
   User,
   Calendar,
-  PenSquare,
   Trash2,
 } from "lucide-react";
 
@@ -27,9 +25,15 @@ const CenterDetail = () => {
   const [error, setError] = useState(null);
   const [liked, setLiked] = useState(false);
   const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState({
+    text: "",
+    star: 5,
+  });
   const [commentError, setCommentError] = useState(null);
   const [isCommenting, setIsCommenting] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editCommentText, setEditCommentText] = useState("");
+  const [editCommentStar, setEditCommentStar] = useState(5);
 
   const toggleLike = () => {
     const likedCenters = JSON.parse(localStorage.getItem('likedCenters') || '[]');
@@ -45,13 +49,15 @@ const CenterDetail = () => {
     try {
       const response = await axios.get(`${API_BASE}/api/comments`, {
         params: {
-          // Try different parameter names based on API requirements
-          center_id: centerId,  // Some APIs use snake_case
-          // Or try without parameters if API gets comments differently
+          centerId: centerId,
+          page: 1,
+          limit: 100
         }
       });
       
-      return response.data?.data || response.data || [];
+      // Filter comments by centerId in case the API doesn't support filtering
+      const allComments = response.data?.data || response.data || [];
+      return allComments.filter(comment => comment.centerId == centerId);
     } catch (error) {
       console.error("Comments fetch error:", error.response?.data || error.message);
       return [];
@@ -98,7 +104,7 @@ const CenterDetail = () => {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    if (!newComment.text.trim()) return;
 
     try {
       setIsCommenting(true);
@@ -107,15 +113,17 @@ const CenterDetail = () => {
       const response = await axios.post(
         `${API_BASE}/api/comments`,
         {
-          // Try different parameter names based on API requirements
-          center_id: id,  // Some APIs use snake_case
-          // centerId: id,  // Alternative
-          content: newComment,
+          text: newComment.text,
+          star: newComment.star,
+          centerId: id,
         }
       );
 
-      setComments([response.data.data, ...comments]);
-      setNewComment("");
+      setComments([response.data, ...comments]);
+      setNewComment({
+        text: "",
+        star: 5,
+      });
     } catch (err) {
       console.error("Error posting comment:", err);
       setCommentError(
@@ -137,6 +145,40 @@ const CenterDetail = () => {
     } catch (err) {
       console.error("Error deleting comment:", err);
       alert(err.response?.data?.message || "Failed to delete comment");
+    }
+  };
+
+  const startEditingComment = (comment) => {
+    setEditingCommentId(comment.id);
+    setEditCommentText(comment.text || comment.content);
+    setEditCommentStar(comment.star);
+  };
+
+  const cancelEditing = () => {
+    setEditingCommentId(null);
+    setEditCommentText("");
+    setEditCommentStar(5);
+  };
+
+  const handleUpdateComment = async () => {
+    if (!editCommentText.trim()) return;
+
+    try {
+      const response = await axios.patch(
+        `${API_BASE}/api/comments/${editingCommentId}`,
+        {
+          text: editCommentText,
+          star: editCommentStar,
+        }
+      );
+      
+      setComments(comments.map(comment => 
+        comment.id === editingCommentId ? response.data : comment
+      ));
+      cancelEditing();
+    } catch (err) {
+      console.error("Error updating comment:", err);
+      alert(err.response?.data?.message || "Failed to update comment");
     }
   };
 
@@ -283,7 +325,7 @@ const CenterDetail = () => {
 
               {/* Additional info/sidebar */}
               <div className="md:w-80 space-y-6">
-
+                {/* You can add additional center info here if needed */}
               </div>
             </div>
 
@@ -298,19 +340,34 @@ const CenterDetail = () => {
               <form onSubmit={handleCommentSubmit} className="mt-4">
                 <div className="flex flex-col space-y-2">
                   <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
+                    value={newComment.text}
+                    onChange={(e) => setNewComment({...newComment, text: e.target.value})}
                     placeholder="Share your thoughts about this center..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     rows={3}
                     disabled={isCommenting}
                   />
+                  <div className="flex items-center">
+                    <span className="mr-2">Rating:</span>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setNewComment({...newComment, star})}
+                        className="focus:outline-none"
+                      >
+                        <Star
+                          className={`h-5 w-5 ${star <= newComment.star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                        />
+                      </button>
+                    ))}
+                  </div>
                   {commentError && (
                     <p className="text-red-500 text-sm">{commentError}</p>
                   )}
                   <button
                     type="submit"
-                    disabled={!newComment.trim() || isCommenting}
+                    disabled={!newComment.text.trim() || isCommenting}
                     className="self-end px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-purple-300"
                   >
                     {isCommenting ? "Posting..." : "Post Comment"}
@@ -325,25 +382,81 @@ const CenterDetail = () => {
                 ) : (
                   comments.map((comment) => (
                     <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center space-x-2">
-                          <User className="h-5 w-5 text-gray-400" />
-                          <span className="font-medium">{comment.user?.name || "Anonymous"}</span>
+                      {editingCommentId === comment.id ? (
+                        <div className="space-y-2">
+                          <textarea
+                            value={editCommentText}
+                            onChange={(e) => setEditCommentText(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            rows={3}
+                          />
+                          <div className="flex items-center">
+                            <span className="mr-2">Rating:</span>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                type="button"
+                                key={star}
+                                onClick={() => setEditCommentStar(star)}
+                                className="focus:outline-none"
+                              >
+                                <Star
+                                  className={`h-5 w-5 ${star <= editCommentStar ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                                />
+                              </button>
+                            ))}
+                          </div>
+                          <div className="flex justify-end space-x-2">
+                            <button
+                              onClick={cancelEditing}
+                              className="px-3 py-1 text-gray-600 hover:text-gray-800"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={handleUpdateComment}
+                              className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+                            >
+                              Save
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            {new Date(comment.createdAt).toLocaleDateString()}
-                          </span>
-                          <button 
-                            onClick={() => handleDeleteComment(comment.id)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                      <p className="mt-2 text-gray-700">{comment.content}</p>
+                      ) : (
+                        <>
+                          <div className="flex justify-between items-start">
+                            <div className="flex items-center space-x-2">
+                              <User className="h-5 w-5 text-gray-400" />
+                              <span className="font-medium">{comment.user?.name || "Anonymous"}</span>
+                              <div className="flex items-center ml-2">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`h-4 w-4 ${i < comment.star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                              <Calendar className="h-4 w-4" />
+                              <span>
+                                {new Date(comment.createdAt || comment.updatedAt || Date.now()).toLocaleDateString()}
+                              </span>
+                              <button 
+                                onClick={() => startEditingComment(comment)}
+                                className="text-blue-500 hover:text-blue-700"
+                              >
+                                Edit
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteComment(comment.id)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                          <p className="mt-2 text-gray-700">{comment.text || comment.content}</p>
+                        </>
+                      )}
                     </div>
                   ))
                 )}
@@ -355,5 +468,4 @@ const CenterDetail = () => {
     </div>
   );
 };
-
 export default CenterDetail;
