@@ -31,7 +31,7 @@ export const useAuthStore = create((set, get) => ({
 
       const userData = { ...data, role };
       set({ user: userData });
-      console.log(userData);
+      // console.log(userData);
       return userData;
     } catch (error) {
       console.warn("Failed to fetch user data:", error?.response?.data || error);
@@ -183,7 +183,7 @@ export const useCategoryStore = create((set) => ({
       };
 
       const { data } = await axios.get(`${API_BASE}/categories`, { params });
-      console.log(data)
+      // console.log(data)
 
       set({
         categories: data.data || [],
