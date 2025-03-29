@@ -8,14 +8,12 @@ import VerifyOtp from "./Register/Login/VerifyOtp.jsx";
 import ErrorPage from "./Register/Login/Error.jsx";
 import About from "./Register/Login/Aboutus.jsx";
 import { Index } from "./Pages/Index-page.jsx";
-import CeoPage from "./Pages/CeoPage.jsx"; // Matching your actual filename
-import CenterDetail from "./Pages/CenterDetail.jsx"; // Matching your actual filename
+import CeoPage from "./Pages/CeoPage.jsx";
+import CenterDetail from "./Pages/CenterDetail.jsx";
 import { AuthProvider } from "./context/auth";
 import { useAuthStore } from "./Store.jsx";
 import { Resources } from "./Pages/Resources.jsx";
 function App() {
-
-
   const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
 
   useEffect(() => {
@@ -37,7 +35,7 @@ function App() {
           <Route path="/Login" element={<Login />} />
           <Route path="/Forget" element={<Forget />} />
           <Route path="/VerifyOtp" element={<VerifyOtp />} />
-         
+
           <Route path="*" element={<ErrorPage />} />
           <Route
             path="/you"

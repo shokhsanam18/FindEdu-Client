@@ -34,7 +34,10 @@ export const useAuthStore = create((set, get) => ({
       // console.log(userData);
       return userData;
     } catch (error) {
-      console.warn("Failed to fetch user data:", error?.response?.data || error);
+      console.warn(
+        "Failed to fetch user data:",
+        error?.response?.data || error
+      );
       return null;
     }
   },
@@ -94,7 +97,12 @@ export const useAuthStore = create((set, get) => ({
   logout: () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    set({ user: null, accessToken: null, refreshToken: null, profileImageUrl: null });
+    set({
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      profileImageUrl: null,
+    });
   },
 
   deleteAccount: async () => {
@@ -125,9 +133,12 @@ export const useAuthStore = create((set, get) => ({
         const { exp } = JSON.parse(atob(token.split(".")[1]));
         const timeUntilExpiry = exp * 1000 - Date.now() - 30000;
 
-        setTimeout(() => {
-          get().refreshTokenFunc();
-        }, timeUntilExpiry > 0 ? timeUntilExpiry : 0);
+        setTimeout(
+          () => {
+            get().refreshTokenFunc();
+          },
+          timeUntilExpiry > 0 ? timeUntilExpiry : 0
+        );
       } catch {
         get().logout();
       }
@@ -154,7 +165,6 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 }));
-
 
 export const useCategoryStore = create((set) => ({
   categories: [],
@@ -183,7 +193,7 @@ export const useCategoryStore = create((set) => ({
       };
 
       const { data } = await axios.get(`${API_BASE}/categories`, { params });
-      console.log(data)
+      console.log(data);
 
       set({
         categories: data.data || [],
@@ -194,7 +204,6 @@ export const useCategoryStore = create((set) => ({
         },
         loading: false,
       });
-
     } catch (error) {
       console.error("Error fetching categories:", error);
       toast.error("Failed to fetch categories");
@@ -203,9 +212,13 @@ export const useCategoryStore = create((set) => ({
   },
 }));
 
-
-
 export const useSearchStore = create((set) => ({
   searchTerm: "",
   setSearchTerm: (term) => set({ searchTerm: term }),
+}));
+
+export const useSidebarStore = create((set) => ({
+  side: false,
+  closeSidebar: () => set(() => ({ side: false })),
+  openSidebar: () => set(() => ({ side: true })),
 }));
