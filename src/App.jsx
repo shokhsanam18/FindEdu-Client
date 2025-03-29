@@ -13,6 +13,8 @@ import CenterDetail from "./Pages/CenterDetail.jsx";
 import { AuthProvider } from "./context/auth";
 import { useAuthStore } from "./Store.jsx";
 import { Resources } from "./Pages/Resources.jsx";
+import { Test } from "./Test.jsx";
+
 function App() {
   const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
 
@@ -35,7 +37,7 @@ function App() {
           <Route path="/Login" element={<Login />} />
           <Route path="/Forget" element={<Forget />} />
           <Route path="/VerifyOtp" element={<VerifyOtp />} />
-
+          <Route path="/Test" element={<Test />} />
           <Route path="*" element={<ErrorPage />} />
           <Route
             path="/you"
