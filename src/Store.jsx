@@ -10,89 +10,67 @@ export const useAuthStore = create((set, get) => ({
   refreshToken: localStorage.getItem("refreshToken") || null,
   profileImageUrl: null,
 
-  // Fetch user data (GET /users/mydata)
   fetchUserData: async () => {
     try {
-      // 🔄 Always refresh token before calling /mydata
-      let token = await get().refreshTokenFunc();
-      if (!token) {
-        console.warn("❌ No access token after refresh.");
-        return null;
-      }
+      const token = await get().refreshTokenFunc(false); // don't logout immediately on missing token
+      if (!token) return null;
 
-      
       const { data } = await axios.get(`${API_BASE}/users/mydata`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-
-      let role = data?.role; // Check if API response has role
-
-      // 🛠 Extract role from JWT token if missing from API
+      let role = data?.role;
       if (!role && token) {
         try {
           const decoded = JSON.parse(atob(token.split(".")[1]));
-          role = decoded?.role || "USER"; 
-        } catch (error) {
-          console.warn("❌ Failed to decode token:", error);
+          role = decoded?.role || "USER";
+        } catch {
+          role = "USER";
         }
       }
 
-      if (!role) {
-        console.warn("❌ Role still missing. Defaulting to USER.");
-        role = "USER"; // Fallback role
-      }
-
-      const userData = { ...data, role }; // Attach extracted role to user data
+      const userData = { ...data, role };
       set({ user: userData });
-
-      console.log(userData);
+      // console.log(userData);
       return userData;
     } catch (error) {
-      console.error("Error fetching user:", error?.response?.data || error);
+      console.warn("Failed to fetch user data:", error?.response?.data || error);
       return null;
     }
   },
 
-  // Login (POST /users/login)
   login: async (values) => {
     try {
-      const response = await axios.post(`${API_BASE}/users/login`, values);
-      const data = response.data;
+      const res = await axios.post(`${API_BASE}/users/login`, values);
+      const { accessToken, refreshToken } = res.data;
 
-      
-
-      if (data.accessToken && data.refreshToken) {
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-
-        set({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+      if (accessToken && refreshToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        set({ accessToken, refreshToken });
 
         const user = await get().fetchUserData();
-
         toast.success("Login successful!");
         return { success: true, role: user?.role };
-      } else {
-        toast.error("Invalid credentials");
-        return { success: false };
       }
+
+      toast.error("Invalid credentials");
+      return { success: false };
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error(error.response?.data?.message || "Something went wrong");
+      toast.error(error.response?.data?.message || "Login failed");
       return { success: false, message: error.response?.data?.message };
     }
   },
 
-  // Refresh token (POST /users/refreshToken)
-  refreshTokenFunc: async () => {
+  refreshTokenFunc: async (shouldLogout = true) => {
+    const refreshToken = get().refreshToken;
+
+    if (!refreshToken) {
+      if (shouldLogout) get().logout();
+      return null;
+    }
+
     try {
-      const refreshToken = get().refreshToken;
-
-      if (!refreshToken) {
-        console.warn("❌ No refresh token available. Logging out.");
-        return get().logout();
-      }
-
       const { data } = await axios.post(`${API_BASE}/users/refreshToken`, {
         refreshToken,
       });
@@ -101,67 +79,133 @@ export const useAuthStore = create((set, get) => ({
         localStorage.setItem("accessToken", data.accessToken);
         set({ accessToken: data.accessToken });
         return data.accessToken;
-      } else {
-        console.warn("❌ Refresh response missing accessToken. Logging out.");
-        get().logout();
       }
+
+      if (shouldLogout) get().logout();
+      return null;
     } catch (error) {
-      console.error("❌ Token refresh failed:", error?.response?.data || error);
-      get().logout();
+      if (shouldLogout) get().logout();
+      return null;
     }
   },
 
-  isLoggedIn: () => {
-    const user = get().user;
-    return !!user && user.isActive;
-  },
+  isLoggedIn: () => !!get().user?.isActive,
 
-  // Logout
   logout: () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    set({ user: null, accessToken: null, refreshToken: null });
+    set({ user: null, accessToken: null, refreshToken: null, profileImageUrl: null });
   },
 
-  // Auto-refresh setup
+  deleteAccount: async () => {
+    try {
+      const { user, refreshTokenFunc, logout } = get();
+      const token = await refreshTokenFunc();
+      const userId = user?.data?.id;
+
+      if (!token || !userId) return toast.error("User not authenticated");
+
+      await axios.delete(`${API_BASE}/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success("Account deleted successfully");
+      logout();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to delete account");
+    }
+  },
+
   autoRefreshToken: () => {
-    const checkTokenExpiry = () => {
+    const scheduleRefresh = () => {
       const token = get().accessToken;
       if (!token) return;
 
       try {
         const { exp } = JSON.parse(atob(token.split(".")[1]));
-        const expiryTime = exp * 1000 - Date.now() - 30000;
+        const timeUntilExpiry = exp * 1000 - Date.now() - 30000;
 
-        if (expiryTime > 0) {
-          setTimeout(() => get().refreshTokenFunc(), expiryTime);
-        } else {
+        setTimeout(() => {
           get().refreshTokenFunc();
-        }
+        }, timeUntilExpiry > 0 ? timeUntilExpiry : 0);
       } catch {
-        console.warn("❌ Token could not be decoded, logging out.");
         get().logout();
       }
     };
 
-    checkTokenExpiry();
+    scheduleRefresh();
   },
 
-
-  // 🔥 Fetch profile image by filename and store as blob URL
   fetchProfileImage: async (filename) => {
+    if (!filename) {
+      set({ profileImageUrl: null });
+      return;
+    }
+
     try {
-      const response = await axios.get(`http://18.141.233.37:4000/api/image/${filename}`, {
+      const res = await axios.get(`${API_BASE}/image/${filename}`, {
         responseType: "blob",
       });
 
-      // console.log("Fetched image blob:", response.data);
-
-      const blobUrl = URL.createObjectURL(response.data);
+      const blobUrl = URL.createObjectURL(res.data);
       set({ profileImageUrl: blobUrl });
-    } catch (error) {
-      console.error("🛑 Failed to fetch profile image:", error);
+    } catch {
       set({ profileImageUrl: null });
     }
   },
+}));
+
+
+export const useCategoryStore = create((set) => ({
+  categories: [],
+  loading: false,
+  error: null,
+  pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+  },
+
+  fetchCategories: async ({
+    name = "",
+    page = 1,
+    limit = 10,
+    sortOrder = "ASC",
+  } = {}) => {
+    set({ loading: true, error: null });
+
+    try {
+      const params = {
+        ...(name && { name }),
+        page,
+        limit,
+        sortOrder,
+      };
+
+      const { data } = await axios.get(`${API_BASE}/categories`, { params });
+      console.log(data)
+
+      set({
+        categories: data.data || [],
+        pagination: {
+          page,
+          limit,
+          total: data.total || 0,
+        },
+        loading: false,
+      });
+
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast.error("Failed to fetch categories");
+      set({ error, loading: false });
+    }
+  },
+}));
+
+
+
+export const useSearchStore = create((set) => ({
+  searchTerm: "",
+  setSearchTerm: (term) => set({ searchTerm: term }),
 }));
