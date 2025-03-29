@@ -92,42 +92,42 @@ export default function Navbar() {
   }, []);
   // console.log("Profile image URL:", profileImageUrl);
 
-  const [region, setRegion] = useState("");
-  const [level, setLevel] = useState("");
-  const [studyType, setStudyType] = useState("");
-  const [direction, setDirection] = useState("");
-  const [price, setPrice] = useState("");
+  // const [region, setRegion] = useState("");
+  // const [level, setLevel] = useState("");
+  // const [studyType, setStudyType] = useState("");
+  // const [direction, setDirection] = useState("");
+  // const [price, setPrice] = useState("");
   const [searchText, setSearchText] = useState("");
 
-  const handleRegionChange = (value) => {
-    setRegion(value);
-    console.log("Selected Region:", value);
-    // Implement your filtering logic here
-  };
+  // const handleRegionChange = (value) => {
+  //   setRegion(value);
+  //   console.log("Selected Region:", value);
+  //   // Implement your filtering logic here
+  // };
 
-  const handleLevelChange = (value) => {
-    setLevel(value);
-    console.log("Selected Level:", value);
-    // Implement your filtering logic here
-  };
+  // const handleLevelChange = (value) => {
+  //   setLevel(value);
+  //   console.log("Selected Level:", value);
+  //   // Implement your filtering logic here
+  // };
 
-  const handleStudyTypeChange = (value) => {
-    setStudyType(value);
-    console.log("Selected Study Type:", value);
-    // Implement your filtering logic here
-  };
+  // const handleStudyTypeChange = (value) => {
+  //   setStudyType(value);
+  //   console.log("Selected Study Type:", value);
+  //   // Implement your filtering logic here
+  // };
 
-  const handleDirectionChange = (value) => {
-    setDirection(value);
-    console.log("Selected Direction:", value);
-    // Implement your filtering logic here
-  };
+  // const handleDirectionChange = (value) => {
+  //   setDirection(value);
+  //   console.log("Selected Direction:", value);
+  //   // Implement your filtering logic here
+  // };
 
-  const handlePriceChange = (value) => {
-    setPrice(value);
-    console.log("Selected Price:", value);
-    // Implement your filtering logic here
-  };
+  // const handlePriceChange = (value) => {
+  //   setPrice(value);
+  //   console.log("Selected Price:", value);
+  //   // Implement your filtering logic here
+  // };
 
   const handleSearchTextChange = (e) => {
     setSearchText(e.target.value);
@@ -135,33 +135,33 @@ export default function Navbar() {
     // Implement your search logic here (could be debounced)
   };
 
-  const regions = [
-    { value: "", label: "Mintaqa →" },
-    { value: "tashkent", label: "Tashkent" },
-    { value: "samarkand", label: "Samarkand" },
-  ];
-  const levels = [
-    { value: "", label: "Darajasi →" },
-    { value: "beginner", label: "Beginner" },
-    { value: "advanced", label: "Advanced" },
-  ];
-  const studyTypes = [
-    { value: "", label: "O'qish turi →" },
-    { value: "online", label: "Online" },
-    { value: "offline", label: "Offline" },
-  ];
-  const directions = [
-    { value: "", label: "Yo'nalish →" },
-    { value: "it", label: "IT" },
-    { value: "marketing", label: "Marketing" },
-    { value: "sat", label: "SAT" },
-    { value: "IELTS", label: "IELTS" },
-  ];
-  const prices = [
-    { value: "", label: "Narxi →" },
-    { value: "free", label: "Free" },
-    { value: "paid", label: "Paid" },
-  ];
+  // const regions = [
+  //   { value: "", label: "Mintaqa →" },
+  //   { value: "tashkent", label: "Tashkent" },
+  //   { value: "samarkand", label: "Samarkand" },
+  // ];
+  // const levels = [
+  //   { value: "", label: "Darajasi →" },
+  //   { value: "beginner", label: "Beginner" },
+  //   { value: "advanced", label: "Advanced" },
+  // ];
+  // const studyTypes = [
+  //   { value: "", label: "O'qish turi →" },
+  //   { value: "online", label: "Online" },
+  //   { value: "offline", label: "Offline" },
+  // ];
+  // const directions = [
+  //   { value: "", label: "Yo'nalish →" },
+  //   { value: "it", label: "IT" },
+  //   { value: "marketing", label: "Marketing" },
+  //   { value: "sat", label: "SAT" },
+  //   { value: "IELTS", label: "IELTS" },
+  // ];
+  // const prices = [
+  //   { value: "", label: "Narxi →" },
+  //   { value: "free", label: "Free" },
+  //   { value: "paid", label: "Paid" },
+  // ];
 
   return (
     <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-7 w-full z-50 bg-white shadow-md backdrop-blur-md">
@@ -277,7 +277,7 @@ export default function Navbar() {
               style={{ color: "#000000" }}
             />
           </div>
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             <div className="border-l border-[#000000]">
               <Select onValueChange={handleRegionChange} value={region}>
                 <SelectTrigger
@@ -373,7 +373,7 @@ export default function Navbar() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </nav>
