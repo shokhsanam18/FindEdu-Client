@@ -616,7 +616,7 @@
 
 
 import { useEffect, useState } from "react";
-import { ChevronDown, Heart, ArrowRight } from "lucide-react";
+import { ChevronDown, Heart, ArrowRight, Star } from "lucide-react";
 import axios from "axios";
 import { Card, CardHeader, CardTitle, CardContent } from "./card.jsx";
 import { motion } from "framer-motion";
@@ -626,7 +626,32 @@ import { Link } from "react-router-dom";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
 const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
 const CentersApi = "http://18.141.233.37:4000/api/centers";
-const ImageApi = "http://18.141.233.37:4000/api/image"; // Base image API URL
+const ImageApi = "http://18.141.233.37:4000/api/image";
+
+// Star Rating Component
+const StarRating = ({ rating }) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+  return (
+    <div className="flex items-center">
+      {[...Array(fullStars)].map((_, i) => (
+        <Star key={`full-${i}`} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+      ))}
+      {hasHalfStar && (
+        <div className="relative w-4 h-4">
+          <Star className="absolute w-4 h-4 fill-gray-300 text-gray-300" />
+          <Star className="absolute w-4 h-4 fill-yellow-400 text-yellow-400" style={{ clipPath: 'inset(0 50% 0 0)' }} />
+        </div>
+      )}
+      {[...Array(emptyStars)].map((_, i) => (
+        <Star key={`empty-${i}`} className="w-4 h-4 fill-gray-300 text-gray-300" />
+      ))}
+      <span className="ml-1 text-sm text-gray-600">{rating.toFixed(1)}</span>
+    </div>
+  );
+};
 
 export const Modal = ({
   isOpen,
@@ -734,7 +759,6 @@ export const Cards = () => {
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [likedCenters, setLikedCenters] = useState([]);
 
-  // Function to toggle like status
   const toggleLike = (centerId) => {
     setLikedCenters(prev =>
       prev.includes(centerId)
@@ -757,10 +781,10 @@ export const Cards = () => {
         setMajors(majorsResponse.data.data || []);
         setRegions(regionsResponse.data.data || []);
         
-        // Process centers to include full image URL
         const processedCenters = centersResponse.data.data?.map(center => ({
           ...center,
-          imageUrl: center.image ? `${ImageApi}/${center.image}` : null
+          imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
+          rating: center.rating || 0 // Ensure rating exists
         })) || [];
         
         setCenters(processedCenters);
@@ -781,7 +805,8 @@ export const Cards = () => {
         .then((response) => {
           const processedCenters = response.data.data?.map(center => ({
             ...center,
-            imageUrl: center.image ? `${ImageApi}/${center.image}` : null
+            imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
+            rating: center.rating || 0
           })) || [];
           setCenters(processedCenters);
         })
@@ -801,7 +826,8 @@ export const Cards = () => {
               selectedRegions.includes(center.regionId))
         )?.map(center => ({
           ...center,
-          imageUrl: center.image ? `${ImageApi}/${center.image}` : null
+          imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
+          rating: center.rating || 0
         })) || []
     );
 
@@ -848,7 +874,7 @@ export const Cards = () => {
               className="mt-6 flex justify-center md:justify-start items-center gap-4"
             >
               <Link to="/" className="cursor-pointer">
-                <button className="flex items-center  text-white cursor-pointer px-6 py-3 rounded-full font-semibold shadow-lg bg-[#461773] hover:bg-[#533d75] transition">
+                <button className="flex items-center text-white cursor-pointer px-6 py-3 rounded-full font-semibold shadow-lg bg-[#461773] hover:bg-[#533d75] transition">
                   <span className="text-xl font-bold mr-2 cursor-pointer">+</span> EXPLORE
                   COURSES
                 </button>
@@ -881,50 +907,57 @@ export const Cards = () => {
         regions={regions}
       />
 
-      {/* Centers cards with image and like functionality */}
       {loading ? (
         <p className="text-center mt-10">Loading...</p>
       ) : (
-        <div className="Main_Cards flex flex-wrap justify-center xl:gap-8 gap-6 mt-10">
+        <div className="Main_Cards flex flex-wrap justify-center xl:gap-8 gap-6 mt-10 ">
           {centers.length > 0 ? (
             centers.map((center) => (
               <Card 
                 key={center.id}
-                className="relative xl:w-80 w-[270px] xl:h-72 h-60 rounded-xl cursor-pointer hover:shadow-lg transition-shadow"
+                className="relative xl:w-80 w-[270px] xl:h-80 h-72 rounded-xl border-purple-200 cursor-pointer hover:shadow-lg transition-shadow"
               >
                 <Link to={`/centers/${center.id}`} className="block h-full">
                   <CardHeader>
-                    <CardTitle>{center.name}</CardTitle>
+                    <CardTitle className="text-xl font-semibold">{center.name}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between h-full">
-                      {center.imageUrl && (
-                        <img
-                          className="w-28 h-28 absolute bottom-2 left-4 object-cover rounded-lg"
-                          src={center.imageUrl}
-                          alt={center.name}
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
+                  <CardContent className="flex flex-col h-full">
+                    <div className="flex-grow">
+                      {center.address && (
+                        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                          {center.address}
+                        </p>
                       )}
-                      <div className="absolute bottom-7 right-7">
+                      
+                      <div className="flex items-center justify-between mt-2">
+                        <StarRating rating={center.rating} />
                         <div 
-                          className="flex text-yellow-400 font-semibold items-center gap-1 cursor-pointer"
+                          className="flex items-center gap-1 cursor-pointer"
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             toggleLike(center.id);
                           }}
                         >
-                          <Heart 
+                          <Heart  
                             color={likedCenters.includes(center.id) ? "red" : "gray"} 
                             fill={likedCenters.includes(center.id) ? "red" : "none"}
-                          /> 
-                          {center.rating}
+                            className="w-6 h-6"
+                          />
                         </div>
                       </div>
                     </div>
+                    
+                    {center.imageUrl && (
+                      <img
+                        className="w-40 h-28 absolute bottom-4 right-4 object-cover rounded-lg"
+                        src={center.imageUrl}
+                        alt={center.name}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    )}
                   </CardContent>
                 </Link>
               </Card>
