@@ -218,7 +218,7 @@ const CenterDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-36">
+    <div className="min-h-screen bg-gray-50 mt-42 md:mt-36">
       {/* Back button */}
       <div className="container mx-auto px-4 py-6">
         <Link to="/" className="inline-flex items-center text-purple-600 hover:text-purple-800">
@@ -228,15 +228,15 @@ const CenterDetail = () => {
       </div>
 
       {/* Main content */}
-      <div className="container mx-auto px-4 py-8 flex flex-row ">
+      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row ">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex rounded-xl shadow-lg overflow-hidden "
+          className="flex rounded-xl shadow-lg overflow-hidden flex-col md:flex-row"
         >
           {/* Header with image */}
-          <div className="relative h-[400px] w-[500px] overflow-hidden ">
+          <div className="relative h-[400px] w-[460px] md:w-[500px] overflow-hidden ">
             {center.imageUrl ? (
               <img
                 src={center.imageUrl}
