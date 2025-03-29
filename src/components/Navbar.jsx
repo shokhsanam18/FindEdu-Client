@@ -57,6 +57,7 @@ export default function Navbar() {
   const isLoggedIn = useAuthStore((state) => !!state.user?.data?.isActive);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const fetchImage = useAuthStore((state) => state.fetchProfileImage);
+  const categories = useCategoryStore((state) => state.categories);
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -143,11 +144,11 @@ export default function Navbar() {
   //   // Implement your search logic here (could be debounced)
   // };
 
-  // const regions = [
-  //   { value: "", label: "Mintaqa →" },
-  //   { value: "tashkent", label: "Tashkent" },
-  //   { value: "samarkand", label: "Samarkand" },
-  // ];
+  const regions = [
+    { value: "", label: "Mintaqa →" },
+    { value: "tashkent", label: "Tashkent" },
+    { value: "samarkand", label: "Samarkand" },
+  ];
   // const levels = [
   //   { value: "", label: "Darajasi →" },
   //   { value: "beginner", label: "Beginner" },
@@ -285,27 +286,25 @@ export default function Navbar() {
               style={{ color: "#000000" }}
             />
           </div>
-          {/* <div className="flex items-center">
+          <div className="flex items-center">
             <div className="border-l border-[#000000]">
-              <Select onValueChange={handleRegionChange} value={region}>
+              <Select>
                 <SelectTrigger
                   className="w-[80px] md:w-[120px] lg:w-[160px] border-none bg-transparent text-left rounded-none focus-visible:ring-0 pl-2 md:pl-4"
                   style={{ color: "#000000" }}
                 >
-                  <SelectValue placeholder="Mintaqa →" />
+                  <SelectValue placeholder="Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  {regions
-                    .filter((item) => item.value !== "")
-                    .map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.name}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="border-l border-[#000000]">
+            {/* <div className="border-l border-[#000000]">
               <Select onValueChange={handleLevelChange} value={level}>
                 <SelectTrigger
                   className="w-[80px] md:w-[100px] lg:w-[140px] border-none bg-transparent text-left rounded-none focus-visible:ring-0 pl-2 md:pl-4"
@@ -380,8 +379,8 @@ export default function Navbar() {
                     ))}
                 </SelectContent>
               </Select>
-            </div>
-          </div> */}
+            </div> */}
+          </div>
         </div>
       </div>
     </nav>
