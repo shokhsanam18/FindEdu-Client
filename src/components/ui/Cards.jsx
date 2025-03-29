@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "./card.jsx";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
+import { useSearchStore } from "../../Store.jsx";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
 const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
 const CentersApi = "http://18.141.233.37:4000/api/centers";
@@ -113,6 +114,7 @@ export const Cards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMajors, setSelectedMajors] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
+  const searchTerm = useSearchStore((state) => state.searchTerm);
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -136,6 +138,17 @@ export const Cards = () => {
 
     fetchData();
   }, []);
+
+  const filteredCenters = centers.filter((center) => {
+    const term = searchTerm.toLowerCase();
+    const nameMatch = center.name?.toLowerCase().includes(term);
+    const addressMatch = center.address?.toLowerCase().includes(term);
+    const majorMatch = center.majors?.some((major) =>
+      major.name?.toLowerCase().includes(term)
+    );
+    return nameMatch || addressMatch || majorMatch;
+  });
+  
 
   useEffect(() => {
     if (selectedMajors.length === 0 && selectedRegions.length === 0) {
@@ -240,8 +253,8 @@ export const Cards = () => {
         <p className="text-center mt-10">Loading...</p>
       ) : (
         <div className="Main_Cards flex flex-wrap justify-center xl:gap-8 gap-6 mt-10">
-          {centers.length > 0 ? (
-            centers.map((center) => (
+          {filteredCenters.length > 0 ? (
+            filteredCenters.map((center) => (
               <Card
                 key={center.id}
                 className="relative xl:w-80 w-[270px] xl:h-72 h-60 rounded-xl"

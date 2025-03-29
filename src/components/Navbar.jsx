@@ -36,7 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuthStore, useCategoryStore } from "../Store";
+import { useAuthStore, useCategoryStore, useSearchStore } from "../Store";
 
 // profile menu component
 const profileMenuItems = [
@@ -92,12 +92,20 @@ export default function Navbar() {
   }, []);
   // console.log("Profile image URL:", profileImageUrl);
 
+
+  const searchTerm = useSearchStore((state) => state.searchTerm);
+  const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
+
+  const handleSearchTextChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   // const [region, setRegion] = useState("");
   // const [level, setLevel] = useState("");
   // const [studyType, setStudyType] = useState("");
   // const [direction, setDirection] = useState("");
   // const [price, setPrice] = useState("");
-  const [searchText, setSearchText] = useState("");
+  // const [searchText, setSearchText] = useState("");
 
   // const handleRegionChange = (value) => {
   //   setRegion(value);
@@ -129,11 +137,11 @@ export default function Navbar() {
   //   // Implement your filtering logic here
   // };
 
-  const handleSearchTextChange = (e) => {
-    setSearchText(e.target.value);
-    console.log("Search Text:", e.target.value);
-    // Implement your search logic here (could be debounced)
-  };
+  // const handleSearchTextChange = (e) => {
+  //   setSearchText(e.target.value);
+  //   console.log("Search Text:", e.target.value);
+  //   // Implement your search logic here (could be debounced)
+  // };
 
   // const regions = [
   //   { value: "", label: "Mintaqa →" },
@@ -271,7 +279,7 @@ export default function Navbar() {
             <Input
               type="text"
               placeholder="Kasb, fan yoki o'quv markaz nomini kiriting..."
-              value={searchText}
+              value={searchTerm}
               onChange={handleSearchTextChange}
               className="border-0 rounded-l-full md:rounded-l-md shadow-none focus-visible:ring-0 pl-2 md:pl-4"
               style={{ color: "#000000" }}

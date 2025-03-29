@@ -202,3 +202,10 @@ export const useCategoryStore = create((set) => ({
     }
   },
 }));
+
+
+
+export const useSearchStore = create((set) => ({
+  searchTerm: "",
+  setSearchTerm: (term) => set({ searchTerm: term }),
+}));
