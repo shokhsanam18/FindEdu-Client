@@ -616,9 +616,10 @@
 
 
 import { useEffect, useState } from "react";
-import { ChevronDown, Heart, ArrowRight, Star } from "lucide-react";
+import { ChevronDown, MapPinIcon, StarIcon, ArrowRight, PhoneIcon, X } from "lucide-react";
 import axios from "axios";
-import { Card, CardHeader, CardTitle, CardContent } from "./card.jsx";
+import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
@@ -628,32 +629,7 @@ const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
 const CentersApi = "http://18.141.233.37:4000/api/centers";
 const ImageApi = "http://18.141.233.37:4000/api/image";
 
-// Star Rating Component
-const StarRating = ({ rating }) => {
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 >= 0.5;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
-  return (
-    <div className="flex items-center">
-      {[...Array(fullStars)].map((_, i) => (
-        <Star key={`full-${i}`} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-      ))}
-      {hasHalfStar && (
-        <div className="relative w-4 h-4">
-          <Star className="absolute w-4 h-4 fill-gray-300 text-gray-300" />
-          <Star className="absolute w-4 h-4 fill-yellow-400 text-yellow-400" style={{ clipPath: 'inset(0 50% 0 0)' }} />
-        </div>
-      )}
-      {[...Array(emptyStars)].map((_, i) => (
-        <Star key={`empty-${i}`} className="w-4 h-4 fill-gray-300 text-gray-300" />
-      ))}
-      <span className="ml-1 text-sm text-gray-600">{rating.toFixed(1)}</span>
-    </div>
-  );
-};
-
-export const Modal = ({
+const Modal = ({
   isOpen,
   onClose,
   onSave,
@@ -683,10 +659,7 @@ export const Modal = ({
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={onClose}>
       <div
         className="w-[40%] max-w-[500px] max-h-[80vh] overflow-y-auto px-6 py-6 bg-[#A88CC0] text-white border border-white rounded-lg shadow-lg z-50"
         onClick={(e) => e.stopPropagation()}
@@ -708,9 +681,7 @@ export const Modal = ({
             ))}
           </form>
 
-          <label className="text-2xl font-semibold mt-5 mb-2">
-            Select Regions
-          </label>
+          <label className="text-2xl font-semibold mt-5 mb-2">Select Regions</label>
           <form className="text-lg flex flex-wrap gap-3">
             {regions.map((region) => (
               <label key={region.id} className="flex items-center gap-2 w-1/2">
@@ -752,31 +723,24 @@ export const Modal = ({
 export const Cards = () => {
   const [majors, setMajors] = useState([]);
   const [regions, setRegions] = useState([]);
-  const [centers, setCenters] = useState([]);
+  const [allCenters, setAllCenters] = useState([]);
+  const [filteredCenters, setFilteredCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMajors, setSelectedMajors] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [likedCenters, setLikedCenters] = useState([]);
 
-  const toggleLike = (centerId) => {
-    setLikedCenters(prev =>
-      prev.includes(centerId)
-        ? prev.filter(id => id !== centerId)
-        : [...prev, centerId]
-    );
-  };
-
+  // Fetch all data on component mount
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [majorsResponse, regionsResponse, centersResponse] =
-          await Promise.all([
-            axios.get(MajorsApi),
-            axios.get(RegionsApi),
-            axios.get(CentersApi),
-          ]);
+        const [majorsResponse, regionsResponse, centersResponse] = await Promise.all([
+          axios.get(MajorsApi),
+          axios.get(RegionsApi),
+          axios.get(CentersApi),
+        ]);
 
         setMajors(majorsResponse.data.data || []);
         setRegions(regionsResponse.data.data || []);
@@ -784,10 +748,11 @@ export const Cards = () => {
         const processedCenters = centersResponse.data.data?.map(center => ({
           ...center,
           imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
-          rating: center.rating || 0 // Ensure rating exists
+          rating: center.rating || 0
         })) || [];
         
-        setCenters(processedCenters);
+        setAllCenters(processedCenters);
+        setFilteredCenters(processedCenters);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -798,44 +763,45 @@ export const Cards = () => {
     fetchData();
   }, []);
 
+  // Apply filters when selections change
   useEffect(() => {
     if (selectedMajors.length === 0 && selectedRegions.length === 0) {
-      axios
-        .get(CentersApi)
-        .then((response) => {
-          const processedCenters = response.data.data?.map(center => ({
-            ...center,
-            imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
-            rating: center.rating || 0
-          })) || [];
-          setCenters(processedCenters);
-        })
-        .catch((error) =>
-          console.error("Error loading default centers:", error)
-        );
+      setFilteredCenters(allCenters);
       return;
     }
 
-    const filteredCenters = majors.flatMap(
-      (major) =>
-        major.centers?.filter(
-          (center) =>
-            (selectedMajors.length === 0 ||
-              selectedMajors.includes(major.id)) &&
-            (selectedRegions.length === 0 ||
-              selectedRegions.includes(center.regionId))
-        )?.map(center => ({
-          ...center,
-          imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
-          rating: center.rating || 0
-        })) || []
-    );
+    const filtered = allCenters.filter(center => {
+      const matchesMajor = selectedMajors.length === 0 || 
+        selectedMajors.includes(center.majorId);
+      const matchesRegion = selectedRegions.length === 0 || 
+        selectedRegions.includes(center.regionId);
+      return matchesMajor && matchesRegion;
+    });
 
-    setCenters(filteredCenters);
-  }, [selectedMajors, selectedRegions, majors]);
+    setFilteredCenters(filtered);
+  }, [selectedMajors, selectedRegions, allCenters]);
+
+  const toggleLike = (centerId) => {
+    setLikedCenters(prev =>
+      prev.includes(centerId)
+        ? prev.filter(id => id !== centerId)
+        : [...prev, centerId]
+    );
+  };
+
+  const removeMajorFilter = (majorId) => {
+    setSelectedMajors(prev => prev.filter(id => id !== majorId));
+  };
+
+  const removeRegionFilter = (regionId) => {
+    setSelectedRegions(prev => prev.filter(id => id !== regionId));
+  };
+
+  const getMajorName = (id) => majors.find(m => m.id === id)?.name || id;
+  const getRegionName = (id) => regions.find(r => r.id === id)?.name || id;
 
   return (
-    <div className="mb-16 mt-[11%]">
+    <div className="mb-16 mt-36">
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -867,38 +833,53 @@ export const Cards = () => {
               student reviews, we make your education journey effortless.
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.9 }}
-              className="mt-6 flex justify-center md:justify-start items-center gap-4"
-            >
-              <Link to="/" className="cursor-pointer">
-                <button className="flex items-center text-white cursor-pointer px-6 py-3 rounded-full font-semibold shadow-lg bg-[#461773] hover:bg-[#533d75] transition">
-                  <span className="text-xl font-bold mr-2 cursor-pointer">+</span> EXPLORE
-                  COURSES
-                </button>
-              </Link>
-            </motion.div>
           </div>
         </div>
       </motion.div>
-      <div className="flex items-center justify-center gap-5 flex-wrap">
-        <h2
-          className="text-2xl text-center hover:cursor-pointer bg-blue-500 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-blue-500 hover:bg-white hover:text-blue-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center"
-          onClick={() => setIsModalOpen(true)}
-        >
-          Majors & Regions
-          <ChevronDown className="mt-2" />
-        </h2>
+
+      {/* Filter controls */}
+      <div className="flex flex-col items-center gap-4">
+        <div className="flex items-center justify-center gap-5 flex-wrap">
+          <h2
+            className="text-xl text-center hover:cursor-pointer bg-[#451774] rounded-xl w-auto h-auto px-9 py-3 pb-4 border-[#924bda] text-white border-2  hover:bg-white hover:text-purple-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Majors & Regions
+            <ChevronDown className="mt-2" />
+          </h2>
+        </div>
+
+        {/* Active filters display */}
+        <div className="flex flex-wrap gap-2 justify-center">
+          {selectedMajors.map(id => (
+            <div key={`major-${id}`} className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+              {getMajorName(id)}
+              <button 
+                onClick={() => removeMajorFilter(id)}
+                className="ml-2 text-blue-600 hover:text-blue-800"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ))}
+          {selectedRegions.map(id => (
+            <div key={`region-${id}`} className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
+              {getRegionName(id)}
+              <button 
+                onClick={() => removeRegionFilter(id)}
+                className="ml-2 text-green-600 hover:text-green-800"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
+
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={() => {
-          setIsModalOpen(false);
-          console.log("Saved selections:", { selectedMajors, selectedRegions });
-        }}
+        onSave={() => setIsModalOpen(false)}
         selectedMajors={selectedMajors}
         setSelectedMajors={setSelectedMajors}
         selectedRegions={selectedRegions}
@@ -910,60 +891,71 @@ export const Cards = () => {
       {loading ? (
         <p className="text-center mt-10">Loading...</p>
       ) : (
-        <div className="Main_Cards flex flex-wrap justify-center xl:gap-8 gap-6 mt-10 ">
-          {centers.length > 0 ? (
-            centers.map((center) => (
-              <Card 
+        <div className="Main_Cards flex flex-wrap justify-center xl:gap-20 gap-6 mt-10">
+          {filteredCenters.length > 0 ? (
+            filteredCenters.map((center) => (
+              <motion.div
                 key={center.id}
-                className="relative xl:w-80 w-[270px] xl:h-80 h-72 rounded-xl border-purple-200 cursor-pointer hover:shadow-lg transition-shadow"
+                className="w-full max-w-sm overflow-hidden rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
               >
-                <Link to={`/centers/${center.id}`} className="block h-full">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold">{center.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-col h-full">
-                    <div className="flex-grow">
-                      {center.address && (
-                        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                          {center.address}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center justify-between mt-2">
-                        <StarRating rating={center.rating} />
-                        <div 
-                          className="flex items-center gap-1 cursor-pointer"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleLike(center.id);
-                          }}
-                        >
-                          <Heart  
-                            color={likedCenters.includes(center.id) ? "red" : "gray"} 
-                            fill={likedCenters.includes(center.id) ? "red" : "none"}
-                            className="w-6 h-6"
-                          />
-                        </div>
-                      </div>
+                <div className="relative h-48 overflow-hidden">
+                  {center.imageUrl ? (
+                    <img
+                      className="w-full h-full object-cover"
+                      src={center.imageUrl}
+                      alt={center.name}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.parentElement.classList.add('bg-gray-100');
+                      }}
+                    />
+                  ) : (
+                    <div className="h-full bg-gray-100 flex items-center justify-center">
+                      <MapPinIcon className="h-10 w-10 text-gray-400" />
                     </div>
-                    
-                    {center.imageUrl && (
-                      <img
-                        className="w-40 h-28 absolute bottom-4 right-4 object-cover rounded-lg"
-                        src={center.imageUrl}
-                        alt={center.name}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
+                  )}
+
+                  <motion.button
+                    className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => toggleLike(center.id)}
+                  >
+                    {likedCenters.includes(center.id) ? (
+                      <HeartSolid className="h-5 w-5 text-red-500" />
+                    ) : (
+                      <HeartOutline className="h-5 w-5 text-red-500" />
                     )}
-                  </CardContent>
-                </Link>
-              </Card>
+                  </motion.button>
+                </div>
+
+                <div className="px-4 py-7 space-y-1.5">
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-xl font-semibold truncate">{center.name}</h3>
+                    <div className="flex items-center space-x-1">
+                      <StarIcon className="h-4 w-4 text-yellow-500" />
+                      <span className="text-sm font-medium">{center.rating?.toFixed(1) || "4.8"}</span>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-gray-600 line-clamp-1">{center.address}</p>
+                  
+                  <div className="flex items-center justify-between mt-1.5">
+                    <div className="flex items-center space-x-1 text-sm text-gray-500">
+                      <PhoneIcon className="h-4 w-4" />
+                      <span>{center.phone || "+1 (555) 123-4567"}</span>
+                    </div>
+                    <button className="text-sm font-medium text-blue-600 hover:underline">
+                      Details
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
             ))
           ) : (
-            <p className="text-center text-gray-600">No centers found.</p>
+            <p className="text-center text-gray-600">No centers match your filters.</p>
           )}
         </div>
       )}
