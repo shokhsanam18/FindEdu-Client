@@ -943,14 +943,17 @@ export const Cards = () => {
                   <p className="text-sm text-gray-600 line-clamp-1">{center.address}</p>
                   
                   <div className="flex items-center justify-between mt-1.5">
-                    <div className="flex items-center space-x-1 text-sm text-gray-500">
-                      <PhoneIcon className="h-4 w-4" />
-                      <span>{center.phone || "+1 (555) 123-4567"}</span>
-                    </div>
-                    <button className="text-sm font-medium text-blue-600 hover:underline">
-                      Details
-                    </button>
-                  </div>
+  <div className="flex items-center space-x-1 text-sm text-gray-500">
+    <PhoneIcon className="h-4 w-4" />
+    <span>{center.phone || "+1 (555) 123-4567"}</span>
+  </div>
+  <Link 
+    to={`/centers/${center.id}`} 
+    className="text-sm font-medium text-blue-600 hover:underline"
+  >
+    Details
+  </Link>
+</div>
                 </div>
               </motion.div>
             ))
