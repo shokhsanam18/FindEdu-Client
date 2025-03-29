@@ -273,7 +273,7 @@ export default function Navbar() {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="bg-white flex justify-center items-center">
+      <div className="bg-white flex justify-center w-full md:w-3/4 mx-auto items-center">
         <div className="container  flex items-center rounded-full border-2 border-[#461773] text-[#000000]">
           <div className="flex-grow">
             <Input
