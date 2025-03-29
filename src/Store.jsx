@@ -183,7 +183,7 @@ export const useCategoryStore = create((set) => ({
       };
 
       const { data } = await axios.get(`${API_BASE}/categories`, { params });
-      // console.log(data)
+      console.log(data)
 
       set({
         categories: data.data || [],
