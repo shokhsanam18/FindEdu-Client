@@ -14,8 +14,6 @@ import { AuthProvider } from "./context/auth";
 import { useAuthStore } from "./Store.jsx";
 import { Resources } from "./Pages/Resources.jsx";
 function App() {
-
-
   const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
 
   useEffect(() => {
@@ -37,7 +35,7 @@ function App() {
           <Route path="/Login" element={<Login />} />
           <Route path="/Forget" element={<Forget />} />
           <Route path="/VerifyOtp" element={<VerifyOtp />} />
-         
+
           <Route path="*" element={<ErrorPage />} />
           <Route
             path="/you"
