@@ -25,30 +25,44 @@ const Favorites = () => {
   }, []);
 
   useEffect(() => {
-    const fetchCenters = async () => {
+    const fetchLikedCenters = async () => {
       try {
-        const res = await axios.get(CentersApi);
-        const data = res.data?.data || [];
-
-        const processed = data.map((center) => ({
-          ...center,
-          imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
-        }));
-
-        setAllCenters(processed);
+        setLoading(true);
+        await fetchLiked(); // fetch likedItems first
+  
+        const token = localStorage.getItem("accessToken");
+        const res = await axios.get("http://18.141.233.37:4000/api/liked/query", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        const likedData = res.data?.data || [];
+  
+        // Get detailed info for liked centers
+        const centerDetails = await Promise.all(
+          likedData.map(async (like) => {
+            const res = await axios.get(`http://18.141.233.37:4000/api/centers/${like.centerId}`);
+            const center = res.data?.data;
+            return {
+              ...center,
+              imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
+            };
+          })
+        );
+  
+        setAllCenters(centerDetails);
       } catch (err) {
-        console.error("Failed to fetch centers", err);
+        console.error("Failed to fetch liked centers", err);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchCenters();
+  
+    fetchLikedCenters();
   }, []);
 
-  const favoriteCenters = allCenters.filter((center) =>
-    isLiked(center.id)
-  );
+  // const favoriteCenters = allCenters.filter((center) =>
+  //   isLiked(center.id)
+  // );
 
   return (
     <div className="mt-40 mb-20 mx-auto flex flex-col px-[5%]">
@@ -56,7 +70,7 @@ const Favorites = () => {
 
       {loading ? (
         <p>Loading...</p>
-      ) : favoriteCenters.length === 0 ? (
+      ) : allCenters.length === 0 ? (
         <p>You haven’t liked any centers yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
