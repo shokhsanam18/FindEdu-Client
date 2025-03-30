@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { toast } from "sonner";
-
+import { createJSONStorage, persist } from "zustand/middleware";
 const API_BASE = "http://18.141.233.37:4000/api";
 
 export const useAuthStore = create((set, get) => ({
@@ -222,3 +222,30 @@ export const useSidebarStore = create((set) => ({
   closeSidebar: () => set(() => ({ side: false })),
   openSidebar: () => set(() => ({ side: true })),
 }));
+
+
+export const useFavoriteStore = create(
+  persist(
+    (set, get) => ({
+      favorites: JSON.parse(localStorage.getItem("likedCenters")) || [],
+
+      toggleFavorite: (centerId) => {
+        const { favorites } = get();
+        const isLiked = favorites.includes(centerId);
+        const updated = isLiked
+          ? favorites.filter((id) => id !== centerId)
+          : [...favorites, centerId];
+
+        set({ favorites: updated });
+      },
+
+      isFavorite: (centerId) => get().favorites.includes(centerId),
+
+      clearFavorites: () => set({ favorites: [] }),
+    }),
+    {
+      name: "favorite-centers",
+      getStorage: () => localStorage,
+    }
+  )
+);

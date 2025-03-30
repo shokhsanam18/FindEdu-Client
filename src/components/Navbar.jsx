@@ -3,6 +3,7 @@ import { Button as Buton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { HeartIcon } from "@heroicons/react/24/outline";
 import {
   MobileNav,
   Typography,
@@ -188,6 +189,10 @@ export default function Navbar() {
           </Link>
           <Link to="/Resources" className="hover:text-[#461773]">
             Resources
+          </Link>
+          <Link to="/Favorites" className="hover:text-[#461773] flex gap-2 items-center">
+            <HeartIcon className="h-5 w-5" />
+            Favorites
           </Link>
           </div>
         {isLoggedIn ? 
