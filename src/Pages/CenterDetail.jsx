@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -12,9 +11,9 @@ import {
   MessageSquare,
   User,
   Calendar,
-  PenSquare,
   Trash2,
 } from "lucide-react";
+import { useLikedStore, useCommentStore, useAuthStore } from "../Store";
 
 const API_BASE = "http://18.141.233.37:4000";
 const ImageApi = `${API_BASE}/api/image`;
@@ -25,120 +24,107 @@ const CenterDetail = () => {
   const [center, setCenter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [liked, setLiked] = useState(false);
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
-  const [commentError, setCommentError] = useState(null);
+  const { user } = useAuthStore();
+
+
+  const { toggleLike, isLiked } = useLikedStore();
+  const liked = isLiked(Number(id));
+
+    const {
+    comments,
+    fetchCommentsByCenter,
+    postComment,
+    updateComment,
+    deleteComment,
+    loading: commentLoading,
+    error: commentError,
+  } = useCommentStore();
+  
+  const [newComment, setNewComment] = useState({ text: "", star: 5 });
   const [isCommenting, setIsCommenting] = useState(false);
-
-  const toggleLike = () => {
-    const likedCenters = JSON.parse(localStorage.getItem('likedCenters') || '[]');
-    const newLikedCenters = liked 
-      ? likedCenters.filter(centerId => centerId !== id)
-      : [...likedCenters, id];
-    
-    localStorage.setItem('likedCenters', JSON.stringify(newLikedCenters));
-    setLiked(!liked);
-  };
-
-  const fetchComments = async (centerId) => {
-    try {
-      const response = await axios.get(`${API_BASE}/api/comments`, {
-        params: {
-          // Try different parameter names based on API requirements
-          center_id: centerId,  // Some APIs use snake_case
-          // Or try without parameters if API gets comments differently
-        }
-      });
-      
-      return response.data?.data || response.data || [];
-    } catch (error) {
-      console.error("Comments fetch error:", error.response?.data || error.message);
-      return [];
-    }
-  };
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editCommentText, setEditCommentText] = useState("");
+  const [editCommentStar, setEditCommentStar] = useState(5);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
-        // Fetch center data
-        const centerResponse = await axios.get(`${API_BASE}/api/centers/${id}`);
-        const centerData = centerResponse.data.data;
-        
-        // Fetch comments with proper error handling
-        const commentsData = await fetchComments(id);
-
+        const res = await axios.get(`${API_BASE}/api/centers/${id}`);
+        const data = res.data?.data;
+  
         setCenter({
-          ...centerData,
-          imageUrl: centerData.image 
-            ? `${ImageApi}/${centerData.image}` 
-            : null
+          ...data,
+          imageUrl: data.image ? `${ImageApi}/${data.image}` : null,
         });
-        setComments(commentsData);
-
-        // Check if center is liked
-        const likedCenters = JSON.parse(localStorage.getItem('likedCenters') || '[]');
-        setLiked(likedCenters.includes(id));
-        
+  
+        await fetchCommentsByCenter(id);
       } catch (err) {
-        console.error("Error fetching data:", err);
-        setError(err.response?.data?.message || err.message || "Failed to fetch center details");
-        if (err.response?.status === 404) {
-          setTimeout(() => navigate("/"), 3000);
-        }
+        setError("Failed to load center info");
+        console.error(err);
+        navigate("/", { replace: true });
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, [id, navigate]);
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
-
+    if (!newComment.text.trim()) return;
+  
+    setIsCommenting(true);
     try {
-      setIsCommenting(true);
-      setCommentError(null);
-      
-      const response = await axios.post(
-        `${API_BASE}/api/comments`,
-        {
-          // Try different parameter names based on API requirements
-          center_id: id,  // Some APIs use snake_case
-          // centerId: id,  // Alternative
-          content: newComment,
-        }
-      );
-
-      setComments([response.data.data, ...comments]);
-      setNewComment("");
+      await postComment({ ...newComment, centerId: Number(id) });
+      setNewComment({ text: "", star: 5 });
     } catch (err) {
-      console.error("Error posting comment:", err);
-      setCommentError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to post comment. Please try again."
-      );
+      console.error("Failed to post comment:", err);
     } finally {
       setIsCommenting(false);
     }
   };
 
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Are you sure you want to delete this comment?")) return;
-    
+  const handleUpdateComment = async () => {
+    if (!editCommentText.trim()) return;
     try {
-      await axios.delete(`${API_BASE}/api/comments/${commentId}`);
-      setComments(comments.filter(comment => comment.id !== commentId));
+      await updateComment({
+        id: editingCommentId,
+        text: editCommentText,
+        star: editCommentStar,
+      });
+      cancelEditing();
     } catch (err) {
-      console.error("Error deleting comment:", err);
-      alert(err.response?.data?.message || "Failed to delete comment");
+      console.error("Failed to update comment", err);
     }
   };
+  
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    try {
+      await deleteComment(commentId);
+    } catch (err) {
+      console.error("Failed to delete comment", err);
+    }
+  };
+
+
+
+
+
+  const startEditingComment = (comment) => {
+    setEditingCommentId(comment.id);
+    setEditCommentText(comment.text || comment.content);
+    setEditCommentStar(comment.star);
+  };
+
+  const cancelEditing = () => {
+    setEditingCommentId(null);
+    setEditCommentText("");
+    setEditCommentStar(5);
+  };
+
 
   if (loading) {
     return (
@@ -176,7 +162,7 @@ const CenterDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-36">
+    <div className="min-h-screen bg-gray-50 mt-42 md:mt-36">
       {/* Back button */}
       <div className="container mx-auto px-4 py-6">
         <Link to="/" className="inline-flex items-center text-purple-600 hover:text-purple-800">
@@ -186,15 +172,15 @@ const CenterDetail = () => {
       </div>
 
       {/* Main content */}
-      <div className="container mx-auto px-4 py-8 flex flex-row ">
+      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row ">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex rounded-xl shadow-lg overflow-hidden "
+          className="flex rounded-xl shadow-lg overflow-hidden flex-col md:flex-row"
         >
           {/* Header with image */}
-          <div className="relative h-[400px] w-[500px] overflow-hidden ">
+          <div className="relative h-[400px] w-[460px] md:w-[500px] overflow-hidden ">
             {center.imageUrl ? (
               <img
                 src={center.imageUrl}
@@ -215,7 +201,7 @@ const CenterDetail = () => {
               className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-md"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={toggleLike}
+              onClick={() => toggleLike(Number(id))}
             >
               {liked ? (
                 <Heart className="h-6 w-6 text-red-500 fill-red-500" />
@@ -283,7 +269,7 @@ const CenterDetail = () => {
 
               {/* Additional info/sidebar */}
               <div className="md:w-80 space-y-6">
-
+                {/* You can add additional center info here if needed */}
               </div>
             </div>
 
@@ -298,19 +284,34 @@ const CenterDetail = () => {
               <form onSubmit={handleCommentSubmit} className="mt-4">
                 <div className="flex flex-col space-y-2">
                   <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
+                    value={newComment.text}
+                    onChange={(e) => setNewComment({...newComment, text: e.target.value})}
                     placeholder="Share your thoughts about this center..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     rows={3}
                     disabled={isCommenting}
                   />
+                  <div className="flex items-center">
+                    <span className="mr-2">Rating:</span>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setNewComment({...newComment, star})}
+                        className="focus:outline-none"
+                      >
+                        <Star
+                          className={`h-5 w-5 ${star <= newComment.star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                        />
+                      </button>
+                    ))}
+                  </div>
                   {commentError && (
                     <p className="text-red-500 text-sm">{commentError}</p>
                   )}
                   <button
                     type="submit"
-                    disabled={!newComment.trim() || isCommenting}
+                    disabled={!newComment.text.trim() || isCommenting}
                     className="self-end px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-purple-300"
                   >
                     {isCommenting ? "Posting..." : "Post Comment"}
@@ -323,27 +324,94 @@ const CenterDetail = () => {
                 {comments.length === 0 ? (
                   <p className="text-gray-500">No comments yet. Be the first to share your thoughts!</p>
                 ) : (
-                  comments.map((comment) => (
+                  comments
+                    .slice()
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .map((comment) => (
                     <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center space-x-2">
-                          <User className="h-5 w-5 text-gray-400" />
-                          <span className="font-medium">{comment.user?.name || "Anonymous"}</span>
+                      {editingCommentId === comment.id ? (
+                        <div className="space-y-2">
+                          <textarea
+                            value={editCommentText}
+                            onChange={(e) => setEditCommentText(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            rows={3}
+                          />
+                          <div className="flex items-center">
+                            <span className="mr-2">Rating:</span>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                type="button"
+                                key={star}
+                                onClick={() => setEditCommentStar(star)}
+                                className="focus:outline-none"
+                              >
+                                <Star
+                                  className={`h-5 w-5 ${star <= editCommentStar ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                                />
+                              </button>
+                            ))}
+                          </div>
+                          <div className="flex justify-end space-x-2">
+                            <button
+                              onClick={cancelEditing}
+                              className="px-3 py-1 text-gray-600 hover:text-gray-800"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={handleUpdateComment}
+                              className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+                            >
+                              Save
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            {new Date(comment.createdAt).toLocaleDateString()}
-                          </span>
-                          <button 
-                            onClick={() => handleDeleteComment(comment.id)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                      <p className="mt-2 text-gray-700">{comment.content}</p>
+                      ) : (
+                        <>
+                          <div className="flex justify-between items-start">
+                            <div className="flex items-center space-x-2">
+                              <User className="h-5 w-5 text-gray-400" />
+                              <span className="font-medium">
+                                {comment.user?.firstName && comment.user?.lastName
+                                  ? `${comment.user.firstName} ${comment.user.lastName}`
+                                  : "Anonymous"}
+                              </span>
+                              <div className="flex items-center ml-2">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`h-4 w-4 ${i < comment.star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                              <Calendar className="h-4 w-4" />
+                              <span>
+                                {new Date(comment.createdAt || comment.updatedAt || Date.now()).toLocaleDateString()}
+                              </span>
+                              {user?.data?.id === comment.user?.id && (
+                                <>
+                                  <button 
+                                    onClick={() => startEditingComment(comment)}
+                                    className="text-blue-500 hover:text-blue-700"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button 
+                                    onClick={() => handleDeleteComment(comment.id)}
+                                    className="text-red-500 hover:text-red-700"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <p className="mt-2 text-gray-700">{comment.text || comment.content}</p>
+                        </>
+                      )}
                     </div>
                   ))
                 )}
@@ -355,5 +423,4 @@ const CenterDetail = () => {
     </div>
   );
 };
-
 export default CenterDetail;

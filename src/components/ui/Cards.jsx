@@ -13,7 +13,7 @@ import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
-import { useSearchStore } from "../../Store.jsx";
+import { useLikedStore , useSearchStore } from "../../Store.jsx";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
 const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
 const CentersApi = "http://18.141.233.37:4000/api/centers";
@@ -125,7 +125,11 @@ export const Cards = () => {
   const [selectedMajors, setSelectedMajors] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
   const searchTerm = useSearchStore((state) => state.searchTerm);
-  const [likedCenters, setLikedCenters] = useState([]);
+  // const [likedCenters, setLikedCenters] = useState([]);
+  const { toggleLike, isLiked, fetchLiked } = useLikedStore();
+  useEffect(() => {
+    fetchLiked(); // ← make sure likes are ready before rendering
+  }, []);
 
   // Fetch all data on component mount
   useEffect(() => {
@@ -201,13 +205,13 @@ export const Cards = () => {
     setFilteredCenters(filtered);
   }, [selectedMajors, selectedRegions, searchTerm, allCenters]);
 
-  const toggleLike = (centerId) => {
-    setLikedCenters((prev) =>
-      prev.includes(centerId)
-        ? prev.filter((id) => id !== centerId)
-        : [...prev, centerId]
-    );
-  };
+  // const toggleLike = (centerId) => {
+  //   setLikedCenters((prev) =>
+  //     prev.includes(centerId)
+  //       ? prev.filter((id) => id !== centerId)
+  //       : [...prev, centerId]
+  //   );
+  // };
 
   const removeMajorFilter = (majorId) => {
     setSelectedMajors((prev) => prev.filter((id) => id !== majorId));
@@ -342,18 +346,18 @@ export const Cards = () => {
                     </div>
                   )}
 
-                  <motion.button
-                    className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => toggleLike(center.id)}
-                  >
-                    {likedCenters.includes(center.id) ? (
-                      <HeartSolid className="h-5 w-5 text-red-500" />
-                    ) : (
-                      <HeartOutline className="h-5 w-5 text-red-500" />
-                    )}
-                  </motion.button>
+                <motion.button
+                  className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => toggleLike(center.id)}
+                >
+                  {isLiked(center.id) ? (
+                    <HeartSolid className="h-5 w-5 text-red-500" />
+                  ) : (
+                    <HeartOutline className="h-5 w-5 text-red-500" />
+                  )}
+                </motion.button>
                 </div>
 
                 <div className="px-4 py-7 space-y-1.5">

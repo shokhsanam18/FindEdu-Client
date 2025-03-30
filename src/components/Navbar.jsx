@@ -3,6 +3,8 @@ import { Button as Buton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { HeartIcon } from "@heroicons/react/24/outline";
+import logo from "../../public/logo.png";
 import {
   MobileNav,
   Typography,
@@ -81,18 +83,15 @@ export default function Navbar() {
 
   const profileImageUrl = useAuthStore((state) => state.profileImageUrl);
 
-
-
   useEffect(() => {
     const fetchInitialCategories = async () => {
       const { fetchCategories } = useCategoryStore.getState();
       await fetchCategories(); // fetch with default params
     };
-  
+
     fetchInitialCategories();
   }, []);
   // console.log("Profile image URL:", profileImageUrl);
-
 
   const searchTerm = useSearchStore((state) => state.searchTerm);
   const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
@@ -178,22 +177,35 @@ export default function Navbar() {
       <div className="bg-white flex items-center justify-between ">
         <div className="md:w-52 w-48  text-[#461773] flex items-center">
           <Link to="/" className="flex items-center">
-            <img src="./logo.png" />
+            <img src={logo} />
           </Link>
         </div>
 
         <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
+          <Link to="/" className="hover:text-[#461773]">
+            Home
+          </Link>
           <Link to="/About" className="hover:text-[#461773]">
             About Us
           </Link>
           <Link to="/Resources" className="hover:text-[#461773]">
             Resources
           </Link>
-          </div>
-        {isLoggedIn ? 
-          (
-            <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
-            <MenuHandler className='p-0 flex items-center gap-1.5'>
+          <Link
+            to="/Favorites"
+            className="hover:text-[#461773] flex gap-2 items-center"
+          >
+            <HeartIcon className="h-5 w-5" />
+            Favorites
+          </Link>
+        </div>
+        {isLoggedIn ? (
+          <Menu
+            open={isMenuOpen}
+            handler={setIsMenuOpen}
+            placement="bottom-end"
+          >
+            <MenuHandler className="p-0 flex items-center gap-1.5">
               <Button
                 variant="text"
                 color="blue-gray"

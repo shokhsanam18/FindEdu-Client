@@ -107,7 +107,10 @@ toast.success("Login successful! Redirecting...");
 } else if (role === "CEO") {
 toast.success("Login successful! Redirecting...");
             navigate("/ceo"); 
-} else {
+} else if (role === "ADMIN") {
+  toast.success("Login successful! Redirecting...");
+              navigate("/"); 
+  } else {
  console.error(" Unexpected role received:", role);
   toast.error("Unknown role, please contact support.");
 }}, 1500);

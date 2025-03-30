@@ -15,6 +15,7 @@ import { useAuthStore } from "./Store.jsx";
 import { Resources } from "./Pages/Resources.jsx";
 import { Test } from "./Test.jsx";
 
+import Favorites from "./Pages/Favorites.jsx";
 function App() {
   const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
 
@@ -31,6 +32,7 @@ function App() {
             <Route path="/About" element={<About />} />
             <Route path="/centers/:id" element={<CenterDetail />} />
             <Route path="/CEO" element={<CeoPage />} />
+            <Route path="/Favorites" element={<Favorites />} />
             <Route path="/Resources" element={<Resources />} />
           </Route>
           <Route path="/Register" element={<Register />} />
