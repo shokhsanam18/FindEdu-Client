@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { HeartIcon } from "@heroicons/react/24/outline";
 import logo from "../../public/logo.png";
+import { useSidebarSt } from "@/Store";
 import {
   MobileNav,
   Typography,
@@ -39,6 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuthStore, useCategoryStore, useSearchStore } from "../Store";
+import { AlignJustify } from "lucide-react";
 
 // profile menu component
 const profileMenuItems = [
@@ -170,18 +172,22 @@ export default function Navbar() {
   //   { value: "free", label: "Free" },
   //   { value: "paid", label: "Paid" },
   // ];
-
+  const toggleSidebar = useSidebarSt((state) => state.toggleSidebar);
   return (
     <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-7 w-full z-50 bg-white shadow-md backdrop-blur-md">
       {/* Top Navigation */}
-      <div className="bg-white flex items-center justify-between ">
-        <div className="md:w-52 w-48  text-[#461773] flex items-center">
+      <div className="bg-white items-center justify-between flex">
+        <div className="md:w-52 w-48  text-[#461773] lg:flex items-center hidden">
           <Link to="/" className="flex items-center">
             <img src={logo} />
           </Link>
         </div>
-
-        <div className="flex gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl">
+        <div className="lg:hidden">
+          <button className="hover:text-slate-600" onClick={toggleSidebar}>
+            <AlignJustify />
+          </button>
+        </div>
+        <div className="hidden gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl lg:flex">
           <Link to="/" className="hover:text-[#461773]">
             Home
           </Link>

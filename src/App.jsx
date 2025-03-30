@@ -13,7 +13,7 @@ import CenterDetail from "./Pages/CenterDetail.jsx";
 import { AuthProvider } from "./context/auth";
 import { useAuthStore } from "./Store.jsx";
 import { Resources } from "./Pages/Resources.jsx";
-import { Test } from "./Test.jsx";
+import Test from "./Test.jsx";
 
 import Favorites from "./Pages/Favorites.jsx";
 function App() {

@@ -1,108 +1,76 @@
-import React, { useEffect, useState } from "react";
-import {
-  Drawer,
-  Card,
-  List,
-  ListItem,
-  ListItemPrefix,
-  Typography,
-} from "@material-tailwind/react";
-
-import {
-  PowerIcon,
-  Cog6ToothIcon,
-  PresentationChartBarIcon,
-  ShoppingBagIcon,
-  UserCircleIcon,
-  InboxIcon,
-  UsersIcon,
-  AcademicCapIcon,
-} from "@heroicons/react/24/solid";
-import { useSidebarStore } from "../Store";
+import React from "react";
+import { X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSidebarSt } from "@/Store";
+import icon from "/public/icon.png";
 
-export default function Sidebar() {
-  const { side, closeSidebar } = useSidebarStore();
+export const Sidebar = () => {
+  const { isOpen, toggleSidebar, closeSidebar } = useSidebarSt();
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 720) closeSidebar();
-    };
+  const pages = [
+    {
+      title: "Home",
+      href: "/",
+    },
+    {
+      title: "About Us",
+      href: "/About",
+    },
+    {
+      title: "Resources",
+      href: "/Resources",
+    },
+    {
+      title: "Favorites",
+      href: "/Favorites",
+    },
+  ];
 
-    window.addEventListener("resize", handleResize);
-    handleResize();
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, [closeSidebar]);
   return (
-    <Drawer className={`md:hidden `} open={side} onClose={closeSidebar}>
-      <Card
-        color="transparent"
-        shadow={false}
-        className="h-[calc(100vh-2rem)] w-full p-4"
+    <>
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${
+          isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+        onClick={closeSidebar}
+        aria-hidden={!isOpen}
+      />
+
+      <div
+        className={`fixed top-0 left-0 w-64 h-full p-6 bg-white shadow-lg z-50 transition-transform duration-300 transform ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+        role="navigation"
+        aria-label="Sidebar"
       >
-        <Link to="/" onClick={closeSidebar}>
-          <div className="mb-2 w-56 flex items-center gap-4 p-4">
-            <img src="./img/logo.png" alt="" />
-          </div>
-        </Link>
-        <List>
-          <Link
-            to="/"
-            onClick={closeSidebar}
-            className="hover:bg-[#efd8ff] rounded-lg "
-          >
-            <ListItem className=" active:bg-[#efd8ff]  hover:text-[#290a3f] text-[#5f1d8e] focus:bg-[#efd8ff] hover:bg-[#efd8ff]">
-              <ListItemPrefix className="text-[#290a3f]">
-                <PresentationChartBarIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              Dashboard
-            </ListItem>
+        <button
+          onClick={toggleSidebar}
+          className="absolute top-4 right-4 p-2 text-black rounded hover:text-slate-600"
+          aria-label="Close sidebar"
+        >
+          <X />
+        </button>
+
+        <div className="text-2xl font-bold flex text-violet-800">
+          <Link to="/" className="flex items-center">
+            F<img src={icon} alt="Logo" className="h-7 w-4 mx-1" />
+            ndedu.uz
           </Link>
-          <Link
-            to="/Users"
-            onClick={closeSidebar}
-            className="hover:bg-[#efd8ff] rounded-lg"
-          >
-            <ListItem className="hover:bg-[#efd8ff]  hover:text-[#290a3f] focus:bg-[#efd8ff] text-[#5f1d8e] active:bg-[#efd8ff]">
-              <ListItemPrefix className="text-[#290a3f]">
-                <UsersIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              Users
-            </ListItem>
-          </Link>
-          <Link
-            to="/CEO"
-            onClick={closeSidebar}
-            className="hover:bg-[#efd8ff] rounded-lg"
-          >
-            <ListItem className="hover:bg-[#efd8ff] hover:text-[#290a3f]  focus:bg-[#efd8ff] text-[#5f1d8e] active:bg-[#efd8ff]">
-              <ListItemPrefix className="text-[#290a3f]">
-                <AcademicCapIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              CEO
-            </ListItem>
-          </Link>
-          <Link
-            to="/Settings"
-            onClick={closeSidebar}
-            className="hover:bg-[#efd8ff] rounded-lg"
-          >
-            <ListItem className="hover:bg-[#efd8ff]  hover:text-[#290a3f]  focus:bg-[#efd8ff] text-[#5f1d8e] active:bg-[#efd8ff]">
-              <ListItemPrefix className="text-[#290a3f]">
-                <Cog6ToothIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              Settings
-            </ListItem>
-          </Link>
-          <ListItem className="hover:bg-[#efd8ff]  hover:text-[#290a3f]  focus:bg-[#efd8ff] text-[#5f1d8e] active:bg-[#efd8ff]">
-            <ListItemPrefix className="text-[#290a3f]">
-              <PowerIcon className="h-5 w-5" />
-            </ListItemPrefix>
-            Log Out
-          </ListItem>
-        </List>
-      </Card>
-    </Drawer>
+        </div>
+
+        <ul className="mt-12 text-lg text-gray-700 flex flex-col gap-1">
+          {pages.map((page) => (
+            <li key={page.title} className="relative group">
+              <Link
+                to={page.href}
+                className="hover:text-violet-800 font-semibold"
+              >
+                {page.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </>
   );
-}
+};

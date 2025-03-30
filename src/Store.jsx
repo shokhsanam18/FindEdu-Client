@@ -223,8 +223,6 @@ export const useSidebarStore = create((set) => ({
   openSidebar: () => set(() => ({ side: true })),
 }));
 
-
-
 export const useLikedStore = create((set, get) => ({
   likedItems: [], // Array of { centerId, id (likeId) }
   loading: false,
@@ -292,8 +290,6 @@ export const useLikedStore = create((set, get) => ({
   isLiked: (centerId) =>
     get().likedItems.some((item) => item.centerId === centerId),
 }));
-
-
 
 export const useCommentStore = create((set, get) => ({
   comments: [],
@@ -394,3 +390,8 @@ export const useCommentStore = create((set, get) => ({
   },
 }));
 
+export const useSidebarSt = create((set) => ({
+  isOpen: false,
+  toggleSidebar: () => set((state) => ({ isOpen: !state.isOpen })),
+  closeSidebar: () => set({ isOpen: false }),
+}));
