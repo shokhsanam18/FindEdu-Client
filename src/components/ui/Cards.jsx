@@ -147,11 +147,19 @@ export const Cards = () => {
         setRegions(regionsResponse.data.data || []);
 
         const processedCenters =
-          centersResponse.data.data?.map((center) => ({
-            ...center,
-            imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
-            rating: center.rating || 0,
-          })) || [];
+          centersResponse.data.data?.map((center) => {
+            const comments = center.comments || [];
+            const avgRating =
+              comments.length > 0
+                ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
+                : 0;
+          
+            return {
+              ...center,
+              imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
+              rating: avgRating,
+            };
+          }) || [];
 
         setAllCenters(processedCenters);
         setFilteredCenters(processedCenters);
@@ -366,11 +374,24 @@ export const Cards = () => {
                       {center.name}
                     </h3>
                     <div className="flex items-center space-x-1">
-                      <StarIcon className="h-4 w-4 text-yellow-500" />
-                      <span className="text-sm font-medium">
-                        {center.rating?.toFixed(1) || "4.8"}
-                      </span>
-                    </div>
+                        <div className="relative w-5 h-5">
+                          {/* Gray base star (background) */}
+                          <StarIcon className="absolute text-gray-300 w-5 h-5" />
+
+                          {/* Yellow overlay with dynamic width */}
+                          <div
+                            className="absolute overflow-hidden h-5"
+                            style={{ width: `${(center.rating / 5) * 100}%` }}
+                          >
+                            <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
+                          </div>
+                        </div>
+
+                        <span className="text-sm font-medium text-gray-800">
+                          {center.rating?.toFixed(1) || "4.8"}
+                        </span>
+                      </div>
+
                   </div>
 
                   <p className="text-sm text-gray-600 line-clamp-1">

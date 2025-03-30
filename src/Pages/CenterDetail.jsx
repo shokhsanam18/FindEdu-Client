@@ -52,9 +52,17 @@ const CenterDetail = () => {
         setLoading(true);
         const res = await axios.get(`${API_BASE}/api/centers/${id}`);
         const data = res.data?.data;
+        console.log(data)
+
+        const comments = data.comments || [];
+        const avgRating =
+        comments.length > 0
+          ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
+          : 0;
   
         setCenter({
           ...data,
+          rating: avgRating,
           imageUrl: data.image ? `${ImageApi}/${data.image}` : null,
         });
   
@@ -124,6 +132,8 @@ const CenterDetail = () => {
     setEditCommentText("");
     setEditCommentStar(5);
   };
+
+  
 
 
   if (loading) {

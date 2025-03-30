@@ -1,7 +1,7 @@
 // src/pages/Favorites.jsx
 
 import { useEffect, useState } from "react";
-import { useLikedStore  } from "../Store"; // or where your favorite store is
+import { useLikedStore, useSearchStore } from "../Store";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -19,6 +19,7 @@ const Favorites = () => {
   const { likedItems, isLiked, toggleLike, fetchLiked } = useLikedStore();
   const [allCenters, setAllCenters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const searchTerm = useSearchStore((state) => state.searchTerm);
 
   useEffect(() => {
     fetchLiked();
@@ -42,9 +43,14 @@ const Favorites = () => {
           likedData.map(async (like) => {
             const res = await axios.get(`http://18.141.233.37:4000/api/centers/${like.centerId}`);
             const center = res.data?.data;
+            const avgRating =
+            center.comments?.length > 0
+              ? center.comments.reduce((sum, c) => sum + c.star, 0) / center.comments.length
+              : 0;
             return {
               ...center,
               imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
+              rating: avgRating,
             };
           })
         );
@@ -64,6 +70,17 @@ const Favorites = () => {
   //   isLiked(center.id)
   // );
 
+  const filteredFavorites = allCenters.filter((center) => {
+    const term = searchTerm.toLowerCase();
+    const nameMatch = center.name?.toLowerCase().includes(term);
+    const addressMatch = center.address?.toLowerCase().includes(term);
+    const majorMatch = center.majors?.some((major) =>
+      major.name?.toLowerCase().includes(term)
+    );
+  
+    return nameMatch || addressMatch || majorMatch;
+  });
+
   return (
     <div className="mt-40 mb-20 mx-auto flex flex-col px-[5%]">
       <h1 className="text-3xl font-bold text-[#451774] text-center mb-6">Your Favorite Centers</h1>
@@ -74,7 +91,7 @@ const Favorites = () => {
         <p>You haven’t liked any centers yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {allCenters.map((center) => (
+          {filteredFavorites.map((center) => (
             <motion.div
               key={center.id}
               className="w-full max-w-sm overflow-hidden rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow"
@@ -116,11 +133,23 @@ const Favorites = () => {
                 <div className="flex justify-between items-start">
                   <h3 className="text-xl font-semibold truncate">{center.name}</h3>
                   <div className="flex items-center space-x-1">
-                    <StarIcon className="h-4 w-4 text-yellow-500" />
-                    <span className="text-sm font-medium">
-                      {center.rating?.toFixed(1) || "4.8"}
-                    </span>
-                  </div>
+                        <div className="relative w-5 h-5">
+                          {/* Gray base star (background) */}
+                          <StarIcon className="absolute text-gray-300 w-5 h-5" />
+
+                          {/* Yellow overlay with dynamic width */}
+                          <div
+                            className="absolute overflow-hidden h-5"
+                            style={{ width: `${(center.rating / 5) * 100}%` }}
+                          >
+                            <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
+                          </div>
+                        </div>
+
+                        <span className="text-sm font-medium text-gray-800">
+                          {center.rating?.toFixed(1) || "4.8"}
+                        </span>
+                      </div>
                 </div>
 
                 <p className="text-sm text-gray-600 line-clamp-1">{center.address}</p>
