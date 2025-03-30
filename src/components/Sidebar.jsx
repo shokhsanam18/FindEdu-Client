@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSidebarSt } from "@/Store";
@@ -6,6 +6,18 @@ import icon from "/public/icon.png";
 
 export const Sidebar = () => {
   const { isOpen, toggleSidebar, closeSidebar } = useSidebarSt();
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 720) closeSidebar();
+    };
+  
+    window.addEventListener("resize", handleResize);
+    handleResize(); 
+  
+    return () => window.removeEventListener("resize", handleResize);
+  }, [closeSidebar]);
+
 
   const pages = [
     {
