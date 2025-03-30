@@ -224,28 +224,71 @@ export const useSidebarStore = create((set) => ({
 }));
 
 
-export const useFavoriteStore = create(
-  persist(
-    (set, get) => ({
-      favorites: JSON.parse(localStorage.getItem("likedCenters")) || [],
 
-      toggleFavorite: (centerId) => {
-        const { favorites } = get();
-        const isLiked = favorites.includes(centerId);
-        const updated = isLiked
-          ? favorites.filter((id) => id !== centerId)
-          : [...favorites, centerId];
+export const useLikedStore = create((set, get) => ({
+  likedItems: [], // Array of { centerId, id (likeId) }
+  loading: false,
 
-        set({ favorites: updated });
-      },
+  fetchLiked: async () => {
+    set({ loading: true });
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.get(`${API_BASE}/liked/query`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const liked = res.data?.data || [];
 
-      isFavorite: (centerId) => get().favorites.includes(centerId),
+      // Save both centerId and the likeId (id) from the backend
+      const likedItems = liked.map((item) => ({
+        centerId: item.centerId,
+        id: item.id,
+      }));
 
-      clearFavorites: () => set({ favorites: [] }),
-    }),
-    {
-      name: "favorite-centers",
-      getStorage: () => localStorage,
+      set({ likedItems });
+    } catch (err) {
+      console.error("Failed to fetch liked centers", err);
+    } finally {
+      set({ loading: false });
     }
-  )
-);
+  },
+
+  toggleLike: async (centerId) => {
+    const { likedItems } = get();
+    const token = localStorage.getItem("accessToken");
+
+    const existing = likedItems.find((item) => item.centerId === centerId);
+
+    try {
+      if (existing) {
+        // Unlike using `likeId` (not centerId)
+        await axios.delete(`${API_BASE}/liked/${existing.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        set({
+          likedItems: likedItems.filter((item) => item.centerId !== centerId),
+        });
+      } else {
+        // Like
+        const res = await axios.post(
+          `${API_BASE}/liked`,
+          { centerId },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const newLike = res.data?.data;
+        if (newLike?.id) {
+          set({
+            likedItems: [...likedItems, { centerId, id: newLike.id }],
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Toggle like error", err);
+    }
+  },
+
+  isLiked: (centerId) =>
+    get().likedItems.some((item) => item.centerId === centerId),
+}));

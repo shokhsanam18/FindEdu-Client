@@ -1,7 +1,7 @@
 // src/pages/Favorites.jsx
 
 import { useEffect, useState } from "react";
-import { useFavoriteStore } from "../Store"; // or where your favorite store is
+import { useLikedStore  } from "../Store"; // or where your favorite store is
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -16,9 +16,13 @@ const CentersApi = "http://18.141.233.37:4000/api/centers";
 const ImageApi = "http://18.141.233.37:4000/api/image";
 
 const Favorites = () => {
-  const { favorites, isFavorite, toggleFavorite } = useFavoriteStore();
+  const { likedItems, isLiked, toggleLike, fetchLiked } = useLikedStore();
   const [allCenters, setAllCenters] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLiked();
+  }, []);
 
   useEffect(() => {
     const fetchCenters = async () => {
@@ -43,7 +47,7 @@ const Favorites = () => {
   }, []);
 
   const favoriteCenters = allCenters.filter((center) =>
-    favorites.includes(center.id)
+    isLiked(center.id)
   );
 
   return (
@@ -84,9 +88,9 @@ const Favorites = () => {
                   className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => toggleFavorite(center.id)}
+                  onClick={() => toggleLike(center.id)}
                 >
-                  {isFavorite(center.id) ? (
+                  {isLiked(center.id) ? (
                     <HeartSolid className="h-5 w-5 text-red-500" />
                   ) : (
                     <HeartOutline className="h-5 w-5 text-red-500" />

@@ -13,7 +13,7 @@ import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
-import { useFavoriteStore, useSearchStore } from "../../Store.jsx";
+import { useLikedStore , useSearchStore } from "../../Store.jsx";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
 const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
 const CentersApi = "http://18.141.233.37:4000/api/centers";
@@ -126,7 +126,10 @@ export const Cards = () => {
   const [selectedRegions, setSelectedRegions] = useState([]);
   const searchTerm = useSearchStore((state) => state.searchTerm);
   // const [likedCenters, setLikedCenters] = useState([]);
-  const { toggleFavorite, isFavorite } = useFavoriteStore()
+  const { toggleLike, isLiked, fetchLiked } = useLikedStore();
+  useEffect(() => {
+    fetchLiked(); // ← make sure likes are ready before rendering
+  }, []);
 
   // Fetch all data on component mount
   useEffect(() => {
@@ -347,9 +350,9 @@ export const Cards = () => {
                   className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => toggleFavorite(center.id)}
+                  onClick={() => toggleLike(center.id)}
                 >
-                  {isFavorite(center.id) ? (
+                  {isLiked(center.id) ? (
                     <HeartSolid className="h-5 w-5 text-red-500" />
                   ) : (
                     <HeartOutline className="h-5 w-5 text-red-500" />

@@ -13,7 +13,7 @@ import {
   Calendar,
   Trash2,
 } from "lucide-react";
-import { useFavoriteStore } from "../Store";
+import { useLikedStore } from "../Store";
 
 const API_BASE = "http://18.141.233.37:4000";
 const ImageApi = `${API_BASE}/api/image`;
@@ -36,8 +36,8 @@ const CenterDetail = () => {
   const [editCommentText, setEditCommentText] = useState("");
   const [editCommentStar, setEditCommentStar] = useState(5);
 
-  const { toggleFavorite, isFavorite } = useFavoriteStore();
-  const liked = isFavorite(id);
+  const { toggleLike, isLiked } = useLikedStore();
+  const liked = isLiked(Number(id));
 
   // const toggleLike = () => {
   //   const likedCenters = JSON.parse(localStorage.getItem('likedCenters') || '[]');
@@ -261,7 +261,7 @@ const CenterDetail = () => {
               className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-md"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={() => toggleFavorite(id)}
+              onClick={() => toggleLike(Number(id))}
             >
               {liked ? (
                 <Heart className="h-6 w-6 text-red-500 fill-red-500" />
