@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import aboutus from "/public/aboutus.png";
 import about1 from "/public/about1.png";
 import mission from "/public/mission.png";
@@ -23,6 +23,9 @@ const logos = [
   { text: "PROWEB", className: "text-5xl font-bold mt-16" },
 ];
 
+// Duplicate the logos array to create seamless looping
+const duplicatedLogos = [...logos, ...logos];
+
 const Counter = ({ target, label, icon: Icon }) => {
   const [count, setCount] = useState(0);
 
@@ -31,7 +34,7 @@ const Counter = ({ target, label, icon: Icon }) => {
     const end = target;
     if (start === end) return;
 
-    const incrementTime = 2000 / end;
+    const incrementTime = 5000 / end;
     let timer = setInterval(() => {
       start += 1;
       setCount(start);
@@ -46,40 +49,106 @@ const Counter = ({ target, label, icon: Icon }) => {
       className="flex flex-col items-center bg-gray-100 p-6 rounded-lg shadow-lg"
       initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
       <Icon className="text-[#461773] text-4xl mb-3" />
-<motion.h3
-className="text-4xl font-bold text-gray-900" 
-initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}  transition={{ duration: 1, delay: 0.2 }}> {count.toLocaleString()}+
-</motion.h3>
-<p className="text-gray-600">{label}</p>
+      <motion.h3
+        className="text-4xl font-bold text-gray-900" 
+        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}  transition={{ duration: 1, delay: 0.2 }}> {count.toLocaleString()}+
+      </motion.h3>
+      <p className="text-gray-600">{label}</p>
     </motion.div>
+  );
+};
+
+const ScrollingLogos = () => {
+  const containerRef = useRef(null);
+  const [animationDuration, setAnimationDuration] = useState(40); // seconds
+
+  useEffect(() => {
+    const calculateDuration = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.scrollWidth;
+        const viewportWidth = window.innerWidth;
+        // Adjust duration based on total width (wider content = longer duration)
+        const newDuration = Math.max(30, containerWidth / viewportWidth * 20);
+        setAnimationDuration(newDuration);
+      }
+    };
+
+    calculateDuration();
+    window.addEventListener('resize', calculateDuration);
+    return () => window.removeEventListener('resize', calculateDuration);
+  }, []);
+
+  return (
+    <div className="overflow-hidden py-10">
+      <motion.div
+        ref={containerRef}
+        className="flex"
+        animate={{
+          x: ['0%', `-${100 / duplicatedLogos.length * logos.length}%`],
+        }}
+        transition={{
+          duration: animationDuration,
+          ease: "linear",
+          repeat: Infinity,
+        }}
+      >
+        {duplicatedLogos.map((logo, index) => (
+          <motion.div
+            key={index}
+            className="flex-shrink-0 px-4"
+            whileHover={{ scale: 1.05 }}
+          >
+            {logo.src ? (
+              <img
+                src={logo.src}
+                alt="Education Center"
+                className={`max-w-full max-h-full cursor-pointer block ${
+                  logo.className || ""
+                }`}
+                style={{
+                  width: `${logo.width}px`,
+                  height: `${logo.height}px`,
+                }}
+              />
+            ) : (
+              <div
+                className={`text-center cursor-pointer ${logo.className}`}
+              >
+                {logo.text}
+              </div>
+            )}
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
   );
 };
 
 const About = () => {
   return (
-<div className="mt-25 sm:mt-35 md:mt-35">
-<motion.div
-initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
-className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-6 min-h-[60vh] text-white bg-cover bg-center"
-style={{ backgroundImage: "url('/aboutus.png')" }}>
-<div className="absolute inset-0 bg-[#6e69728d]"></div>
+    <div className="mt-25 sm:mt-35 md:mt-35">
+      <motion.div
+        initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+        className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-6 min-h-[60vh] text-white bg-cover bg-center"
+        style={{ backgroundImage: "url('/aboutus.png')" }}>
+        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
- <motion.div
-initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
-className="relative z-10 max-w-3xl px-6 md:p-8 text-start mt-50 md:mt-0" >
-<p className="text-l md:text-xl  mt-6 md:mt-0"> {" "}Helping You Find the Best Education Centers!</p>
-<h1 className="text-4xl md:text-7xl font-bold "> About Us</h1>
- </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
+          className="relative z-10 max-w-3xl px-6 md:p-8 text-start mt-50 md:mt-0" >
+          <p className="text-l md:text-xl  mt-6 md:mt-0"> {" "}Helping You Find the Best Education Centers!</p>
+          <h1 className="text-4xl md:text-7xl font-bold "> About Us</h1>
+        </motion.div>
 
-<motion.div
-initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.6 }}
-className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-xl  mt-4 md:mt-0">
- <div className="flex gap-2">
-<Link to="/" className="no-underline hover:underline text-white"> Home</Link>
-<p>|</p>
-<Link to="/" className="text-[#bbbbbb] no-underline hover:underline" >
-About Us </Link>
- </div>
+        <motion.div
+          initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.6 }}
+          className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-xl  mt-4 md:mt-0">
+          <div className="flex gap-2">
+            <Link to="/" className="no-underline hover:underline text-white"> Home</Link>
+            <p>|</p>
+            <Link to="/" className="text-[#bbbbbb] no-underline hover:underline" >
+              About Us </Link>
+          </div>
         </motion.div>
       </motion.div>
 
@@ -247,7 +316,7 @@ About Us </Link>
                 Shaping the Future of Education
               </h3>
               <p className="text-gray-600 mt-4 leading-relaxed">
-                Our vision is to become the world’s leading educational
+                Our vision is to become the world's leading educational
                 matchmaking platform, ensuring every student finds the right
                 learning resources, institutions, and guidance to excel in their
                 academic journey.
@@ -277,42 +346,12 @@ About Us </Link>
           </div>
         </div>
 
-        <div className="text-center py-10">
+        <div className="text-center ">
           <h2 className="text-3xl md:text-5xl font-semibold text-[#461773] ">
             Your Guide to Education Centers
           </h2>
           <div className="mt-4 w-16 h-1 bg-yellow-400 mx-auto mb-17"></div>
-          <div className="flex flex-wrap justify-center gap-13 md:gap-25 px-6 md:px-10">
-            {logos.map((logo, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                {logo.src ? (
-                  <img
-                    src={logo.src}
-                    alt="Education Center"
-                    className={`max-w-full max-h-full cursor-pointer block ${
-                      logo.className || ""
-                    }`}
-                    style={{
-                      width: `${logo.width}px`,
-                      height: `${logo.height}px`,
-                    }}
-                  />
-                ) : (
-                  <div
-                    className={`text-center cursor-pointer ${logo.className}`}
-                  >
-                    {logo.text}
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
+          <ScrollingLogos />
         </div>
       </div>
     </div>

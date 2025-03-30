@@ -82,8 +82,8 @@ const Favorites = () => {
   });
 
   return (
-    <div className="mt-40 mb-20 mx-auto flex flex-col px-[5%]">
-      <h1 className="text-3xl font-bold text-[#451774] text-center mb-6">Your Favorite Centers</h1>
+    <div className="mt-50 mb-20 mx-auto flex flex-col px-[5%]">
+      <h1 className="text-4xl font-bold text-[#451774] text-center mb-12">Your Favorite Centers</h1>
 
       {loading ? (
         <p>Loading...</p>
@@ -161,7 +161,7 @@ const Favorites = () => {
                   </div>
                   <Link
                     to={`/centers/${center.id}`}
-                    className="text-sm font-medium text-blue-600 hover:underline"
+                    className="text-sm font-medium text-purple-800 hover:underline"
                   >
                     Details
                   </Link>

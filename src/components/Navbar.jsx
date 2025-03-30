@@ -187,24 +187,77 @@ export default function Navbar() {
             <AlignJustify />
           </button>
         </div>
-        <div className="hidden gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl lg:flex">
-          <Link to="/" className="hover:text-[#461773]">
-            Home
-          </Link>
-          <Link to="/About" className="hover:text-[#461773]">
+
+
+
+
+
+        {/* <div className="hidden bg gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl lg:flex">
+        <Link 
+  to="/" 
+  className="hover:text-[#461773]"
+  onClick={() => window.scrollTo(0, 0)}
+>
+  Home
+</Link>
+          <Link to="/About" className="hover:text-[#461773]"   onClick={() => window.scrollTo(0, 0)}>
             About Us
           </Link>
-          <Link to="/Resources" className="hover:text-[#461773]">
+          <Link to="/Resources" className="hover:text-[#461773]"   onClick={() => window.scrollTo(0, 0)}>
             Resources
           </Link>
           <Link
             to="/Favorites"
-            className="hover:text-[#461773] flex gap-2 items-center"
+            className="hover:text-[#461773] flex gap-2 items-center"   onClick={() => window.scrollTo(0, 0)}
           >
             <HeartIcon className="h-5 w-5" />
             Favorites
           </Link>
-        </div>
+        </div> */}
+
+
+<div className="hidden lg:flex items-center gap-6 xl:gap-8 px-6 py-3  ">
+  <Link 
+    to="/" 
+    className="text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
+    onClick={() => window.scrollTo(0, 0)}
+  >
+    Home
+    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
+  </Link>
+  
+  <Link 
+    to="/About" 
+    className="text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
+    onClick={() => window.scrollTo(0, 0)}
+  >
+    About Us
+    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
+  </Link>
+  
+  <Link 
+    to="/Resources" 
+    className="text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
+    onClick={() => window.scrollTo(0, 0)}
+  >
+    Resources
+    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
+  </Link>
+  
+  <Link
+    to="/Favorites"
+    className="text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 flex items-center gap-2 relative group"
+    onClick={() => window.scrollTo(0, 0)}
+  >
+    <HeartIcon className="h-5 w-5 transition-colors duration-300 group-hover:fill-[#461773] group-hover:stroke-[#461773]" />
+    Favorites
+    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
+  </Link>
+</div>
+
+
+
+
         {isLoggedIn ? (
           <Menu
             open={isMenuOpen}
@@ -273,21 +326,28 @@ export default function Navbar() {
             </MenuList>
           </Menu>
         ) : (
-          <div className="flex gap-2 md:gap-6">
-            <Buton
-              variant="outline"
-              className="border-[#461773] text-[#461773] text-sm md:text-xl p-2 md:p-4 rounded-full"
-              asChild
-            >
-              <Link to="/Login">Login</Link>
-            </Buton>
-            <Buton
-              className="bg-[#461773] text-white text-sm md:text-xl p-2 md:p-4 rounded-full"
-              asChild
-            >
-              <Link to="/Register">Register</Link>
-            </Buton>
-          </div>
+<div className="flex gap-3 md:gap-4">
+  <Buton
+    variant="outline"
+    className="relative overflow-hidden border-[#461773] text-[#461773] hover:text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full transition-all duration-300 group"
+    asChild
+  >
+    <Link to="/Login">
+      <span className="relative z-10">Login</span>
+      <span className="absolute inset-0 bg-[#461773] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full z-0"></span>
+    </Link>
+  </Buton>
+  
+  <Buton
+    className="relative overflow-hidden bg-[#461773] hover:bg-[#3a1260] text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full shadow-lg hover:shadow-[0_4px_15px_rgba(70,23,115,0.3)] transition-all duration-300"
+    asChild
+  >
+    <Link to="/Register">
+      <span className="relative z-10">Register</span>
+      <span className="absolute inset-0 bg-gradient-to-r from-[#5a1d99] to-[#461773] opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full"></span>
+    </Link>
+  </Buton>
+</div>
         )}
       </div>
 

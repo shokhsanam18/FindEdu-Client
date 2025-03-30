@@ -243,7 +243,7 @@ export const Cards = () => {
       >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
-        <div className="relative max-w-6xl mx-auto flex flex-col md:flex-row items-center px-6 text-white">
+        <div className="relative  mx-auto flex flex-col md:flex-row items-center  text-white">
           <div className="md:w-1/2 text-center md:text-left">
             <motion.h1
               initial={{ opacity: 0, x: -50 }}
@@ -269,19 +269,29 @@ export const Cards = () => {
       </motion.div>
 
       {/* Filter controls */}
-      <div className="flex flex-col items-center gap-4">
-        <div className="flex items-center justify-center gap-5 flex-wrap">
-          <h2
-            className="text-xl text-center hover:cursor-pointer bg-[#451774] rounded-xl w-auto h-auto px-9 py-3 pb-4 border-[#924bda] text-white border-2  hover:bg-white hover:text-purple-500 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center"
-            onClick={() => setIsModalOpen(true)}
-          >
-            Majors & Regions
-            <ChevronDown className="mt-2" />
-          </h2>
-        </div>
+      <div className="flex flex-row ml-20 gap-4">
+      <div className="flex flex-col gap-3">
+  <div className="text-left">
+    <h3 className="text-xl font-medium text-[#461773] mb-1">
+      Find Your Program
+    </h3>
+    <p className="text-sm text-gray-600">
+      Select course and region
+    </p>
+    <button
+    className=" mt-5 group inline-flex items-center justify-center gap-2 bg-[#461773] hover:bg-[#3a1260] text-white font-medium px-6 py-2.5 rounded-xl border border-[#5e1b9e] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(90,29,153,0.2)]"
+    onClick={() => setIsModalOpen(true)}
+  >
+    <span>Courses & Regions</span>
+    <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
+  </button>
+  </div>
+
+
+</div>
 
         {/* Active filters display */}
-        <div className="flex flex-wrap gap-2 justify-center">
+        <div className="flex flex-wrap gap-2 h-10 mt-18">
           {selectedMajors.map((id) => (
             <div
               key={`major-${id}`}
@@ -299,12 +309,12 @@ export const Cards = () => {
           {selectedRegions.map((id) => (
             <div
               key={`region-${id}`}
-              className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full"
+              className="flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full"
             >
               {getRegionName(id)}
               <button
                 onClick={() => removeRegionFilter(id)}
-                className="ml-2 text-green-600 hover:text-green-800"
+                className="ml-2 text-puple-600 hover:text-purple-800"
               >
                 <X size={16} />
               </button>
@@ -404,8 +414,8 @@ export const Cards = () => {
                       <span>{center.phone || "+1 (555) 123-4567"}</span>
                     </div>
                     <Link
-                      to={`/centers/${center.id}`}
-                      className="text-sm font-medium text-blue-600 hover:underline"
+                      to={`/centers/${center.id}`} 
+                      className="text-sm font-medium text-purple-800 hover:underline" onClick={() => window.scrollTo(0, 0)}
                     >
                       Details
                     </Link>
