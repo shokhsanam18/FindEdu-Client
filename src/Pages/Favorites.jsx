@@ -74,7 +74,7 @@ const Favorites = () => {
         <p>You haven’t liked any centers yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {favoriteCenters.map((center) => (
+          {allCenters.map((center) => (
             <motion.div
               key={center.id}
               className="w-full max-w-sm overflow-hidden rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow"
