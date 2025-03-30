@@ -74,6 +74,7 @@ export const Sidebar = () => {
           {pages.map((page) => (
             <li key={page.title} className="relative group">
               <Link
+              onClick={closeSidebar}
                 to={page.href}
                 className="hover:text-violet-800 font-semibold"
               >
