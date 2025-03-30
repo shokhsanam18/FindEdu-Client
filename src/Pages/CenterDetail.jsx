@@ -90,7 +90,7 @@ const CenterDetail = () => {
 
         // Check if center is liked
         const likedCenters = JSON.parse(localStorage.getItem('likedCenters') || '[]');
-        setLiked(likedCenters.includes(id));
+        // setLiked(likedCenters.includes(id));
         
       } catch (err) {
         console.error("Error fetching data:", err);
