@@ -174,7 +174,7 @@ export default function Navbar() {
   // ];
   const toggleSidebar = useSidebarSt((state) => state.toggleSidebar);
   return (
-    <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-7 w-full z-50 bg-white shadow-md backdrop-blur-md">
+    <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-7 w-full z-40 bg-white shadow-md backdrop-blur-md">
       {/* Top Navigation */}
       <div className="bg-white items-center justify-between flex">
         <div className="md:w-52 w-48  text-[#461773] lg:flex items-center hidden">
