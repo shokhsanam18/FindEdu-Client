@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { HeartIcon } from "@heroicons/react/24/outline";
+import logo from "../../public/logo.png";
 import {
   MobileNav,
   Typography,
@@ -179,7 +180,7 @@ export default function Navbar() {
       <div className="bg-white flex items-center justify-between ">
         <div className="md:w-52 w-48  text-[#461773] flex items-center">
           <Link to="/" className="flex items-center">
-            <img src="./logo.png" />
+            <img src={logo} />
           </Link>
         </div>
 

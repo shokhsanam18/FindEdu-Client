@@ -292,3 +292,105 @@ export const useLikedStore = create((set, get) => ({
   isLiked: (centerId) =>
     get().likedItems.some((item) => item.centerId === centerId),
 }));
+
+
+
+export const useCommentStore = create((set, get) => ({
+  comments: [],
+  loading: false,
+  error: null,
+
+  fetchCommentsByCenter: async (centerId) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await axios.get(`${API_BASE}/comments`, {
+        params: {
+          page: 1,
+          limit: 100,
+        },
+      });
+
+      const all = res.data?.data || [];
+      const filtered = all.filter((c) => c.centerId === Number(centerId));
+      set({ comments: filtered });
+    } catch (err) {
+      console.error("Fetch comments failed", err);
+      set({ error: "Failed to load comments" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  postComment: async ({ text, star, centerId }) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.post(
+        `${API_BASE}/comments`,
+        { text, star, centerId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const newComment = res.data?.data;
+      if (newComment) {
+        set((state) => ({
+          comments: [newComment, ...state.comments],
+        }));
+        toast.success("Comment posted!");
+      }
+    } catch (err) {
+      console.error("Post comment error", err);
+      toast.error(err.response?.data?.message || "Failed to post comment");
+    }
+  },
+
+  deleteComment: async (id) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      await axios.delete(`${API_BASE}/comments/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      set((state) => ({
+        comments: state.comments.filter((c) => c.id !== id),
+      }));
+
+      toast.success("Comment deleted");
+    } catch (err) {
+      console.error("Delete comment error", err);
+      toast.error("Failed to delete comment");
+    }
+  },
+
+  updateComment: async ({ id, text, star }) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.patch(
+        `${API_BASE}/comments/${id}`,
+        { text, star },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const updated = res.data?.data;
+
+      set((state) => ({
+        comments: state.comments.map((c) => (c.id === id ? updated : c)),
+      }));
+
+      toast.success("Comment updated");
+    } catch (err) {
+      console.error("Update comment error", err);
+      toast.error("Failed to update comment");
+    }
+  },
+}));
+

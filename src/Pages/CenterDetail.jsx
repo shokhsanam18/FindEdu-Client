@@ -13,7 +13,7 @@ import {
   Calendar,
   Trash2,
 } from "lucide-react";
-import { useLikedStore } from "../Store";
+import { useLikedStore, useCommentStore, useAuthStore } from "../Store";
 
 const API_BASE = "http://18.141.233.37:4000";
 const ImageApi = `${API_BASE}/api/image`;
@@ -24,133 +24,94 @@ const CenterDetail = () => {
   const [center, setCenter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // const [liked, setLiked] = useState(false);
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState({
-    text: "",
-    star: 5,
-  });
-  const [commentError, setCommentError] = useState(null);
+  const { user } = useAuthStore();
+
+
+  const { toggleLike, isLiked } = useLikedStore();
+  const liked = isLiked(Number(id));
+
+    const {
+    comments,
+    fetchCommentsByCenter,
+    postComment,
+    updateComment,
+    deleteComment,
+    loading: commentLoading,
+    error: commentError,
+  } = useCommentStore();
+  
+  const [newComment, setNewComment] = useState({ text: "", star: 5 });
   const [isCommenting, setIsCommenting] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editCommentText, setEditCommentText] = useState("");
   const [editCommentStar, setEditCommentStar] = useState(5);
 
-  const { toggleLike, isLiked } = useLikedStore();
-  const liked = isLiked(Number(id));
-
-  // const toggleLike = () => {
-  //   const likedCenters = JSON.parse(localStorage.getItem('likedCenters') || '[]');
-  //   const newLikedCenters = liked 
-  //     ? likedCenters.filter(centerId => centerId !== id)
-  //     : [...likedCenters, id];
-    
-  //   localStorage.setItem('likedCenters', JSON.stringify(newLikedCenters));
-  //   setLiked(!liked);
-  // };
-
-  const fetchComments = async (centerId) => {
-    try {
-      const response = await axios.get(`${API_BASE}/api/comments`, {
-        params: {
-          centerId: centerId,
-          page: 1,
-          limit: 100
-        }
-      });
-      
-      // Filter comments by centerId in case the API doesn't support filtering
-      const allComments = response.data?.data || response.data || [];
-      return allComments.filter(comment => comment.centerId == centerId);
-    } catch (error) {
-      console.error("Comments fetch error:", error.response?.data || error.message);
-      return [];
-    }
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
-        // Fetch center data
-        const centerResponse = await axios.get(`${API_BASE}/api/centers/${id}`);
-        const centerData = centerResponse.data.data;
-        
-        // Fetch comments with proper error handling
-        const commentsData = await fetchComments(id);
-
+        const res = await axios.get(`${API_BASE}/api/centers/${id}`);
+        const data = res.data?.data;
+  
         setCenter({
-          ...centerData,
-          imageUrl: centerData.image 
-            ? `${ImageApi}/${centerData.image}` 
-            : null
+          ...data,
+          imageUrl: data.image ? `${ImageApi}/${data.image}` : null,
         });
-        setComments(commentsData);
-
-        // Check if center is liked
-        const likedCenters = JSON.parse(localStorage.getItem('likedCenters') || '[]');
-        // setLiked(likedCenters.includes(id));
-        
+  
+        await fetchCommentsByCenter(id);
       } catch (err) {
-        console.error("Error fetching data:", err);
-        setError(err.response?.data?.message || err.message || "Failed to fetch center details");
-        if (err.response?.status === 404) {
-          setTimeout(() => navigate("/"), 3000);
-        }
+        setError("Failed to load center info");
+        console.error(err);
+        navigate("/", { replace: true });
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, [id, navigate]);
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.text.trim()) return;
-
+  
+    setIsCommenting(true);
     try {
-      setIsCommenting(true);
-      setCommentError(null);
-      
-      const response = await axios.post(
-        `${API_BASE}/api/comments`,
-        {
-          text: newComment.text,
-          star: newComment.star,
-          centerId: id,
-        }
-      );
-
-      setComments([response.data, ...comments]);
-      setNewComment({
-        text: "",
-        star: 5,
-      });
+      await postComment({ ...newComment, centerId: Number(id) });
+      setNewComment({ text: "", star: 5 });
     } catch (err) {
-      console.error("Error posting comment:", err);
-      setCommentError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to post comment. Please try again."
-      );
+      console.error("Failed to post comment:", err);
     } finally {
       setIsCommenting(false);
     }
   };
 
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Are you sure you want to delete this comment?")) return;
-    
+  const handleUpdateComment = async () => {
+    if (!editCommentText.trim()) return;
     try {
-      await axios.delete(`${API_BASE}/api/comments/${commentId}`);
-      setComments(comments.filter(comment => comment.id !== commentId));
+      await updateComment({
+        id: editingCommentId,
+        text: editCommentText,
+        star: editCommentStar,
+      });
+      cancelEditing();
     } catch (err) {
-      console.error("Error deleting comment:", err);
-      alert(err.response?.data?.message || "Failed to delete comment");
+      console.error("Failed to update comment", err);
     }
   };
+  
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    try {
+      await deleteComment(commentId);
+    } catch (err) {
+      console.error("Failed to delete comment", err);
+    }
+  };
+
+
+
+
 
   const startEditingComment = (comment) => {
     setEditingCommentId(comment.id);
@@ -164,27 +125,6 @@ const CenterDetail = () => {
     setEditCommentStar(5);
   };
 
-  const handleUpdateComment = async () => {
-    if (!editCommentText.trim()) return;
-
-    try {
-      const response = await axios.patch(
-        `${API_BASE}/api/comments/${editingCommentId}`,
-        {
-          text: editCommentText,
-          star: editCommentStar,
-        }
-      );
-      
-      setComments(comments.map(comment => 
-        comment.id === editingCommentId ? response.data : comment
-      ));
-      cancelEditing();
-    } catch (err) {
-      console.error("Error updating comment:", err);
-      alert(err.response?.data?.message || "Failed to update comment");
-    }
-  };
 
   if (loading) {
     return (
@@ -384,7 +324,10 @@ const CenterDetail = () => {
                 {comments.length === 0 ? (
                   <p className="text-gray-500">No comments yet. Be the first to share your thoughts!</p>
                 ) : (
-                  comments.map((comment) => (
+                  comments
+                    .slice()
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .map((comment) => (
                     <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
                       {editingCommentId === comment.id ? (
                         <div className="space-y-2">
@@ -429,7 +372,11 @@ const CenterDetail = () => {
                           <div className="flex justify-between items-start">
                             <div className="flex items-center space-x-2">
                               <User className="h-5 w-5 text-gray-400" />
-                              <span className="font-medium">{comment.user?.name || "Anonymous"}</span>
+                              <span className="font-medium">
+                                {comment.user?.firstName && comment.user?.lastName
+                                  ? `${comment.user.firstName} ${comment.user.lastName}`
+                                  : "Anonymous"}
+                              </span>
                               <div className="flex items-center ml-2">
                                 {[...Array(5)].map((_, i) => (
                                   <Star
@@ -444,18 +391,22 @@ const CenterDetail = () => {
                               <span>
                                 {new Date(comment.createdAt || comment.updatedAt || Date.now()).toLocaleDateString()}
                               </span>
-                              <button 
-                                onClick={() => startEditingComment(comment)}
-                                className="text-blue-500 hover:text-blue-700"
-                              >
-                                Edit
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteComment(comment.id)}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
+                              {user?.data?.id === comment.user?.id && (
+                                <>
+                                  <button 
+                                    onClick={() => startEditingComment(comment)}
+                                    className="text-blue-500 hover:text-blue-700"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button 
+                                    onClick={() => handleDeleteComment(comment.id)}
+                                    className="text-red-500 hover:text-red-700"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </>
+                              )}
                             </div>
                           </div>
                           <p className="mt-2 text-gray-700">{comment.text || comment.content}</p>
