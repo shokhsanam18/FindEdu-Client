@@ -20,7 +20,7 @@ import { Select, SelectTrigger, SelectContent, SelectItem } from "../../componen
 import purple from "/public/purple.png";
 import icon from "/public/icon.png";
 import register from "/public/register.png";
-const API_BASE = "http://18.141.233.37:4000/api/users";
+const API_BASE = "https://findcourse.net.uz/api/users";
 
 const formSchema = z.object({
   firstName: z.string().min(2, { message: "Required" }),
@@ -58,7 +58,7 @@ const FormTry = () => {
         formData.append("image", values.image);
   
         const uploadResponse = await axios.post(
-          "http://18.141.233.37:4000/api/upload",
+          "https://findcourse.net.uz/api/upload",
           formData,
           {
             headers: {

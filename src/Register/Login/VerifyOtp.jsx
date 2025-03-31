@@ -17,7 +17,7 @@ import {
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 
-const API_BASE = "http://18.141.233.37:4000/api/users";
+const API_BASE = "https://findcourse.net.uz/api/users";
 
 const formSchema = z.object({
   otp: z.string().min(4, { message: "OTP must be at least 4 digits" }),
