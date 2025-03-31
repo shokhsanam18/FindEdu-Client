@@ -12,8 +12,8 @@ import {
 } from "@heroicons/react/24/solid"; // or outline if needed
 
 
-const CentersApi = "https://findcourse.net.uz/api/centers";
-const ImageApi = "https://findcourse.net.uz/api/image";
+const CentersApi = "http://18.141.233.37:4000/api/centers";
+const ImageApi = "http://18.141.233.37:4000/api/image";
 
 const Favorites = () => {
   const { likedItems, isLiked, toggleLike, fetchLiked } = useLikedStore();
@@ -32,7 +32,7 @@ const Favorites = () => {
         await fetchLiked(); // fetch likedItems first
   
         const token = localStorage.getItem("accessToken");
-        const res = await axios.get("https://findcourse.net.uz/api/liked/query", {
+        const res = await axios.get("http://18.141.233.37:4000/api/liked/query", {
           headers: { Authorization: `Bearer ${token}` },
         });
   
@@ -41,7 +41,7 @@ const Favorites = () => {
         // Get detailed info for liked centers
         const centerDetails = await Promise.all(
           likedData.map(async (like) => {
-            const res = await axios.get(`https://findcourse.net.uz/api/centers/${like.centerId}`);
+            const res = await axios.get(`http://18.141.233.37:4000/api/centers/${like.centerId}`);
             const center = res.data?.data;
             const avgRating =
             center.comments?.length > 0

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import axios from "axios";
 import { toast } from "sonner";
 import { createJSONStorage, persist } from "zustand/middleware";
-const API_BASE = "https://findcourse.net.uz/api";
+const API_BASE = "http://18.141.233.37:4000/api";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
