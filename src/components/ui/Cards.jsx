@@ -13,7 +13,7 @@ import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
-import { useLikedStore , useSearchStore } from "../../Store.jsx";
+import { useLikedStore, useSearchStore } from "../../Store.jsx";
 const MajorsApi = "http://18.141.233.37:4000/api/major";
 const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
 const CentersApi = "http://18.141.233.37:4000/api/centers";
@@ -153,7 +153,7 @@ export const Cards = () => {
               comments.length > 0
                 ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
                 : 0;
-          
+
             return {
               ...center,
               imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
@@ -185,19 +185,19 @@ export const Cards = () => {
 
   useEffect(() => {
     let filtered = allCenters;
-  
+
     if (selectedMajors.length > 0) {
       filtered = filtered.filter((center) =>
         selectedMajors.includes(center.majorId)
       );
     }
-  
+
     if (selectedRegions.length > 0) {
       filtered = filtered.filter((center) =>
         selectedRegions.includes(center.regionId)
       );
     }
-  
+
     if (searchTerm.trim() !== "") {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter((center) => {
@@ -209,7 +209,7 @@ export const Cards = () => {
         return nameMatch || addressMatch || majorMatch;
       });
     }
-  
+
     setFilteredCenters(filtered);
   }, [selectedMajors, selectedRegions, searchTerm, allCenters]);
 
@@ -244,7 +244,7 @@ export const Cards = () => {
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
         <div className="relative  mx-auto flex flex-col md:flex-row items-center  text-white">
-          <div className="md:w-1/2 text-center md:text-left">
+          <div className="md:w-1/2 text-center md:text-left pl-10">
             <motion.h1
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -270,25 +270,21 @@ export const Cards = () => {
 
       {/* Filter controls */}
       <div className="flex flex-row ml-20 gap-4">
-      <div className="flex flex-col gap-3">
-  <div className="text-left">
-    <h3 className="text-xl font-medium text-[#461773] mb-1">
-      Find Your Program
-    </h3>
-    <p className="text-sm text-gray-600">
-      Select course and region
-    </p>
-    <button
-    className=" mt-5 group inline-flex items-center justify-center gap-2 bg-[#461773] hover:bg-[#3a1260] text-white font-medium px-6 py-2.5 rounded-xl border border-[#5e1b9e] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(90,29,153,0.2)]"
-    onClick={() => setIsModalOpen(true)}
-  >
-    <span>Courses & Regions</span>
-    <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
-  </button>
-  </div>
-
-
-</div>
+        <div className="flex flex-col gap-3">
+          <div className="text-left">
+            <h3 className="text-xl font-medium text-[#461773] mb-1">
+              Find Your Program
+            </h3>
+            <p className="text-sm text-gray-600">Select course and region</p>
+            <button
+              className=" mt-5 group inline-flex items-center justify-center gap-2 bg-[#461773] hover:bg-[#3a1260] text-white font-medium px-6 py-2.5 rounded-xl border border-[#5e1b9e] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(90,29,153,0.2)]"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <span>Courses & Regions</span>
+              <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
+            </button>
+          </div>
+        </div>
 
         {/* Active filters display */}
         <div className="flex flex-wrap gap-2 h-10 mt-18">
@@ -364,18 +360,18 @@ export const Cards = () => {
                     </div>
                   )}
 
-                <motion.button
-                  className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => toggleLike(center.id)}
-                >
-                  {isLiked(center.id) ? (
-                    <HeartSolid className="h-5 w-5 text-red-500" />
-                  ) : (
-                    <HeartOutline className="h-5 w-5 text-red-500" />
-                  )}
-                </motion.button>
+                  <motion.button
+                    className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => toggleLike(center.id)}
+                  >
+                    {isLiked(center.id) ? (
+                      <HeartSolid className="h-5 w-5 text-red-500" />
+                    ) : (
+                      <HeartOutline className="h-5 w-5 text-red-500" />
+                    )}
+                  </motion.button>
                 </div>
 
                 <div className="px-4 py-7 space-y-1.5">
@@ -384,24 +380,23 @@ export const Cards = () => {
                       {center.name}
                     </h3>
                     <div className="flex items-center space-x-1">
-                        <div className="relative w-5 h-5">
-                          {/* Gray base star (background) */}
-                          <StarIcon className="absolute text-gray-300 w-5 h-5" />
+                      <div className="relative w-5 h-5">
+                        {/* Gray base star (background) */}
+                        <StarIcon className="absolute text-gray-300 w-5 h-5" />
 
-                          {/* Yellow overlay with dynamic width */}
-                          <div
-                            className="absolute overflow-hidden h-5"
-                            style={{ width: `${(center.rating / 5) * 100}%` }}
-                          >
-                            <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
-                          </div>
+                        {/* Yellow overlay with dynamic width */}
+                        <div
+                          className="absolute overflow-hidden h-5"
+                          style={{ width: `${(center.rating / 5) * 100}%` }}
+                        >
+                          <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
                         </div>
-
-                        <span className="text-sm font-medium text-gray-800">
-                          {center.rating?.toFixed(1) || "4.8"}
-                        </span>
                       </div>
 
+                      <span className="text-sm font-medium text-gray-800">
+                        {center.rating?.toFixed(1) || "4.8"}
+                      </span>
+                    </div>
                   </div>
 
                   <p className="text-sm text-gray-600 line-clamp-1">
@@ -414,8 +409,9 @@ export const Cards = () => {
                       <span>{center.phone || "+1 (555) 123-4567"}</span>
                     </div>
                     <Link
-                      to={`/centers/${center.id}`} 
-                      className="text-sm font-medium text-purple-800 hover:underline" onClick={() => window.scrollTo(0, 0)}
+                      to={`/centers/${center.id}`}
+                      className="text-sm font-medium text-purple-800 hover:underline"
+                      onClick={() => window.scrollTo(0, 0)}
                     >
                       Details
                     </Link>
