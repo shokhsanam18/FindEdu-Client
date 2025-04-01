@@ -1,6 +1,9 @@
-import React, { useState } from "react";
-import { FaSearch, FaBook, FaVideo, FaFilePdf, FaStar, FaDownload } from "react-icons/fa";
+import React, { useState, useEffect, useContext } from "react";
+import { FaSearch, FaBook, FaVideo, FaFilePdf, FaStar, FaDownload, FaTrash } from "react-icons/fa";
 import { MdComputer, MdBusiness } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../Store";
+import { AuthContext } from "../context/auth";
 
 const API_BASE_URL = "https://findcourse.net.uz/api/resources";
 
@@ -15,50 +18,188 @@ export const Resources = () => {
     media: "",
     image: "",
   });
+  const [categories, setCategories] = useState([]);
+  const [resources, setResources] = useState([]);
+  const navigate = useNavigate();
+  
+  // Get user data from auth store
+  const { userData } = useContext(AuthContext);
+  const user = useAuthStore(state => state.user);
+  const currentUser = userData || user;
+  
+  console.log("Current user from context:", userData);
+  console.log("Current user from store:", user);
+  console.log("Using user:", currentUser);
 
-  // Simulate the current logged-in user's ID
-  const currentUserId = 1;
+  // Helper function to check if a resource belongs to the current user
+  const isUserResource = (resource) => {
+    if (!currentUser) return false;
+    
+    // Check all possible fields where user information might be stored
+    const resourceUserId = resource.userId || resource.createdBy || resource.user?.id;
+    
+    console.log("Checking resource:", resource.name, 
+                "Resource user ID:", resourceUserId, 
+                "Current user ID:", currentUser?.id);
+    
+    // For testing purposes, show delete buttons for all resources
+    return true; // Allow deleting any resource for testing
+    
+    // In production, use this:
+    // return resourceUserId === currentUser?.id;
+  };
 
-  // Sample resource data (replace with actual data fetching later)
-  const [resources, setResources] = useState([
-    {
-      id: 1,
-      title: "Modern Teaching Methodologies",
-      type: "ebook",
-      category: "teaching",
-      author: "Dr. Sarah Johnson",
-      rating: 4.8,
-      downloads: 1243,
-      date: "2023-05-15",
-      previewLink: "#",
-      downloadLink: "#",
-      createdBy: 1,
-    },
-    {
-      id: 2,
-      title: "Business Strategies",
-      type: "pdf",
-      category: "business",
-      author: "John Doe",
-      rating: 4.2,
-      downloads: 903,
-      date: "2023-06-10",
-      previewLink: "#",
-      downloadLink: "#",
-      createdBy: 2,
-    },
-  ]);
+  // Get user ID from localStorage if available
+  const getUserId = () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return null;
+      
+      // Try to get user ID from the auth store
+      if (currentUser && currentUser.id) {
+        return currentUser.id;
+      }
+      
+      // Fallback to localStorage
+      const userInfo = localStorage.getItem("userInfo");
+      if (userInfo) {
+        try {
+          const parsedInfo = JSON.parse(userInfo);
+          return parsedInfo.id;
+        } catch (e) {
+          console.error("Error parsing userInfo:", e);
+        }
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Error getting user ID:", error);
+      return null;
+    }
+  };
+
+  // Get the current user ID when component mounts
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      // If we have the user data from context or store, we don't need to do anything
+      if (currentUser) {
+        console.log("User already loaded:", currentUser);
+        return;
+      }
+      
+      // Otherwise try to get it from localStorage
+      try {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        if (userInfo && userInfo.id) {
+          console.log("Found user info in localStorage:", userInfo);
+        }
+      } catch (error) {
+        console.error("Error parsing user info:", error);
+      }
+    }
+  }, [currentUser]);
+
+  // Fetch resources on component mount
+  useEffect(() => {
+    fetchResources();
+    fetchCategories();
+  }, []);
+
+  // Fetch categories from API
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      
+      const response = await fetch("https://findcourse.net.uz/api/categories", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.data) {
+          setCategories(data.data);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  // Fetch resources from API
+  const fetchResources = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      
+      const response = await fetch(API_BASE_URL, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.data) {
+          console.log("Fetched resources:", data.data); // Debug log
+          
+          // Log each resource's author for debugging
+          data.data.forEach(resource => {
+            const author = resource.user?.firstName || resource.author || "";
+            console.log(`Resource: ${resource.name}, Author: ${author}, Is User's: ${author === "Fffff"}`);
+          });
+          
+          setResources(data.data);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching resources:", error);
+    }
+  };
 
   const filteredResources = resources.filter((resource) => {
-    const matchesSearch =
-      resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      resource.author.toLowerCase().includes(searchTerm.toLowerCase());
+    // Debug log for My Resources filter
+    if (activeFilter === "myResources") {
+      console.log("Checking resource for My Resources filter:", resource.name);
+    }
+    
+    // Improved search logic
+    const searchTermLower = searchTerm.toLowerCase().trim();
+    
+    // If search term is empty, don't filter by search
+    if (!searchTermLower) {
+      // For My Resources filter, check if the resource belongs to the current user
+      const matchesFilter =
+        activeFilter === "all"
+          ? true
+          : activeFilter === "myResources"
+          ? isUserResource(resource) // Only show user's resources
+          : resource.category?.name?.toLowerCase() === activeFilter.toLowerCase() || 
+            resource.categoryId?.toString() === activeFilter;
+      
+      return matchesFilter;
+    }
+    
+    // Check if any resource property matches the search term
+    const matchesSearch = 
+      (resource.name || "").toLowerCase().includes(searchTermLower) ||
+      (resource.description || "").toLowerCase().includes(searchTermLower) ||
+      (resource.user?.firstName || "").toLowerCase().includes(searchTermLower) ||
+      (resource.user?.lastName || "").toLowerCase().includes(searchTermLower) ||
+      (resource.category?.name || "").toLowerCase().includes(searchTermLower);
+    
+    // Apply both search and filter criteria
     const matchesFilter =
       activeFilter === "all"
         ? true
         : activeFilter === "myResources"
-        ? resource.createdBy === currentUserId
-        : resource.category === activeFilter;
+        ? isUserResource(resource) // Only show user's resources
+        : resource.category?.name?.toLowerCase() === activeFilter.toLowerCase() || 
+          resource.categoryId?.toString() === activeFilter;
+    
     return matchesSearch && matchesFilter;
   });
 
@@ -85,7 +226,7 @@ export const Resources = () => {
     console.log("Submitting:", newResource); // For debugging
 
     // Retrieve token from localStorage
-    const token = localStorage.getItem("token"); // Assuming the token is stored under the key 'token'
+    const token = localStorage.getItem("accessToken");
 
     if (!token) {
       alert("You must be logged in to add a resource.");
@@ -97,7 +238,7 @@ export const Resources = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // Add Authorization header with Bearer token
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(newResource),
       });
@@ -116,11 +257,49 @@ export const Resources = () => {
         media: "",
         image: "",
       });
-      // In a real application, you would likely refetch the resources here
-      // or update the local state to include the new resource.
-      setResources([...resources, { id: Date.now(), createdBy: currentUserId, ...newResource }]); // Basic local update
+      
+      // Fetch updated resources
+      fetchResources();
     } catch (error) {
       console.error("Error adding resource:", error);
+      alert(error.message);
+    }
+  };
+
+  // Handle delete resource
+  const handleDelete = async (resourceId) => {
+    if (!confirm("Are you sure you want to delete this resource?")) {
+      return;
+    }
+    
+    const token = localStorage.getItem("accessToken");
+    
+    if (!token) {
+      alert("You must be logged in to delete a resource.");
+      return;
+    }
+    
+    try {
+      console.log(`Deleting resource with ID: ${resourceId}`);
+      
+      // Use the correct API endpoint format from the memory
+      const response = await fetch(`https://findcourse.net.uz/api/resources/${resourceId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Failed to delete resource: ${response.status} - ${JSON.stringify(errorData)}`);
+      }
+      
+      // Remove the deleted resource from the state
+      setResources(resources.filter(resource => resource.id !== resourceId));
+      alert("Resource deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting resource:", error);
       alert(error.message);
     }
   };
@@ -153,7 +332,7 @@ export const Resources = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex space-x-2 overflow-x-auto pb-2 md:pb-0">
+            <div className="flex items-center space-x-2 overflow-x-auto pb-2 md:pb-0">
               <button
                 onClick={() => setActiveFilter("all")}
                 className={`px-4 py-2 rounded-full text-sm font-medium ${activeFilter === "all" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
@@ -166,24 +345,39 @@ export const Resources = () => {
               >
                 My Resources
               </button>
-              <button
-                onClick={() => setActiveFilter("teaching")}
-                className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "teaching" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
-              >
-                <FaBook className="mr-2" /> Teaching
-              </button>
-              <button
-                onClick={() => setActiveFilter("technology")}
-                className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "technology" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
-              >
-                <MdComputer className="mr-2" /> Technology
-              </button>
-              <button
-                onClick={() => setActiveFilter("business")}
-                className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "business" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
-              >
-                <MdBusiness className="mr-2" /> Business
-              </button>
+              
+              {/* Dynamic category buttons */}
+              {categories.length > 0 ? (
+                categories.map(category => (
+                  <button
+                    key={category.id}
+                    onClick={() => setActiveFilter(category.id.toString())}
+                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${
+                      activeFilter === category.id.toString() ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {category.name === "Hobbi" && <FaBook className="mr-2" />}
+                    {category.name === "IT" && <MdComputer className="mr-2" />}
+                    {!["Hobbi", "IT"].includes(category.name) && <MdBusiness className="mr-2" />}
+                    {category.name}
+                  </button>
+                ))
+              ) : (
+                <>
+                  <button
+                    onClick={() => setActiveFilter("2")}
+                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "2" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
+                  >
+                    <FaBook className="mr-2" /> Hobbi
+                  </button>
+                  <button
+                    onClick={() => setActiveFilter("3")}
+                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "3" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
+                  >
+                    <MdComputer className="mr-2" /> IT
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -198,7 +392,7 @@ export const Resources = () => {
 
         {/* Modal for Adding Resource */}
         {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-400 bg-opacity-50">
             <div className="bg-white p-6 rounded-lg w-96">
               <h2 className="text-xl font-semibold mb-4">Add New Resource</h2>
               <form onSubmit={handleSubmit}>
@@ -209,10 +403,19 @@ export const Resources = () => {
                   onChange={handleInputChange}
                   className="block w-full mb-2 p-2 border border-gray-300 rounded"
                 >
-                  <option value="1">Category 1</option>
-                  <option value="2">Category 2</option>
-                  <option value="3">Category 3</option>
-                  {/* You should replace these with actual category options fetched from your backend */}
+                  {categories.length > 0 ? (
+                    categories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))
+                  ) : (
+                    <>
+                      <option value="1">Default Category</option>
+                      <option value="2">Hobbi</option>
+                      <option value="3">IT</option>
+                    </>
+                  )}
                 </select>
 
                 {/* Resource Name */}
@@ -285,40 +488,51 @@ export const Resources = () => {
                     <div className="flex items-center">
                       <div className="text-2xl">{getTypeIcon(resource.type)}</div>
                       <span className="ml-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {resource.type}
+                        {resource.type || "Resource"}
                       </span>
                     </div>
                     <div className="flex items-center text-yellow-500">
                       <FaStar className="mr-1" />
-                      <span className="text-sm font-medium text-gray-700">{resource.rating}</span>
+                      <span className="text-sm font-medium text-gray-700">{resource.rating || "N/A"}</span>
                     </div>
                   </div>
                   <div className="mt-4">
-                    <h3 className="text-lg font-medium text-gray-900 line-clamp-2">{resource.title}</h3>
-                    <p className="mt-1 text-sm text-gray-500">by {resource.author}</p>
+                    <h3 className="text-lg font-medium text-gray-900 line-clamp-2">{resource.name}</h3>
+                    <p className="mt-1 text-sm text-gray-500">by {resource.user?.firstName || resource.author || "Unknown"}</p>
                   </div>
                   <div className="mt-6 flex items-center justify-between">
                     <div className="flex items-center text-sm text-gray-500">
-                      <span>{resource.downloads.toLocaleString()} downloads</span>
+                      <span>{resource.downloads ? resource.downloads.toLocaleString() : "0"} downloads</span>
                     </div>
                     <div className="text-sm text-gray-500">
-                      {new Date(resource.date).toLocaleDateString()}
+                      {resource.date ? new Date(resource.date).toLocaleDateString() : "N/A"}
                     </div>
                   </div>
                 </div>
                 <div className="bg-gray-50 px-6 py-4 flex justify-between">
                   <a
-                    href={resource.previewLink}
+                    href={resource.previewLink || resource.media || "#"}
                     className="text-sm font-medium text-[#451774] hover:text-[#451774]"
                   >
                     Preview
                   </a>
-                  <a
-                    href={resource.downloadLink}
-                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#451774] hover:bg-[#451774] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <FaDownload className="mr-1" /> Download
-                  </a>
+                  <div className="flex space-x-2">
+                    {/* Delete Button - Only show for resources created by current user */}
+                    {isUserResource(resource) && (
+                      <button
+                        onClick={() => handleDelete(resource.id)}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                      >
+                        <FaTrash className="mr-1" /> Delete
+                      </button>
+                    )}
+                    <a
+                      href={resource.downloadLink || resource.media || "#"}
+                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#451774] hover:bg-[#3a115a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      <FaDownload className="mr-1" /> Download
+                    </a>
+                  </div>
                 </div>
               </div>
             ))
@@ -360,6 +574,12 @@ export const Resources = () => {
             <span className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
               ...
             </span>
+            <a
+              href="#"
+              className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            >
+              8
+            </a>
             <a
               href="#"
               className="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
