@@ -2,12 +2,25 @@ import React, { useState } from "react";
 import { FaSearch, FaBook, FaVideo, FaFilePdf, FaStar, FaDownload } from "react-icons/fa";
 import { MdComputer, MdBusiness } from "react-icons/md";
 
+const API_BASE_URL = "https://findcourse.net.uz/api/resources";
+
 export const Resources = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newResource, setNewResource] = useState({
+    categoryId: 1, // Default category
+    name: "",
+    description: "",
+    media: "",
+    image: "",
+  });
 
-  // Sample resource data
-  const resources = [
+  // Simulate the current logged-in user's ID
+  const currentUserId = 1;
+
+  // Sample resource data (replace with actual data fetching later)
+  const [resources, setResources] = useState([
     {
       id: 1,
       title: "Modern Teaching Methodologies",
@@ -18,83 +31,97 @@ export const Resources = () => {
       downloads: 1243,
       date: "2023-05-15",
       previewLink: "#",
-      downloadLink: "#"
+      downloadLink: "#",
+      createdBy: 1,
     },
     {
       id: 2,
-      title: "Classroom Management Techniques",
-      type: "video",
-      category: "teaching",
-      author: "Education Excellence",
-      rating: 4.6,
-      downloads: 892,
-      date: "2023-04-22",
-      previewLink: "#",
-      downloadLink: "#"
-    },
-    {
-      id: 3,
-      title: "Digital Tools for Educators",
-      type: "pdf",
-      category: "technology",
-      author: "TechEd Solutions",
-      rating: 4.9,
-      downloads: 1567,
-      date: "2023-06-10",
-      previewLink: "#",
-      downloadLink: "#"
-    },
-    {
-      id: 4,
-      title: "Curriculum Development Guide",
-      type: "ebook",
-      category: "teaching",
-      author: "Global Education",
-      rating: 4.7,
-      downloads: 1021,
-      date: "2023-03-18",
-      previewLink: "#",
-      downloadLink: "#"
-    },
-    {
-      id: 5,
-      title: "Marketing Your Learning Center",
+      title: "Business Strategies",
       type: "pdf",
       category: "business",
-      author: "EduMarketing Pros",
-      rating: 4.5,
-      downloads: 756,
-      date: "2023-07-05",
+      author: "John Doe",
+      rating: 4.2,
+      downloads: 903,
+      date: "2023-06-10",
       previewLink: "#",
-      downloadLink: "#"
+      downloadLink: "#",
+      createdBy: 2,
     },
-    {
-      id: 6,
-      title: "Interactive Learning Apps Review",
-      type: "video",
-      category: "technology",
-      author: "Digital Education",
-      rating: 4.4,
-      downloads: 689,
-      date: "2023-02-28",
-      previewLink: "#",
-      downloadLink: "#"
-    }
-  ];
+  ]);
 
-  const filteredResources = resources.filter(resource => {
-    const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         resource.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = activeFilter === "all" || resource.category === activeFilter;
+  const filteredResources = resources.filter((resource) => {
+    const matchesSearch =
+      resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.author.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      activeFilter === "all"
+        ? true
+        : activeFilter === "myResources"
+        ? resource.createdBy === currentUserId
+        : resource.category === activeFilter;
     return matchesSearch && matchesFilter;
   });
 
   const getTypeIcon = (type) => {
-    switch(type) {
-      case "ebook": return <FaBook className="text-blue-500" />;
-      case "video": return <FaVideo className="text-red-500" />;
-      case "pdf": return <FaFilePdf className="text-red-600" />;
-      default: return <FaBook className="text-gray-500" />;
+    switch (type) {
+      case "ebook":
+        return <FaBook className="text-blue-500" />;
+      case "video":
+        return <FaVideo className="text-red-500" />;
+      case "pdf":
+        return <FaFilePdf className="text-red-600" />;
+      default:
+        return <FaBook className="text-gray-500" />;
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewResource({ ...newResource, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Submitting:", newResource); // For debugging
+
+    // Retrieve token from localStorage
+    const token = localStorage.getItem("token"); // Assuming the token is stored under the key 'token'
+
+    if (!token) {
+      alert("You must be logged in to add a resource.");
+      return;
+    }
+
+    try {
+      const response = await fetch(API_BASE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // Add Authorization header with Bearer token
+        },
+        body: JSON.stringify(newResource),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json(); // Try to get more specific error info
+        throw new Error(`Failed to add resource: ${response.status} - ${JSON.stringify(errorData)}`);
+      }
+
+      alert("Resource added successfully!");
+      setIsModalOpen(false);
+      setNewResource({
+        categoryId: 1,
+        name: "",
+        description: "",
+        media: "",
+        image: "",
+      });
+      // In a real application, you would likely refetch the resources here
+      // or update the local state to include the new resource.
+      setResources([...resources, { id: Date.now(), createdBy: currentUserId, ...newResource }]); // Basic local update
+    } catch (error) {
+      console.error("Error adding resource:", error);
+      alert(error.message);
     }
   };
 
@@ -129,31 +156,124 @@ export const Resources = () => {
             <div className="flex space-x-2 overflow-x-auto pb-2 md:pb-0">
               <button
                 onClick={() => setActiveFilter("all")}
-                className={`px-4 py-2 rounded-full text-sm font-medium ${activeFilter === "all" ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium ${activeFilter === "all" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
               >
                 All Resources
               </button>
               <button
+                onClick={() => setActiveFilter("myResources")}
+                className={`px-4 py-2 rounded-full text-sm font-medium ${activeFilter === "myResources" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
+              >
+                My Resources
+              </button>
+              <button
                 onClick={() => setActiveFilter("teaching")}
-                className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "teaching" ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "teaching" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
               >
                 <FaBook className="mr-2" /> Teaching
               </button>
               <button
                 onClick={() => setActiveFilter("technology")}
-                className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "technology" ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "technology" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
               >
                 <MdComputer className="mr-2" /> Technology
               </button>
               <button
                 onClick={() => setActiveFilter("business")}
-                className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "business" ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "business" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
               >
                 <MdBusiness className="mr-2" /> Business
               </button>
             </div>
           </div>
         </div>
+
+        {/* Add Resource Button */}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-4 py-2 bg-[#451774] text-white text-sm rounded-lg hover:bg-[#3a115a] transition duration-300 mx-auto block mb-8"
+        >
+          Add Resource
+        </button>
+
+        {/* Modal for Adding Resource */}
+        {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg w-96">
+              <h2 className="text-xl font-semibold mb-4">Add New Resource</h2>
+              <form onSubmit={handleSubmit}>
+                {/* Category Selection */}
+                <select
+                  name="categoryId"
+                  value={newResource.categoryId}
+                  onChange={handleInputChange}
+                  className="block w-full mb-2 p-2 border border-gray-300 rounded"
+                >
+                  <option value="1">Category 1</option>
+                  <option value="2">Category 2</option>
+                  <option value="3">Category 3</option>
+                  {/* You should replace these with actual category options fetched from your backend */}
+                </select>
+
+                {/* Resource Name */}
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Resource Name"
+                  value={newResource.name}
+                  onChange={handleInputChange}
+                  className="block w-full mb-2 p-2 border border-gray-300 rounded"
+                />
+
+                {/* Description */}
+                <textarea
+                  name="description"
+                  placeholder="Description"
+                  value={newResource.description}
+                  onChange={handleInputChange}
+                  className="block w-full mb-2 p-2 border border-gray-300 rounded"
+                />
+
+                {/* Media URL */}
+                <input
+                  type="url"
+                  name="media"
+                  placeholder="Media URL"
+                  value={newResource.media}
+                  onChange={handleInputChange}
+                  className="block w-full mb-2 p-2 border border-gray-300 rounded"
+                />
+
+                {/* Image URL */}
+                <input
+                  type="url"
+                  name="image"
+                  placeholder="Image URL"
+                  value={newResource.image}
+                  onChange={handleInputChange}
+                  className="block w-full mb-4 p-2 border border-gray-300 rounded"
+                />
+
+                {/* Buttons */}
+                <div className="flex justify-end space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 bg-gray-400 text-white rounded"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                  >
+                    Add Resource
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* Resources Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -163,9 +283,7 @@ export const Resources = () => {
                 <div className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <div className="text-2xl">
-                        {getTypeIcon(resource.type)}
-                      </div>
+                      <div className="text-2xl">{getTypeIcon(resource.type)}</div>
                       <span className="ml-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {resource.type}
                       </span>
@@ -176,12 +294,8 @@ export const Resources = () => {
                     </div>
                   </div>
                   <div className="mt-4">
-                    <h3 className="text-lg font-medium text-gray-900 line-clamp-2">
-                      {resource.title}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      by {resource.author}
-                    </p>
+                    <h3 className="text-lg font-medium text-gray-900 line-clamp-2">{resource.title}</h3>
+                    <p className="mt-1 text-sm text-gray-500">by {resource.author}</p>
                   </div>
                   <div className="mt-6 flex items-center justify-between">
                     <div className="flex items-center text-sm text-gray-500">
@@ -216,7 +330,7 @@ export const Resources = () => {
           )}
         </div>
 
-        {/* Pagination (would be dynamic in a real app) */}
+        {/* Pagination (would be dynamic in a real application) */}
         <div className="mt-12 flex justify-center">
           <nav className="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
             <a
@@ -246,12 +360,6 @@ export const Resources = () => {
             <span className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
               ...
             </span>
-            <a
-              href="#"
-              className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              8
-            </a>
             <a
               href="#"
               className="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
