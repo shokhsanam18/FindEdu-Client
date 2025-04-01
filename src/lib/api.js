@@ -1,12 +1,12 @@
 // utils/api.js
 import axios from "axios";
 
-const API_BASE = "http://18.141.233.37:4000";
+const API_BASE = "https://findcourse.net.uz";
 
 export const fetchComments = async (centerId) => {
   try {
     const response = await axios.get(`${API_BASE}/api/comments`, {
-      params: { centerId }
+      params: { centerId },
     });
     return response.data?.data || response.data || [];
   } catch (error) {
