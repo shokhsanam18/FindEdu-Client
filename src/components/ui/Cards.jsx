@@ -14,10 +14,10 @@ import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
 import { useLikedStore, useSearchStore } from "../../Store.jsx";
-const MajorsApi = "http://18.141.233.37:4000/api/major";
-const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
-const CentersApi = "http://18.141.233.37:4000/api/centers";
-const ImageApi = "http://18.141.233.37:4000/api/image";
+const MajorsApi = "https://findcourse.net.uz/api/major";
+const RegionsApi = "https://findcourse.net.uz/api/regions/search";
+const CentersApi = "https://findcourse.net.uz/api/centers";
+const ImageApi = "https://findcourse.net.uz/api/image";
 
 const Modal = ({
   isOpen,
