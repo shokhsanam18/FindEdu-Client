@@ -336,7 +336,7 @@ export default function Navbar() {
             >
               <Link to="/Register">
                 <span className="relative z-10">Register</span>
-                {/* <span className="absolute inset-0 bg-gradient-to-r from-[#5a1d99] to-[#461773] opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full"></span> */}
+                <span className="absolute inset-0 bg-gradient-to-r from-[#5a1d99] to-[#461773] opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full"></span>
               </Link>
             </Buton>
           </div>
