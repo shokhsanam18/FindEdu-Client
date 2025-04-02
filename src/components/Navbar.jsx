@@ -319,24 +319,26 @@ export default function Navbar() {
           </Menu>
         ) : (
           <div className="flex gap-3 md:gap-4">
-            {/* <Button
+            <Buton
               variant="outline"
-              className="relative overflow-hidden bg-white border-[#461773] text-[#461773] hover:text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full transition-all duration-300 group"
+              className="relative overflow-hidden border-[#461773] text-[#461773] hover:text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full transition-all duration-300 group"
+              asChild
             >
               <Link to="/Login">
                 <span className="relative z-10">Login</span>
                 <span className="absolute inset-0 bg-[#461773] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full z-0"></span>
               </Link>
-            </Button> */}
+            </Buton>
 
-            <button className="relative overflow-hidden bg-[#461773] hover:bg-[#3a1260] text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full shadow-lg hover:shadow-[0_4px_15px_rgba(70,23,115,0.3)] transition-all duration-300">
-              <a href="/Register">Register</a>
-
-              {/* <Link to="/Register">
+            <Buton
+              asChild
+              className="relative overflow-hidden bg-[#461773] hover:bg-[#3a1260] text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full shadow-lg hover:shadow-[0_4px_15px_rgba(70,23,115,0.3)] transition-all duration-300"
+            >
+              <Link to="/Register">
                 <span className="relative z-10">Register</span>
-                <span className="absolute inset-0 bg-violet-800 origin-left from-[#5a1d99] to-[#461773] opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full"></span>
-              </Link> */}
-            </button>
+                <span className="absolute inset-0 bg-gradient-to-r from-[#5a1d99] to-[#461773] opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full"></span>
+              </Link>
+            </Buton>
           </div>
         )}
       </div>
