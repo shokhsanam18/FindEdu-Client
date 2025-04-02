@@ -1,11 +1,11 @@
 import React from "react";
 
-import { Sidebar } from "./components/Sidebar.jsx";
+import FormTry from "../src/Register/Login/Register.jsx";
 
 function Test() {
   return (
     <div>
-      <Sidebar />
+      <FormTry />
     </div>
   );
 }
