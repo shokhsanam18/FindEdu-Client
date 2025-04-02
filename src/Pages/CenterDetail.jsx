@@ -453,7 +453,7 @@ import {
 } from "lucide-react";
 import { useLikedStore, useCommentStore, useAuthStore } from "../Store";
 
-const API_BASE = "http://18.141.233.37:4000";
+const API_BASE = "https://findcourse.net.uz";
 const ImageApi = `${API_BASE}/api/image`;
 
 const CenterDetail = () => {

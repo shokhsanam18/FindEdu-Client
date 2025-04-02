@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 
-const API_BASE = "https://findcourse.net.uz/";
+const API_BASE = "https://findcourse.net.uz";
 
 export const AuthContext = createContext({});
 
