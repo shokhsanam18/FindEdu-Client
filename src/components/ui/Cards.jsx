@@ -27,6 +27,10 @@ export const Modal = ({
         : [...prev, majorId]
     );
   };
+  useEffect(() => {
+    console.log("Majors:", majors);
+    console.log("Regions:", regions);
+  }, [majors, regions]);
 
   const handleRegionSelect = (regionId) => {
     setSelectedRegions((prev) =>
