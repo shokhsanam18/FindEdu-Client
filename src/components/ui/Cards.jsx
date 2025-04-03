@@ -1,15 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  ChevronDown,
-  MapPinIcon,
-  StarIcon,
-  ArrowRight,
-  PhoneIcon,
-  X,
-} from "lucide-react";
+import { ChevronDown, Heart, ArrowRight } from "lucide-react";
 import axios from "axios";
-import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
-import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
+import { Card, CardHeader, CardTitle, CardContent } from "./card.jsx";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
@@ -115,20 +107,11 @@ export const Modal = ({
 export const Cards = () => {
   const [majors, setMajors] = useState([]);
   const [regions, setRegions] = useState([]);
-  const [allCenters, setAllCenters] = useState([]);
-  const [filteredCenters, setFilteredCenters] = useState([]);
+  const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMajors, setSelectedMajors] = useState([]);
   const [selectedRegions, setSelectedRegions] = useState([]);
-  const searchTerm = useSearchStore((state) => state.searchTerm);
-  // const [likedCenters, setLikedCenters] = useState([]);
-  const { toggleLike, isLiked, fetchLiked } = useLikedStore();
-  useEffect(() => {
-    fetchLiked(); // ← make sure likes are ready before rendering
-  }, []);
-
-  // Fetch all data on component mount
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -142,24 +125,7 @@ export const Cards = () => {
 
         setMajors(majorsResponse.data.data || []);
         setRegions(regionsResponse.data.data || []);
-
-        const processedCenters =
-          centersResponse.data.data?.map((center) => {
-            const comments = center.comments || [];
-            const avgRating =
-              comments.length > 0
-                ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
-                : 0;
-
-            return {
-              ...center,
-              imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
-              rating: avgRating,
-            };
-          }) || [];
-
-        setAllCenters(processedCenters);
-        setFilteredCenters(processedCenters);
+        setCenters(centersResponse.data.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -170,67 +136,33 @@ export const Cards = () => {
     fetchData();
   }, []);
 
-  // const filteredCenters = centers.filter((center) => {
-  //   const term = searchTerm.toLowerCase();
-  //   const nameMatch = center.name?.toLowerCase().includes(term);
-  //   const addressMatch = center.address?.toLowerCase().includes(term);
-  //   const majorMatch = center.majors?.some((major) =>
-  //     major.name?.toLowerCase().includes(term)
-  //   );
-  //   return nameMatch || addressMatch || majorMatch;
-  // });
-
   useEffect(() => {
-    let filtered = allCenters;
-
-    if (selectedMajors.length > 0) {
-      filtered = filtered.filter((center) =>
-        selectedMajors.includes(center.majorId)
-      );
-    }
-
-    if (selectedRegions.length > 0) {
-      filtered = filtered.filter((center) =>
-        selectedRegions.includes(center.regionId)
-      );
-    }
-
-    if (searchTerm.trim() !== "") {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter((center) => {
-        const nameMatch = center.name?.toLowerCase().includes(term);
-        const addressMatch = center.address?.toLowerCase().includes(term);
-        const majorMatch = center.majors?.some((major) =>
-          major.name?.toLowerCase().includes(term)
+    if (selectedMajors.length === 0 && selectedRegions.length === 0) {
+      axios
+        .get(CentersApi)
+        .then((response) => setCenters(response.data.data || []))
+        .catch((error) =>
+          console.error("Error loading default centers:", error)
         );
-        return nameMatch || addressMatch || majorMatch;
-      });
+      return;
     }
 
-    setFilteredCenters(filtered);
-  }, [selectedMajors, selectedRegions, searchTerm, allCenters]);
+    const filteredCenters = majors.flatMap(
+      (major) =>
+        major.centers?.filter(
+          (center) =>
+            (selectedMajors.length === 0 ||
+              selectedMajors.includes(major.id)) &&
+            (selectedRegions.length === 0 ||
+              selectedRegions.includes(center.regionId))
+        ) || []
+    );
 
-  // const toggleLike = (centerId) => {
-  //   setLikedCenters((prev) =>
-  //     prev.includes(centerId)
-  //       ? prev.filter((id) => id !== centerId)
-  //       : [...prev, centerId]
-  //   );
-  // };
-
-  const removeMajorFilter = (majorId) => {
-    setSelectedMajors((prev) => prev.filter((id) => id !== majorId));
-  };
-
-  const removeRegionFilter = (regionId) => {
-    setSelectedRegions((prev) => prev.filter((id) => id !== regionId));
-  };
-
-  const getMajorName = (id) => majors.find((m) => m.id === id)?.name || id;
-  const getRegionName = (id) => regions.find((r) => r.id === id)?.name || id;
+    setCenters(filteredCenters);
+  }, [selectedMajors, selectedRegions]);
 
   return (
-    <div className="mb-16 mt-36">
+    <div className="mb-16 mt-[11%]">
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -240,8 +172,8 @@ export const Cards = () => {
       >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
-        <div className="relative  mx-auto flex flex-col md:flex-row items-center  text-white">
-          <div className="md:w-1/2 text-center md:text-left pl-10">
+        <div className="relative max-w-6xl mx-auto flex flex-col md:flex-row items-center px-6 text-white">
+          <div className="md:w-1/2 text-center md:text-left">
             <motion.h1
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -257,69 +189,45 @@ export const Cards = () => {
               transition={{ duration: 1, delay: 0.6 }}
               className="text-gray-300 mt-4"
             >
-              We help students discover the best courses, universities, and
-              learning opportunities worldwide. With expert insights and real
+              {" "}
+              We help students discover the best courses, universities,
+              andlearning opportunities worldwide. With expert insights and real
               student reviews, we make your education journey effortless.
             </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+              className="mt-6 flex justify-center md:justify-start items-center gap-4"
+            >
+              <Link to="/">
+                {" "}
+                <button className="flex items-center text-white px-6 py-3 rounded-full font-semibold shadow-lg bg-[#461773] hover:bg-[#533d75] transition">
+                  <span className="text-xl font-bold mr-2">+</span> EXPLORE
+                  COURSES
+                </button>
+              </Link>
+            </motion.div>
           </div>
         </div>
       </motion.div>
-
-      {/* Filter controls */}
-      <div className="flex flex-row ml-20 gap-4">
-        <div className="flex flex-col gap-3">
-          <div className="text-left">
-            <h3 className="text-xl font-medium text-[#461773] mb-1">
-              Find Your Program
-            </h3>
-            <p className="text-sm text-gray-600">Select course and region</p>
-            <button
-              className=" mt-5 group inline-flex items-center justify-center gap-2 bg-[#461773] hover:bg-[#3a1260] text-white font-medium px-6 py-2.5 rounded-xl border border-[#5e1b9e] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(90,29,153,0.2)]"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <span>Courses & Regions</span>
-              <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
-            </button>
-          </div>
-        </div>
-
-        {/* Active filters display */}
-        <div className="flex flex-wrap gap-2 h-10 mt-18">
-          {selectedMajors.map((id) => (
-            <div
-              key={`major-${id}`}
-              className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full"
-            >
-              {getMajorName(id)}
-              <button
-                onClick={() => removeMajorFilter(id)}
-                className="ml-2 text-blue-600 hover:text-blue-800"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          ))}
-          {selectedRegions.map((id) => (
-            <div
-              key={`region-${id}`}
-              className="flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full"
-            >
-              {getRegionName(id)}
-              <button
-                onClick={() => removeRegionFilter(id)}
-                className="ml-2 text-puple-600 hover:text-purple-800"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          ))}
-        </div>
+      <div className="flex items-center justify-center gap-5 flex-wrap">
+        <h2
+          className="text-2xl text-center hover:cursor-pointer bg-purple-900 rounded-xl w-auto h-auto px-3 py-1 pb-2 text-white border-2 border-purple-800 hover:bg-white hover:text-purple-900 transition duration-500 focus:shadow-xl shadow-blue-500 flex items-center justify-center"
+          onClick={() => setIsModalOpen(true)}
+        >
+          Majors & Regions
+          <ChevronDown className="mt-2" />
+        </h2>
       </div>
-
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={() => setIsModalOpen(false)}
+        onSave={() => {
+          setIsModalOpen(false);
+          console.log("Saved selections:", { selectedMajors, selectedRegions });
+        }}
         selectedMajors={selectedMajors}
         setSelectedMajors={setSelectedMajors}
         selectedRegions={selectedRegions}
@@ -327,99 +235,40 @@ export const Cards = () => {
         majors={majors}
         regions={regions}
       />
-
       {loading ? (
         <p className="text-center mt-10">Loading...</p>
       ) : (
-        <div className="Main_Cards flex flex-wrap justify-center xl:gap-20 gap-6 mt-10">
-          {filteredCenters.length > 0 ? (
-            filteredCenters.map((center) => (
-              <motion.div
+        <div className="Main_Cards flex flex-wrap justify-center xl:gap-8 gap-6 mt-10">
+          {centers.length > 0 ? (
+            centers.map((center) => (
+              <Card
                 key={center.id}
-                className="w-full max-w-sm overflow-hidden rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
+                className="relative xl:w-80 w-[270px] xl:h-72 h-60 rounded-xl"
               >
-                <div className="relative h-48 overflow-hidden">
-                  {center.imageUrl ? (
+                <CardHeader>
+                  <CardTitle>{center.name}</CardTitle>
+                </CardHeader>
+                <h3 className="border-[1px] rounded-full border-black p-1 absolute top-5 right-7">
+                  <Link to="/smth">
+                    <ArrowRight />
+                  </Link>
+                </h3>
+                <CardContent>
+                  <div className="flex items-center justify-between">
                     <img
-                      className="w-full h-full object-cover"
-                      src={center.imageUrl}
-                      alt={center.name}
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                        e.target.parentElement.classList.add("bg-gray-100");
-                      }}
+                      className="w-28 h-28 absolute bottom-2 left-4"
+                      src={center.image}
+                      alt="Card"
                     />
-                  ) : (
-                    <div className="h-full bg-gray-100 flex items-center justify-center">
-                      <MapPinIcon className="h-10 w-10 text-gray-400" />
-                    </div>
-                  )}
-
-                  <motion.button
-                    className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => toggleLike(center.id)}
-                  >
-                    {isLiked(center.id) ? (
-                      <HeartSolid className="h-5 w-5 text-red-500" />
-                    ) : (
-                      <HeartOutline className="h-5 w-5 text-red-500" />
-                    )}
-                  </motion.button>
-                </div>
-
-                <div className="px-4 py-7 space-y-1.5">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-semibold truncate">
-                      {center.name}
+                    <h3 className="flex text-yellow-400 font-semibold items-center gap-1 absolute bottom-7 right-7">
+                      <Heart color="gray" /> {center.rating}
                     </h3>
-                    <div className="flex items-center space-x-1">
-                      <div className="relative w-5 h-5">
-                        {/* Gray base star (background) */}
-                        <StarIcon className="absolute text-gray-300 w-5 h-5" />
-
-                        {/* Yellow overlay with dynamic width */}
-                        <div
-                          className="absolute overflow-hidden h-5"
-                          style={{ width: `${(center.rating / 5) * 100}%` }}
-                        >
-                          <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
-                        </div>
-                      </div>
-
-                      <span className="text-sm font-medium text-gray-800">
-                        {center.rating?.toFixed(1) || "4.8"}
-                      </span>
-                    </div>
                   </div>
-
-                  <p className="text-sm text-gray-600 line-clamp-1">
-                    {center.address}
-                  </p>
-
-                  <div className="flex items-center justify-between mt-1.5">
-                    <div className="flex items-center space-x-1 text-sm text-gray-500">
-                      <PhoneIcon className="h-4 w-4" />
-                      <span>{center.phone || "+1 (555) 123-4567"}</span>
-                    </div>
-                    <Link
-                      to={`/centers/${center.id}`}
-                      className="text-sm font-medium text-purple-800 hover:underline"
-                      onClick={() => window.scrollTo(0, 0)}
-                    >
-                      Details
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
+                </CardContent>
+              </Card>
             ))
           ) : (
-            <p className="text-center text-gray-600">
-              No centers match your filters.
-            </p>
+            <p className="text-center text-gray-600">No centers found.</p>
           )}
         </div>
       )}
