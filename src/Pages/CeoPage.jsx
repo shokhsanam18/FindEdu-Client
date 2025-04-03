@@ -137,12 +137,12 @@ export default function CeoPage() {
   };
 
   return (
-    <div className="bg-[#f1edfa] md:mb-auto mb-[350px]">
+    <div className="bg-[#f1edfa] ">
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-white bg-cover bg-center mt-37"
+        className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-white bg-cover bg-center mt-37 "
         style={{ backgroundImage: "url('/ceopage.png')" }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
@@ -184,24 +184,24 @@ export default function CeoPage() {
           </div>
         </motion.div>
       </motion.div>
-      <div className="flex flex-col md:flex-row w-full bg-[#f1edfa] justify-center items-center m-0 h-screen my-20 ">
-        <div className="flex h-screen justify-center items-center ">
-          <motion.img
-            src={ceo}
-            alt="Our Mission"
-            className="max-w-[250px] flex md:max-w-[450px] max-h-[1000px] object-contain ml-0 md:ml-[110px] cursor-pointer justify-center items-center md:mt-0 mt-[600px] "
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              transition: { duration: 0.5, ease: "easeOut" },
-            }}
-            whileHover={{
-              scale: 1.03,
-              transition: { duration: 0.9, ease: "easeInOut" },
-            }}
-          />
-        </div>
+<div className="flex flex-col md:flex-row w-full bg-[#f1edfa] gap-8 justify-center items-center p-4 md:p-0   min-h-screen md:h-screen md:my-30 ">       
+<div className="hidden md:flex h-screen justify-center items-center">
+  <motion.img
+    src={ceo}
+    alt="Our Mission"
+    className="max-w-[250px] md:max-w-[450px] max-h-[1000px] object-contain cursor-pointer ml-10"
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.5, ease: "easeOut" },
+    }}
+    whileHover={{
+      scale: 1.03,
+      transition: { duration: 0.9, ease: "easeInOut" },
+    }}
+  />
+</div>
 
         <div className="flex justify-center items-center w-full md:w-screen h-screen py-[500px] md:mt-0 mt-[50px]">
           <Toaster theme="light" position="top-right" richColors />
