@@ -1,5 +1,6 @@
 import Navbar from "./Navbar";
-import { Footer } from "./Footer";
+import { Sidebar } from "./Sidebar";
+import { Footer } from "./footer";
 import { Outlet } from "react-router-dom";
 
 export const Layout = () => {
@@ -8,6 +9,7 @@ export const Layout = () => {
       style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       <Navbar />
+      <Sidebar />
       <Outlet />
       <Footer />
     </div>

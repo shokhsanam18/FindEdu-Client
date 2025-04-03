@@ -5,9 +5,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "./card.jsx";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
-const MajorsApi = "http://18.141.233.37:4000/api/major";
-const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
-const CentersApi = "http://18.141.233.37:4000/api/centers";
+const MajorsApi = "https://findcourse.net.uz/api/major";
+const RegionsApi = "https://findcourse.net.uz/api/regions/search";
+const CentersApi = "https://findcourse.net.uz/api/centers";
 
 export const Modal = ({
   isOpen,
@@ -27,10 +27,6 @@ export const Modal = ({
         : [...prev, majorId]
     );
   };
-  useEffect(() => {
-    console.log("Majors:", majors);
-    console.log("Regions:", regions);
-  }, [majors, regions]);
 
   const handleRegionSelect = (regionId) => {
     setSelectedRegions((prev) =>
@@ -48,7 +44,7 @@ export const Modal = ({
       onClick={onClose}
     >
       <div
-        className="w-[40%] max-w-[500px] max-h-[80vh] overflow-y-auto px-6 py-6 bg-[#A88CC0] text-white border border-white rounded-lg shadow-lg z-50"
+        className="w-[80%] sm:w-[60%] md:w-[50%] max-w-[600px] max-h-[70vh] overflow-y-auto px-6 py-6 bg-[#A88CC0] text-white border border-white rounded-lg shadow-lg z-50"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col">
@@ -86,7 +82,6 @@ export const Modal = ({
             ))}
           </form>
         </div>
-
         <div className="flex justify-between mt-5">
           <button
             className="bg-[#9270B0] text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-[#7C5B99]"

@@ -17,7 +17,7 @@ import {
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 
-const API_BASE = "http://18.141.233.37:4000/api/users";
+const API_BASE = "https://findcourse.net.uz/api/users";
 
 const formSchema = z.object({
   otp: z.string().min(4, { message: "OTP must be at least 4 digits" }),
@@ -61,42 +61,67 @@ const VerifyOtp = () => {
     <div className="flex flex-col md:flex-row h-screen bg-[#6d24b719]">
       <Sonner theme="light" position="top-right" richColors />
 
-<Link to="/">
- <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold cursor-pointer">
-<p className="flex"> F<img src={icon} alt="Logo" className="h-7 w-4 mx-1 mt-3" />ndedu.uz</p>
-</div>
-</Link>
+      <Link to="/">
+        <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold cursor-pointer">
+          <p className="flex">
+            {" "}
+            F<img src={icon} alt="Logo" className="h-7 w-4 mx-1 mt-3" />
+            ndedu.uz
+          </p>
+        </div>
+      </Link>
 
- <div className="w-full flex items-center justify-center p-6 bg-gradient-to-b from-white to-purple-100  h-screen">
-<div className="w-full max-w-xl bg-white p-8 rounded-lg shadow-md">
- <h2 className="text-4xl font-bold text-[#461773] mb-6 text-center"> Verify OTP
- </h2>
+      <div className="w-full flex items-center justify-center p-6 bg-gradient-to-b from-white to-purple-100  h-screen">
+        <div className="w-full max-w-xl bg-white p-8 rounded-lg shadow-md">
+          <h2 className="text-4xl font-bold text-[#461773] mb-6 text-center">
+            {" "}
+            Verify OTP
+          </h2>
 
-<Form {...form}>
-<form
-onSubmit={form.handleSubmit(resetPassword)}
-className="space-y-4">
-<FormField control={form.control} name="otp" render={({ field }) => (
-<FormItem>
-<FormControl>
-<Input placeholder="Enter OTP" {...field} />
-</FormControl>
- <FormMessage />
- </FormItem>)}/>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(resetPassword)}
+              className="space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="otp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="Enter OTP" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-<FormField
-control={form.control} name="newPassword" render={({ field }) => (<FormItem>
-<FormControl>
-<Input type="password"  placeholder="Enter new password" {...field}/>
-</FormControl>
-<FormMessage />
-</FormItem>)}/>
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter new password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
- <Button  type="submit" className=" cursor-pointer h-[50px] w-full bg-[#461773] text-white font-semibold rounded-md hover:bg-purple-700 transition">Reset Password
-</Button>
-</form>
-</Form>
-</div>
+              <Button
+                type="submit"
+                className=" cursor-pointer h-[50px] w-full bg-[#461773] text-white font-semibold rounded-md hover:bg-purple-700 transition"
+              >
+                Reset Password
+              </Button>
+            </form>
+          </Form>
+        </div>
       </div>
     </div>
   );

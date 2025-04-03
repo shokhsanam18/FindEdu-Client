@@ -1,12 +1,11 @@
-import React from 'react';
-import Navbar from './components/Navbar';
+import React from "react";
+
+import { Sidebar } from "./components/Sidebar.jsx";
 
 function Test() {
   return (
     <div>
-      <Navbar />
-      <h1>This is the Test Page</h1>
-      <p>Your content will go here.</p>
+      <Sidebar />
     </div>
   );
 }

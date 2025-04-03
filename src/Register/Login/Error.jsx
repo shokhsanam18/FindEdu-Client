@@ -1,6 +1,6 @@
 const ErrorPage = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-white to-purple-100 text-center">
+    <div className="flex flex-col items-center justify-center h-screen bg-[#6e24b715] text-center">
       <div className="flex flex-col items-center p-13 bg-white shadow-xl rounded-2xl border border-gray-200 gap-2">
         <h1 className="text-9xl font-bold text-[#461773]">404</h1>
         <p className="text-2xl text-gray-700 mt-4">
@@ -12,7 +12,7 @@ const ErrorPage = () => {
 
         <div className="mt-6">
           <button
-            onClick={() => (window.location.href = "/home")}
+            onClick={() => (window.location.href = "/")}
             className="cursor-pointer px-6 py-3 bg-[#461773] text-white rounded-lg shadow-md hover:bg-purple-600 transition duration-300"
           >
             Go Home
