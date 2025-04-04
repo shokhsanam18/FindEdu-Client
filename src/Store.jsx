@@ -1,97 +1,79 @@
 import { create } from "zustand";
 import axios from "axios";
 import { toast } from "sonner";
-
-const API_BASE = "http://18.141.233.37:4000/api";
+import { createJSONStorage, persist } from "zustand/middleware";
+const API_BASE = "https://findcourse.net.uz/api";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
   accessToken: localStorage.getItem("accessToken") || null,
   refreshToken: localStorage.getItem("refreshToken") || null,
+  profileImageUrl: null,
 
-  // Fetch user data (GET /users/mydata)
   fetchUserData: async () => {
     try {
-      // 🔄 Always refresh token before calling /mydata
-      let token = await get().refreshTokenFunc();
-      if (!token) {
-        console.warn("❌ No access token after refresh.");
-        return null;
-      }
+      const token = await get().refreshTokenFunc(false); // don't logout immediately on missing token
+      if (!token) return null;
 
-      
       const { data } = await axios.get(`${API_BASE}/users/mydata`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-
-      let role = data?.role; // Check if API response has role
-
-      // 🛠 Extract role from JWT token if missing from API
+      let role = data?.role;
       if (!role && token) {
         try {
           const decoded = JSON.parse(atob(token.split(".")[1]));
-          role = decoded?.role || "USER"; 
-        } catch (error) {
-          console.warn("❌ Failed to decode token:", error);
+          role = decoded?.role || "USER";
+        } catch {
+          role = "USER";
         }
       }
 
-      if (!role) {
-        console.warn("❌ Role still missing. Defaulting to USER.");
-        role = "USER"; // Fallback role
-      }
-
-      const userData = { ...data, role }; // Attach extracted role to user data
+      const userData = { ...data, role };
       set({ user: userData });
-
-      console.log(userData);
+      // console.log(userData);
       return userData;
     } catch (error) {
-      console.error("Error fetching user:", error?.response?.data || error);
+      console.warn(
+        "Failed to fetch user data:",
+        error?.response?.data || error
+      );
       return null;
     }
   },
 
-  // Login (POST /users/login)
   login: async (values) => {
     try {
-      const response = await axios.post(`${API_BASE}/users/login`, values);
-      const data = response.data;
+      const res = await axios.post(`${API_BASE}/users/login`, values);
+      const { accessToken, refreshToken } = res.data;
 
-      
-
-      if (data.accessToken && data.refreshToken) {
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-
-        set({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+      if (accessToken && refreshToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        set({ accessToken, refreshToken });
 
         const user = await get().fetchUserData();
-        set({ user });
         toast.success("Login successful!");
         return { success: true, role: user?.role };
-      } else {
-        toast.error("Invalid credentials");
-        return { success: false };
       }
+
+      toast.error("Invalid credentials");
+      return { success: false };
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error(error.response?.data?.message || "Something went wrong");
+      toast.error(error.response?.data?.message || "Login failed");
       return { success: false, message: error.response?.data?.message };
     }
   },
 
-  // Refresh token (POST /users/refreshToken)
-  refreshTokenFunc: async () => {
+  refreshTokenFunc: async (shouldLogout = true) => {
+    const refreshToken = get().refreshToken;
+
+    if (!refreshToken) {
+      if (shouldLogout) get().logout();
+      return null;
+    }
+
     try {
-      const refreshToken = get().refreshToken;
-
-      if (!refreshToken) {
-        console.warn("❌ No refresh token available. Logging out.");
-        return get().logout();
-      }
-
       const { data } = await axios.post(`${API_BASE}/users/refreshToken`, {
         refreshToken,
       });
@@ -100,49 +82,316 @@ export const useAuthStore = create((set, get) => ({
         localStorage.setItem("accessToken", data.accessToken);
         set({ accessToken: data.accessToken });
         return data.accessToken;
-      } else {
-        console.warn("❌ Refresh response missing accessToken. Logging out.");
-        get().logout();
       }
+
+      if (shouldLogout) get().logout();
+      return null;
     } catch (error) {
-      console.error("❌ Token refresh failed:", error?.response?.data || error);
-      get().logout();
+      if (shouldLogout) get().logout();
+      return null;
     }
   },
 
-  isLoggedIn: () => {
-    const user = get().user;
-    return !!user && user.isActive;
-  },
+  isLoggedIn: () => !!get().user?.isActive,
 
-  // Logout
   logout: () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    set({ user: null, accessToken: null, refreshToken: null });
+    set({
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      profileImageUrl: null,
+    });
   },
 
-  // Auto-refresh setup
+  deleteAccount: async () => {
+    try {
+      const { user, refreshTokenFunc, logout } = get();
+      const token = await refreshTokenFunc();
+      const userId = user?.data?.id;
+
+      if (!token || !userId) return toast.error("User not authenticated");
+
+      await axios.delete(`${API_BASE}/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success("Account deleted successfully");
+      logout();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to delete account");
+    }
+  },
+
   autoRefreshToken: () => {
-    const checkTokenExpiry = () => {
+    const scheduleRefresh = () => {
       const token = get().accessToken;
       if (!token) return;
 
       try {
         const { exp } = JSON.parse(atob(token.split(".")[1]));
-        const expiryTime = exp * 1000 - Date.now() - 30000;
+        const timeUntilExpiry = exp * 1000 - Date.now() - 30000;
 
-        if (expiryTime > 0) {
-          setTimeout(() => get().refreshTokenFunc(), expiryTime);
-        } else {
-          get().refreshTokenFunc();
-        }
+        setTimeout(
+          () => {
+            get().refreshTokenFunc();
+          },
+          timeUntilExpiry > 0 ? timeUntilExpiry : 0
+        );
       } catch {
-        console.warn("❌ Token could not be decoded, logging out.");
         get().logout();
       }
     };
 
-    checkTokenExpiry();
+    scheduleRefresh();
   },
+
+  fetchProfileImage: async (filename) => {
+    if (!filename) {
+      set({ profileImageUrl: null });
+      return;
+    }
+
+    try {
+      const res = await axios.get(`${API_BASE}/image/${filename}`, {
+        responseType: "blob",
+      });
+
+      const blobUrl = URL.createObjectURL(res.data);
+      set({ profileImageUrl: blobUrl });
+    } catch {
+      set({ profileImageUrl: null });
+    }
+  },
+}));
+
+export const useCategoryStore = create((set) => ({
+  categories: [],
+  loading: false,
+  error: null,
+  pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+  },
+
+  fetchCategories: async ({
+    name = "",
+    page = 1,
+    limit = 10,
+    sortOrder = "ASC",
+  } = {}) => {
+    set({ loading: true, error: null });
+
+    try {
+      const params = {
+        ...(name && { name }),
+        page,
+        limit,
+        sortOrder,
+      };
+
+      const { data } = await axios.get(`${API_BASE}/categories`, { params });
+      console.log(data);
+
+      set({
+        categories: data.data || [],
+        pagination: {
+          page,
+          limit,
+          total: data.total || 0,
+        },
+        loading: false,
+      });
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast.error("Failed to fetch categories");
+      set({ error, loading: false });
+    }
+  },
+}));
+
+export const useSearchStore = create((set) => ({
+  searchTerm: "",
+  setSearchTerm: (term) => set({ searchTerm: term }),
+}));
+
+export const useSidebarStore = create((set) => ({
+  side: false,
+  closeSidebar: () => set(() => ({ side: false })),
+  openSidebar: () => set(() => ({ side: true })),
+}));
+
+export const useLikedStore = create((set, get) => ({
+  likedItems: [], // Array of { centerId, id (likeId) }
+  loading: false,
+
+  fetchLiked: async () => {
+    set({ loading: true });
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.get(`${API_BASE}/liked/query`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const liked = res.data?.data || [];
+
+      // Save both centerId and the likeId (id) from the backend
+      const likedItems = liked.map((item) => ({
+        centerId: item.centerId,
+        id: item.id,
+      }));
+
+      set({ likedItems });
+    } catch (err) {
+      console.error("Failed to fetch liked centers", err);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  toggleLike: async (centerId) => {
+    const { likedItems } = get();
+    const token = localStorage.getItem("accessToken");
+
+    const existing = likedItems.find((item) => item.centerId === centerId);
+
+    try {
+      if (existing) {
+        // Unlike using `likeId` (not centerId)
+        await axios.delete(`${API_BASE}/liked/${existing.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        set({
+          likedItems: likedItems.filter((item) => item.centerId !== centerId),
+        });
+      } else {
+        // Like
+        const res = await axios.post(
+          `${API_BASE}/liked`,
+          { centerId },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const newLike = res.data?.data;
+        if (newLike?.id) {
+          set({
+            likedItems: [...likedItems, { centerId, id: newLike.id }],
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Toggle like error", err);
+    }
+  },
+
+  isLiked: (centerId) =>
+    get().likedItems.some((item) => item.centerId === centerId),
+}));
+
+export const useCommentStore = create((set, get) => ({
+  comments: [],
+  loading: false,
+  error: null,
+
+  fetchCommentsByCenter: async (centerId) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await axios.get(`${API_BASE}/comments`, {
+        params: {
+          page: 1,
+          limit: 100,
+        },
+      });
+
+      const all = res.data?.data || [];
+      const filtered = all.filter((c) => c.centerId === Number(centerId));
+      set({ comments: filtered });
+    } catch (err) {
+      console.error("Fetch comments failed", err);
+      set({ error: "Failed to load comments" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  postComment: async ({ text, star, centerId }) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.post(
+        `${API_BASE}/comments`,
+        { text, star, centerId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const newComment = res.data?.data;
+      if (newComment) {
+        set((state) => ({
+          comments: [newComment, ...state.comments],
+        }));
+        toast.success("Comment posted!");
+      }
+    } catch (err) {
+      console.error("Post comment error", err);
+      toast.error(err.response?.data?.message || "Failed to post comment");
+    }
+  },
+
+  deleteComment: async (id) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      await axios.delete(`${API_BASE}/comments/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      set((state) => ({
+        comments: state.comments.filter((c) => c.id !== id),
+      }));
+
+      toast.success("Comment deleted");
+    } catch (err) {
+      console.error("Delete comment error", err);
+      toast.error("Failed to delete comment");
+    }
+  },
+
+  updateComment: async ({ id, text, star }) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.patch(
+        `${API_BASE}/comments/${id}`,
+        { text, star },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const updated = res.data?.data;
+
+      set((state) => ({
+        comments: state.comments.map((c) => (c.id === id ? updated : c)),
+      }));
+
+      toast.success("Comment updated");
+    } catch (err) {
+      console.error("Update comment error", err);
+      toast.error("Failed to update comment");
+    }
+  },
+}));
+
+export const useSidebarSt = create((set) => ({
+  isOpen: false,
+  toggleSidebar: () => set((state) => ({ isOpen: !state.isOpen })),
+  closeSidebar: () => set({ isOpen: false }),
 }));
