@@ -82,7 +82,18 @@ const Favorites = () => {
     const majorMatch = center.majors?.some((major) =>
       major.name?.toLowerCase().includes(term)
     );
-
+    if (searchTerm.trim() !== "") {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter((center) => {
+        const nameMatch = center.name?.toLowerCase().includes(term);
+        const addressMatch = center.address?.toLowerCase().includes(term);
+        const majorMatch = center.majors?.some((major) =>
+          major.name?.toLowerCase().includes(term)
+        );
+        return nameMatch || addressMatch || majorMatch;
+      });
+    }
+    
     return nameMatch || addressMatch || majorMatch;
   });
 

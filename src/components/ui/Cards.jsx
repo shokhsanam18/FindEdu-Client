@@ -182,22 +182,24 @@ export const Cards = () => {
   //   );
   //   return nameMatch || addressMatch || majorMatch;
   // });
-
   useEffect(() => {
     let filtered = allCenters;
 
+    // ---------- FILTER BY MAJOR
     if (selectedMajors.length > 0) {
       filtered = filtered.filter((center) =>
-        selectedMajors.includes(center.majorId)
+        center.majors?.some((major) => selectedMajors.includes(major.id))
       );
     }
 
+    //---------------------- FILTER BY REGION
     if (selectedRegions.length > 0) {
-      filtered = filtered.filter((center) =>
-        selectedRegions.includes(center.regionId)
+      filtered = filtered.filter(
+        (center) => selectedRegions.includes(center.regionId) 
       );
     }
 
+  
     if (searchTerm.trim() !== "") {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter((center) => {
