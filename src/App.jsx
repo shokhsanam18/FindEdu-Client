@@ -14,6 +14,7 @@ import { AuthProvider } from "./context/auth";
 import { useAuthStore } from "./Store.jsx";
 import { Resources } from "./Pages/Resources.jsx";
 import Test from "./Test.jsx";
+import { Appointment } from "./Pages/appointment.jsx";
 
 import Favorites from "./Pages/Favorites.jsx";
 import FormTry from "./Register/Login/Register.jsx";
@@ -35,6 +36,7 @@ function App() {
             <Route path="/CEO" element={<CeoPage />} />
             <Route path="/Favorites" element={<Favorites />} />
             <Route path="/Resources" element={<Resources />} />
+            <Route path="/Appointment" element={<Appointment/>} />
           </Route>
           <Route path="/Register" element={<FormTry />} />
           <Route path="/Login" element={<Login />} />
