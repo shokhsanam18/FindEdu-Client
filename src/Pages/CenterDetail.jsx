@@ -673,14 +673,23 @@ const CenterDetail = () => {
 
     const newRegister = {
         id: id,
-        branchId: selectedBranch.id,
+        branch: selectedBranch.name,
+        address: center.address,
         majorId: selectedMajor.id,
         majorName: center.majors[0].name,
         visitDate: visitDate,
     };
-    existingData.push(newRegister);
+    const index = existingData.findIndex(item => item.id === id);
+
+    if (index !== -1) {
+        existingData[index] = newRegister;
+    } else {
+        existingData.push(newRegister);
+    }
+
     localStorage.setItem("RegisterData", JSON.stringify(existingData));
 };
+
 
   return (
     <div className="min-h-screen bg-gray-100 mt-42 md:mt-36">
