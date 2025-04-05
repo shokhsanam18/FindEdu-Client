@@ -50,52 +50,59 @@ const Modal = ({
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50"
       onClick={onClose}
     >
       <div
-        className="w-[40%] max-w-[500px] max-h-[80vh] overflow-y-auto px-6 py-6 bg-[#A88CC0] text-white border border-white rounded-lg shadow-lg z-50"
+        className="w-[90%] max-w-[800px] max-h-[80vh] overflow-y-auto px-8 py-8 bg-[#9B7AAB] text-white border border-[#6A4D7C] rounded-xl shadow-2xl z-50"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col">
-          <label className="text-2xl font-semibold mb-2">Select Majors</label>
-          <form className="text-lg flex flex-wrap gap-3">
-            {majors.map((major) => (
-              <label key={major.id} className="flex items-center gap-2 w-1/2">
-                <input
-                  type="checkbox"
-                  value={major.id}
-                  checked={selectedMajors.includes(major.id)}
-                  onChange={() => handleMajorSelect(major.id)}
-                  className="w-5 h-5 accent-[#4B2E64]"
-                />
-                {major.name}
-              </label>
-            ))}
-          </form>
-
-          <label className="text-2xl font-semibold mt-5 mb-2">
-            Select Regions
-          </label>
-          <form className="text-lg flex flex-wrap gap-3">
-            {regions.map((region) => (
-              <label key={region.id} className="flex items-center gap-2 w-1/2">
-                <input
-                  type="checkbox"
-                  value={region.id}
-                  checked={selectedRegions.includes(region.id)}
-                  onChange={() => handleRegionSelect(region.id)}
-                  className="w-5 h-5 accent-[#4B2E64]"
-                />
-                {region.name}
-              </label>
-            ))}
-          </form>
+        <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-8">
+          <div className="flex-1">
+            <label className="text-3xl font-semibold mb-4 text-[#F1F1F1]">
+              Select Majors
+            </label>
+            <form className="text-lg flex flex-wrap gap-4">
+              {majors.map((major) => (
+                <label key={major.id} className="flex items-center gap-3 w-1/2">
+                  <input
+                    type="checkbox"
+                    value={major.id}
+                    checked={selectedMajors.includes(major.id)}
+                    onChange={() => handleMajorSelect(major.id)}
+                    className="w-5 h-5 accent-[#6A4D7C] transition-transform transform hover:scale-110"
+                  />
+                  <span className="text-lg">{major.name}</span>
+                </label>
+              ))}
+            </form>
+          </div>
+          <div className="flex-1">
+            <label className="text-3xl font-semibold mt-5 mb-4 text-[#F1F1F1]">
+              Select Regions
+            </label>
+            <form className="text-lg flex flex-wrap gap-4">
+              {regions.map((region) => (
+                <label
+                  key={region.id}
+                  className="flex items-center gap-3 w-1/2"
+                >
+                  <input
+                    type="checkbox"
+                    value={region.id}
+                    checked={selectedRegions.includes(region.id)}
+                    onChange={() => handleRegionSelect(region.id)}
+                    className="w-5 h-5 accent-[#6A4D7C] transition-transform transform hover:scale-110"
+                  />
+                  <span className="text-lg">{region.name}</span>
+                </label>
+              ))}
+            </form>
+          </div>
         </div>
-
-        <div className="flex justify-between mt-5">
+        <div className="flex justify-center md:justify-between mt-8 gap-4">
           <button
-            className="bg-[#9270B0] text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-[#7C5B99]"
+            className="bg-[#7E4B99] text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-[#6D3E85] transition duration-300 w-full md:w-auto"
             onClick={() => {
               onSave();
               onClose();
@@ -104,7 +111,7 @@ const Modal = ({
             OK
           </button>
           <button
-            className="bg-[#C47FB6] text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-[#A96DA4]"
+            className="bg-[#D08CBB] text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-[#B476A6] transition duration-300 w-full md:w-auto"
             onClick={onClose}
           >
             Cancel
@@ -194,12 +201,11 @@ export const Cards = () => {
 
     //---------------------- FILTER BY REGION
     if (selectedRegions.length > 0) {
-      filtered = filtered.filter(
-        (center) => selectedRegions.includes(center.regionId) 
+      filtered = filtered.filter((center) =>
+        selectedRegions.includes(center.regionId)
       );
     }
 
-  
     if (searchTerm.trim() !== "") {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter((center) => {
