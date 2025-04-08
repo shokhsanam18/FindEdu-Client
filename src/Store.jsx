@@ -489,6 +489,7 @@ export const useCardStore = create((set, get) => ({
     }
 
     set({ filteredCenters: filtered });
+    console.log(filtered)
   },
 }));
 
