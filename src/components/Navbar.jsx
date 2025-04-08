@@ -25,9 +25,11 @@ import {
   // CodeBracketSquareIcon,
   // Square3Stack3DIcon,
   ChevronDownIcon,
-  Cog6ToothIcon,
+  // Cog6ToothIcon,
+  BuildingOffice2Icon,
   // InboxArrowDownIcon,
   // LifebuoyIcon,
+  CalendarIcon,
   PowerIcon,
   // RocketLaunchIcon,
   // Bars2Icon,
@@ -43,18 +45,6 @@ import { useAuthStore, useCategoryStore, useSearchStore } from "../Store";
 import { AlignJustify } from "lucide-react";
 
 // profile menu component
-const profileMenuItems = [
-  // {
-  //   label: "My Profile",
-  //   icon: UserCircleIcon,
-  //   link: '/MyProfile'
-  // },
-  {
-    label: "Sign Out",
-    icon: PowerIcon,
-    // link: '/MyProfile'
-  },
-];
 
 export default function Navbar() {
   const user = useAuthStore((state) => state.user);
@@ -74,7 +64,30 @@ export default function Navbar() {
       fetchImage(user.data.image);
     }
   }, [user]);
-
+  
+  const profileMenuItems = [
+    ...(user?.role === "CEO"
+      ? [
+          {
+            label: "My Centers",
+            icon: BuildingOffice2Icon,
+            link: "/MyCenters",
+          },
+        ]
+      : user?.role === "USER"
+      ? [
+          {
+            label: "My Appointments",
+            icon: CalendarIcon,
+            link: "/Appointment",
+          },
+        ]
+      : []),
+    {
+      label: "Sign Out",
+      icon: PowerIcon,
+    },
+  ];
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
 
