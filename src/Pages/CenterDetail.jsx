@@ -1176,7 +1176,7 @@ const CenterDetail = () => {
                             min={new Date().toISOString().slice(0, 16)}
                           />
                           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <Calendar className="h-5 w-5 text-gray-400" />
+                            {/* <Calendar className="h-5 w-5" /> */}
                           </div>
                         </div>
                         <p className="mt-2 text-xs text-gray-500">
