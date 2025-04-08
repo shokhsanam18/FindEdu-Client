@@ -13,103 +13,106 @@ import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
-import { useLikedStore, useSearchStore, useCardStore, useModalStore } from "../../Store.jsx";
-// const MajorsApi = "http://18.141.233.37:4000/api/major";
-// const RegionsApi = "http://18.141.233.37:4000/api/regions/search";
-// const CentersApi = "http://18.141.233.37:4000/api/centers";
-// const ImageApi = "http://18.141.233.37:4000/api/image";
+import { useLikedStore, useSearchStore } from "../../Store.jsx";
+const MajorsApi = "https://findcourse.net.uz/api/major";
+const RegionsApi = "https://findcourse.net.uz/api/regions/search";
+const CentersApi = "https://findcourse.net.uz/api/centers";
+const ImageApi = "https://findcourse.net.uz/api/image";
 
-const Modal = () => {
-
-  const {
-    majors,
-    regions,
-    selectedMajors,
-    selectedRegions,
-    setSelectedMajors,
-    setSelectedRegions,
-    filterCenters,
-  } = useCardStore();
-
-  const { isModalOpen, closeModal } = useModalStore();
-
-  
-  
-  
+const Modal = ({
+  isOpen,
+  onClose,
+  onSave,
+  selectedMajors,
+  setSelectedMajors,
+  selectedRegions,
+  setSelectedRegions,
+  majors,
+  regions,
+}) => {
   const handleMajorSelect = (majorId) => {
-    const updated = selectedMajors.includes(majorId)
-      ? selectedMajors.filter((id) => id !== majorId)
-      : [...selectedMajors, majorId];
-    setSelectedMajors(updated);
+    setSelectedMajors((prev) =>
+      prev.includes(majorId)
+        ? prev.filter((id) => id !== majorId)
+        : [...prev, majorId]
+    );
   };
 
   const handleRegionSelect = (regionId) => {
-    const updated = selectedRegions.includes(regionId)
-      ? selectedRegions.filter((id) => id !== regionId)
-      : [...selectedRegions, regionId];
-    setSelectedRegions(updated);
+    setSelectedRegions((prev) =>
+      prev.includes(regionId)
+        ? prev.filter((id) => id !== regionId)
+        : [...prev, regionId]
+    );
   };
-  
-  if (!isModalOpen) return null;
+
+  if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-      onClick={closeModal}
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50"
+      onClick={onClose}
     >
       <div
-        className="w-[40%] max-w-[500px] max-h-[80vh] overflow-y-auto px-6 py-6 bg-[#A88CC0] text-white border border-white rounded-lg shadow-lg z-50"
+        className="w-[90%] max-w-[800px] max-h-[80vh] overflow-y-auto px-8 py-8 bg-[#9B7AAB] text-white border border-[#6A4D7C] rounded-xl shadow-2xl z-50"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col">
-          <label className="text-2xl font-semibold mb-2">Select Majors</label>
-          <form className="text-lg flex flex-wrap gap-3">
-            {(majors || []).map((major) => (
-              <label key={major.id} className="flex items-center gap-2 w-1/2">
-                <input
-                  type="checkbox"
-                  value={major.id}
-                  checked={selectedMajors.includes(major.id)}
-                  onChange={() => handleMajorSelect(major.id)}
-                  className="w-5 h-5 accent-[#4B2E64]"
-                />
-                {major.name}
-              </label>
-            ))}
-          </form>
-
-          <label className="text-2xl font-semibold mt-5 mb-2">
-            Select Regions
-          </label>
-          <form className="text-lg flex flex-wrap gap-3">
-            {(regions || []).map((region) => (
-              <label key={region.id} className="flex items-center gap-2 w-1/2">
-                <input
-                  type="checkbox"
-                  value={region.id}
-                  checked={selectedRegions.includes(region.id)}
-                  onChange={() => handleRegionSelect(region.id)}
-                  className="w-5 h-5 accent-[#4B2E64]"
-                />
-                {region.name}
-              </label>
-            ))}
-          </form>
+        <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-8">
+          <div className="flex-1">
+            <label className="text-3xl font-semibold mb-4 text-[#F1F1F1]">
+              Select Majors
+            </label>
+            <form className="text-lg flex flex-wrap gap-4">
+              {majors.map((major) => (
+                <label key={major.id} className="flex items-center gap-3 w-1/2">
+                  <input
+                    type="checkbox"
+                    value={major.id}
+                    checked={selectedMajors.includes(major.id)}
+                    onChange={() => handleMajorSelect(major.id)}
+                    className="w-5 h-5 accent-[#6A4D7C] transition-transform transform hover:scale-110"
+                  />
+                  <span className="text-lg">{major.name}</span>
+                </label>
+              ))}
+            </form>
+          </div>
+          <div className="flex-1">
+            <label className="text-3xl font-semibold mt-5 mb-4 text-[#F1F1F1]">
+              Select Regions
+            </label>
+            <form className="text-lg flex flex-wrap gap-4">
+              {regions.map((region) => (
+                <label
+                  key={region.id}
+                  className="flex items-center gap-3 w-1/2"
+                >
+                  <input
+                    type="checkbox"
+                    value={region.id}
+                    checked={selectedRegions.includes(region.id)}
+                    onChange={() => handleRegionSelect(region.id)}
+                    className="w-5 h-5 accent-[#6A4D7C] transition-transform transform hover:scale-110"
+                  />
+                  <span className="text-lg">{region.name}</span>
+                </label>
+              ))}
+            </form>
+          </div>
         </div>
-
-        <div className="flex justify-between mt-5">
+        <div className="flex justify-center md:justify-between mt-8 gap-4">
           <button
-            className="bg-[#9270B0] text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-[#7C5B99]"
+            className="bg-[#7E4B99] text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-[#6D3E85] transition duration-300 w-full md:w-auto"
             onClick={() => {
-              filterCenters();  // <- manual filtering
-              closeModal();
+              onSave();
+              onClose();
             }}
           >
             OK
           </button>
           <button
-            className="bg-[#C47FB6] text-white px-5 py-2 rounded-lg font-semibold shadow-md hover:bg-[#A96DA4]"
-            onClick={closeModal}
+            className="bg-[#D08CBB] text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-[#B476A6] transition duration-300 w-full md:w-auto"
+            onClick={onClose}
           >
             Cancel
           </button>
@@ -120,43 +123,122 @@ const Modal = () => {
 };
 
 export const Cards = () => {
+  const [majors, setMajors] = useState([]);
+  const [regions, setRegions] = useState([]);
+  const [allCenters, setAllCenters] = useState([]);
+  const [filteredCenters, setFilteredCenters] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMajors, setSelectedMajors] = useState([]);
+  const [selectedRegions, setSelectedRegions] = useState([]);
+  const searchTerm = useSearchStore((state) => state.searchTerm);
+  // const [likedCenters, setLikedCenters] = useState([]);
   const { toggleLike, isLiked, fetchLiked } = useLikedStore();
   useEffect(() => {
     fetchLiked(); // ← make sure likes are ready before rendering
   }, []);
 
-  const {
-    majors,
-    regions,
-    filteredCenters,
-    allCenters,
-    loading,
-    fetchData,
-    selectedMajors,
-    selectedRegions,
-    setSelectedMajors,
-    setSelectedRegions,
-    removeMajor,
-    removeRegion,
-  } = useCardStore();
-
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  const { isModalOpen, openModal, closeModal } = useModalStore();
-  const searchTerm = useSearchStore((state) => state.searchTerm);
-
+  // Fetch all data on component mount
   useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [majorsResponse, regionsResponse, centersResponse] =
+          await Promise.all([
+            axios.get(MajorsApi),
+            axios.get(RegionsApi),
+            axios.get(CentersApi),
+          ]);
+
+        setMajors(majorsResponse.data.data || []);
+        setRegions(regionsResponse.data.data || []);
+
+        const processedCenters =
+          centersResponse.data.data?.map((center) => {
+            const comments = center.comments || [];
+            const avgRating =
+              comments.length > 0
+                ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
+                : 0;
+
+            return {
+              ...center,
+              imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
+              rating: avgRating,
+            };
+          }) || [];
+
+        setAllCenters(processedCenters);
+        setFilteredCenters(processedCenters);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
   }, []);
-  
-  useEffect(() => {
-    useCardStore.getState().filterCenters();
-  }, [searchTerm]);
-  
-  console.log("Fetched centers:", filteredCenters);
-  console.log("Fetched centers:", allCenters);
-  const getRegionName = (id) => regions?.find((r) => r.id === id)?.name || id;
-const getMajorName = (id) => majors?.find((m) => m.id === id)?.name || id;
 
+  // const filteredCenters = centers.filter((center) => {
+  //   const term = searchTerm.toLowerCase();
+  //   const nameMatch = center.name?.toLowerCase().includes(term);
+  //   const addressMatch = center.address?.toLowerCase().includes(term);
+  //   const majorMatch = center.majors?.some((major) =>
+  //     major.name?.toLowerCase().includes(term)
+  //   );
+  //   return nameMatch || addressMatch || majorMatch;
+  // });
+  useEffect(() => {
+    let filtered = allCenters;
+
+    // ---------- FILTER BY MAJOR
+    if (selectedMajors.length > 0) {
+      filtered = filtered.filter((center) =>
+        center.majors?.some((major) => selectedMajors.includes(major.id))
+      );
+    }
+
+    //---------------------- FILTER BY REGION
+    if (selectedRegions.length > 0) {
+      filtered = filtered.filter((center) =>
+        selectedRegions.includes(center.regionId)
+      );
+    }
+
+    if (searchTerm.trim() !== "") {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter((center) => {
+        const nameMatch = center.name?.toLowerCase().includes(term);
+        const addressMatch = center.address?.toLowerCase().includes(term);
+        const majorMatch = center.majors?.some((major) =>
+          major.name?.toLowerCase().includes(term)
+        );
+        return nameMatch || addressMatch || majorMatch;
+      });
+    }
+
+    setFilteredCenters(filtered);
+  }, [selectedMajors, selectedRegions, searchTerm, allCenters]);
+
+  // const toggleLike = (centerId) => {
+  //   setLikedCenters((prev) =>
+  //     prev.includes(centerId)
+  //       ? prev.filter((id) => id !== centerId)
+  //       : [...prev, centerId]
+  //   );
+  // };
+
+  const removeMajorFilter = (majorId) => {
+    setSelectedMajors((prev) => prev.filter((id) => id !== majorId));
+  };
+
+  const removeRegionFilter = (regionId) => {
+    setSelectedRegions((prev) => prev.filter((id) => id !== regionId));
+  };
+
+  const getMajorName = (id) => majors.find((m) => m.id === id)?.name || id;
+  const getRegionName = (id) => regions.find((r) => r.id === id)?.name || id;
 
   return (
     <div className="mb-16 mt-36">
@@ -204,7 +286,7 @@ const getMajorName = (id) => majors?.find((m) => m.id === id)?.name || id;
             <p className="text-sm text-gray-600">Select course and region</p>
             <button
               className=" mt-5 group inline-flex items-center justify-center gap-2 bg-[#461773] hover:bg-[#3a1260] text-white font-medium px-6 py-2.5 rounded-xl border border-[#5e1b9e] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(90,29,153,0.2)]"
-              onClick={openModal}
+              onClick={() => setIsModalOpen(true)}
             >
               <span>Courses & Regions</span>
               <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
@@ -214,7 +296,7 @@ const getMajorName = (id) => majors?.find((m) => m.id === id)?.name || id;
 
         {/* Active filters display */}
         <div className="flex flex-wrap gap-2 h-10 mt-18">
-          {(selectedMajors || []).map((id) => (
+          {selectedMajors.map((id) => (
             <div
               key={`major-${id}`}
               className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full"
@@ -228,7 +310,7 @@ const getMajorName = (id) => majors?.find((m) => m.id === id)?.name || id;
               </button>
             </div>
           ))}
-          {(selectedRegions || []).map((id) => (
+          {selectedRegions.map((id) => (
             <div
               key={`region-${id}`}
               className="flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full"
@@ -245,13 +327,23 @@ const getMajorName = (id) => majors?.find((m) => m.id === id)?.name || id;
         </div>
       </div>
 
-      <Modal/>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={() => setIsModalOpen(false)}
+        selectedMajors={selectedMajors}
+        setSelectedMajors={setSelectedMajors}
+        selectedRegions={selectedRegions}
+        setSelectedRegions={setSelectedRegions}
+        majors={majors}
+        regions={regions}
+      />
 
       {loading ? (
         <p className="text-center mt-10">Loading...</p>
       ) : (
         <div className="Main_Cards flex flex-wrap justify-center xl:gap-20 gap-6 mt-10">
-          {Array.isArray(filteredCenters) && filteredCenters.length > 0  ? (
+          {filteredCenters.length > 0 ? (
             filteredCenters.map((center) => (
               <motion.div
                 key={center.id}

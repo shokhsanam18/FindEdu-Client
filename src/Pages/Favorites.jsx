@@ -11,9 +11,8 @@ import {
   HeartIcon as HeartSolid,
 } from "@heroicons/react/24/solid"; // or outline if needed
 
-
-const CentersApi = "http://18.141.233.37:4000/api/centers";
-const ImageApi = "http://18.141.233.37:4000/api/image";
+const CentersApi = "https://findcourse.net.uz/api/centers";
+const ImageApi = "https://findcourse.net.uz/api/image";
 
 const Favorites = () => {
   const { likedItems, isLiked, toggleLike, fetchLiked } = useLikedStore();
@@ -30,23 +29,29 @@ const Favorites = () => {
       try {
         setLoading(true);
         await fetchLiked(); // fetch likedItems first
-  
+
         const token = localStorage.getItem("accessToken");
-        const res = await axios.get("http://18.141.233.37:4000/api/liked/query", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-  
+        const res = await axios.get(
+          "https://findcourse.net.uz/api/liked/query",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
         const likedData = res.data?.data || [];
-  
+
         // Get detailed info for liked centers
         const centerDetails = await Promise.all(
           likedData.map(async (like) => {
-            const res = await axios.get(`http://18.141.233.37:4000/api/centers/${like.centerId}`);
+            const res = await axios.get(
+              `https://findcourse.net.uz/api/centers/${like.centerId}`
+            );
             const center = res.data?.data;
             const avgRating =
-            center.comments?.length > 0
-              ? center.comments.reduce((sum, c) => sum + c.star, 0) / center.comments.length
-              : 0;
+              center.comments?.length > 0
+                ? center.comments.reduce((sum, c) => sum + c.star, 0) /
+                  center.comments.length
+                : 0;
             return {
               ...center,
               imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
@@ -54,7 +59,7 @@ const Favorites = () => {
             };
           })
         );
-  
+
         setAllCenters(centerDetails);
       } catch (err) {
         console.error("Failed to fetch liked centers", err);
@@ -62,7 +67,7 @@ const Favorites = () => {
         setLoading(false);
       }
     };
-  
+
     fetchLikedCenters();
   }, []);
 
@@ -77,13 +82,26 @@ const Favorites = () => {
     const majorMatch = center.majors?.some((major) =>
       major.name?.toLowerCase().includes(term)
     );
-  
+    if (searchTerm.trim() !== "") {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter((center) => {
+        const nameMatch = center.name?.toLowerCase().includes(term);
+        const addressMatch = center.address?.toLowerCase().includes(term);
+        const majorMatch = center.majors?.some((major) =>
+          major.name?.toLowerCase().includes(term)
+        );
+        return nameMatch || addressMatch || majorMatch;
+      });
+    }
+    
     return nameMatch || addressMatch || majorMatch;
   });
 
   return (
     <div className="mt-50 mb-20 mx-auto flex flex-col px-[5%]">
-      <h1 className="text-4xl font-bold text-[#451774] text-center mb-12">Your Favorite Centers</h1>
+      <h1 className="text-4xl font-bold text-[#451774] text-center mb-12">
+        Your Favorite Centers
+      </h1>
 
       {loading ? (
         <p>Loading...</p>
@@ -131,28 +149,32 @@ const Favorites = () => {
 
               <div className="px-4 py-7 space-y-1.5">
                 <div className="flex justify-between items-start">
-                  <h3 className="text-xl font-semibold truncate">{center.name}</h3>
+                  <h3 className="text-xl font-semibold truncate">
+                    {center.name}
+                  </h3>
                   <div className="flex items-center space-x-1">
-                        <div className="relative w-5 h-5">
-                          {/* Gray base star (background) */}
-                          <StarIcon className="absolute text-gray-300 w-5 h-5" />
+                    <div className="relative w-5 h-5">
+                      {/* Gray base star (background) */}
+                      <StarIcon className="absolute text-gray-300 w-5 h-5" />
 
-                          {/* Yellow overlay with dynamic width */}
-                          <div
-                            className="absolute overflow-hidden h-5"
-                            style={{ width: `${(center.rating / 5) * 100}%` }}
-                          >
-                            <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
-                          </div>
-                        </div>
-
-                        <span className="text-sm font-medium text-gray-800">
-                          {center.rating?.toFixed(1) || "4.8"}
-                        </span>
+                      {/* Yellow overlay with dynamic width */}
+                      <div
+                        className="absolute overflow-hidden h-5"
+                        style={{ width: `${(center.rating / 5) * 100}%` }}
+                      >
+                        <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
                       </div>
+                    </div>
+
+                    <span className="text-sm font-medium text-gray-800">
+                      {center.rating?.toFixed(1) || "4.8"}
+                    </span>
+                  </div>
                 </div>
 
-                <p className="text-sm text-gray-600 line-clamp-1">{center.address}</p>
+                <p className="text-sm text-gray-600 line-clamp-1">
+                  {center.address}
+                </p>
 
                 <div className="flex items-center justify-between mt-1.5">
                   <div className="flex items-center space-x-1 text-sm text-gray-500">

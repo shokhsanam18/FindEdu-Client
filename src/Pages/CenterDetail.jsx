@@ -453,7 +453,7 @@ import {
 } from "lucide-react";
 import { useLikedStore, useCommentStore, useAuthStore } from "../Store";
 
-const API_BASE = "http://18.141.233.37:4000";
+const API_BASE = "https://findcourse.net.uz";
 const ImageApi = `${API_BASE}/api/image`;
 
 const CenterDetail = () => {
@@ -599,39 +599,39 @@ const CenterDetail = () => {
     setEditCommentStar(5);
   };
 
-  const handleReservationSubmit = async (e) => {
-    e.preventDefault();
-    if (!visitDate || !selectedBranch || !selectedMajor) return;
+  // const handleReservationSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!visitDate || !selectedBranch || !selectedMajor) return;
 
-    setIsSubmittingReservation(true);
-    setReservationError(null);
+  //   setIsSubmittingReservation(true);
+  //   setReservationError(null);
 
-    try {
-      const response = await axios.post(`${API_BASE}/api/resoption`, {
-        centerId: id,
-        filialId: selectedBranch.id,
-        majorId: selectedMajor.id,
-        visitDate: visitDate,
-      });
+  //   try {
+  //     const response = await axios.post(`${API_BASE}/api/reseption`, {
+  //       centerId: id,
+  //       filialId: selectedBranch.id,
+  //       majorId: selectedMajor.id,
+  //       visitDate: visitDate,
+  //     });
 
-      if (response.status === 201) {
-        setReservationSuccess(true);
-        setTimeout(() => {
-          setShowReservationModal(false);
-          setReservationSuccess(false);
-          setVisitDate("");
-        }, 2000);
-      }
-    } catch (err) {
-      console.error("Reservation error:", err);
-      setReservationError(
-        err.response?.data?.message ||
-          "Failed to make reservation. Please try again."
-      );
-    } finally {
-      setIsSubmittingReservation(false);
-    }
-  };
+  //     if (response.status === 201) {
+  //       setReservationSuccess(true);
+  //       setTimeout(() => {
+  //         setShowReservationModal(false);
+  //         setReservationSuccess(false);
+  //         setVisitDate("");
+  //       }, 2000);
+  //     }
+  //   } catch (err) {
+  //     console.error("Reservation error:", err);
+  //     setReservationError(
+  //       err.response?.data?.message ||
+  //         "Failed to make reservation. Please try again."
+  //     );
+  //   } finally {
+  //     setIsSubmittingReservation(false);
+  //   }
+  // };
 
   if (loading) {
     return (
@@ -667,6 +667,29 @@ const CenterDetail = () => {
       </div>
     );
   }
+
+  const PostRegisteration = () => {
+    const existingData = JSON.parse(localStorage.getItem("RegisterData")) || [];
+
+    const newRegister = {
+        id: id,
+        branch: selectedBranch.name,
+        address: center.address,
+        majorId: selectedMajor.id,
+        majorName: center.name,
+        visitDate: visitDate,
+    };
+    const index = existingData.findIndex(item => item.id === id);
+
+    if (index !== -1) {
+        existingData[index] = newRegister;
+    } else {
+        existingData.push(newRegister);
+    }
+
+    localStorage.setItem("RegisterData", JSON.stringify(existingData));
+};
+
 
   return (
     <div className="min-h-screen bg-gray-100 mt-42 md:mt-36">
@@ -1113,7 +1136,7 @@ const CenterDetail = () => {
                     </div>
                   </div>
                 ) : (
-                  <form onSubmit={handleReservationSubmit}>
+                  <form>
                     <div className="space-y-6">
                       {/* Selected branch display */}
                       <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
@@ -1131,7 +1154,7 @@ const CenterDetail = () => {
                         <p className="text-sm font-medium text-purple-700">
                           Selected Major:
                         </p>
-                        <p className="font-medium">{selectedMajor?.name}</p>
+                        <p className="font-medium">{center.majors[0].name}</p>
                       </div>
 
                       {/* Date and time picker */}
@@ -1153,7 +1176,7 @@ const CenterDetail = () => {
                             min={new Date().toISOString().slice(0, 16)}
                           />
                           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <Calendar className="h-5 w-5 text-gray-400" />
+                            {/* <Calendar className="h-5 w-5" /> */}
                           </div>
                         </div>
                         <p className="mt-2 text-xs text-gray-500">
@@ -1178,7 +1201,7 @@ const CenterDetail = () => {
                         >
                           Cancel
                         </button>
-                        <button
+                        <button onClick={() => PostRegisteration()}
                           type="submit"
                           disabled={isSubmittingReservation || !visitDate}
                           className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#441774] hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-70 transition-colors"

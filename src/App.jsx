@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
-import Register from "./Register/Login/Register.jsx";
+// import Register from "./Register/Login/Register.jsx";
 import Login from "./Register/Login/Login.jsx";
 import { Layout } from "./components/Layout.jsx";
 import Forget from "./Register/Login/Forget.jsx";
@@ -14,8 +14,10 @@ import { AuthProvider } from "./context/auth";
 import { useAuthStore } from "./Store.jsx";
 import { Resources } from "./Pages/Resources.jsx";
 import Test from "./Test.jsx";
+import { Appointment } from "./Pages/appointment.jsx";
 
 import Favorites from "./Pages/Favorites.jsx";
+import FormTry from "./Register/Login/Register.jsx";
 function App() {
   const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
 
@@ -34,8 +36,9 @@ function App() {
             <Route path="/CEO" element={<CeoPage />} />
             <Route path="/Favorites" element={<Favorites />} />
             <Route path="/Resources" element={<Resources />} />
+            <Route path="/Appointment" element={<Appointment/>} />
           </Route>
-          <Route path="/Register" element={<Register />} />
+          <Route path="/Register" element={<FormTry />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Forget" element={<Forget />} />
           <Route path="/VerifyOtp" element={<VerifyOtp />} />
