@@ -18,6 +18,7 @@ import { Appointment } from "./Pages/appointment.jsx";
 
 import Favorites from "./Pages/Favorites.jsx";
 import FormTry from "./Register/Login/Register.jsx";
+import { Centers } from "./Pages/Centers.jsx";
 function App() {
   const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
 
@@ -37,6 +38,7 @@ function App() {
             <Route path="/Favorites" element={<Favorites />} />
             <Route path="/Resources" element={<Resources />} />
             <Route path="/Appointment" element={<Appointment/>} />
+            <Route path="/MyCenters" element={<Centers/>} />
           </Route>
           <Route path="/Register" element={<FormTry />} />
           <Route path="/Login" element={<Login />} />
