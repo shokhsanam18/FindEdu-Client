@@ -676,7 +676,7 @@ const CenterDetail = () => {
         branch: selectedBranch.name,
         address: center.address,
         majorId: selectedMajor.id,
-        majorName: center.majors[0].name,
+        majorName: center.name,
         visitDate: visitDate,
     };
     const index = existingData.findIndex(item => item.id === id);
