@@ -340,7 +340,9 @@ export const Cards = () => {
       />
 
       {loading ? (
-        <p className="text-center mt-10">Loading...</p>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        </div>
       ) : (
         <div className="Main_Cards flex flex-wrap justify-center xl:gap-20 gap-6 mt-10">
           {filteredCenters.length > 0 ? (
