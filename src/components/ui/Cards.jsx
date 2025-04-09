@@ -412,7 +412,7 @@ export const Cards = () => {
                   <p className="text-sm text-gray-600 line-clamp-1">
                     {center.address}
                   </p>
-
+                  {/* // i changed */}
                   <div className="flex items-center justify-between mt-1.5">
                     <div className="flex items-center space-x-1 text-sm text-gray-500">
                       <PhoneIcon className="h-4 w-4" />
