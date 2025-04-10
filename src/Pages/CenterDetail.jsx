@@ -672,15 +672,23 @@ const CenterDetail = () => {
     const existingData = JSON.parse(localStorage.getItem("RegisterData")) || [];
 
     const newRegister = {
-        id: id,
-        branchId: selectedBranch.id,
-        majorId: selectedMajor.id,
-        majorName: center.majors[0].name,
-        visitDate: visitDate,
+      id: id,
+      branch: selectedBranch.name,
+      address: center.address,
+      majorId: selectedMajor.id,
+      majorName: center.name,
+      visitDate: visitDate,
     };
-    existingData.push(newRegister);
+    const index = existingData.findIndex((item) => item.id === id);
+
+    if (index !== -1) {
+      existingData[index] = newRegister;
+    } else {
+      existingData.push(newRegister);
+    }
+
     localStorage.setItem("RegisterData", JSON.stringify(existingData));
-};
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 mt-42 md:mt-36">
@@ -1167,7 +1175,7 @@ const CenterDetail = () => {
                             min={new Date().toISOString().slice(0, 16)}
                           />
                           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <Calendar className="h-5 w-5 text-gray-400" />
+                            {/* <Calendar className="h-5 w-5" /> */}
                           </div>
                         </div>
                         <p className="mt-2 text-xs text-gray-500">
@@ -1192,7 +1200,8 @@ const CenterDetail = () => {
                         >
                           Cancel
                         </button>
-                        <button onClick={() => PostRegisteration()}
+                        <button
+                          onClick={() => PostRegisteration()}
                           type="submit"
                           disabled={isSubmittingReservation || !visitDate}
                           className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#441774] hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-70 transition-colors"

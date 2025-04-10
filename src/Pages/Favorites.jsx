@@ -82,6 +82,17 @@ const Favorites = () => {
     const majorMatch = center.majors?.some((major) =>
       major.name?.toLowerCase().includes(term)
     );
+    if (searchTerm.trim() !== "") {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter((center) => {
+        const nameMatch = center.name?.toLowerCase().includes(term);
+        const addressMatch = center.address?.toLowerCase().includes(term);
+        const majorMatch = center.majors?.some((major) =>
+          major.name?.toLowerCase().includes(term)
+        );
+        return nameMatch || addressMatch || majorMatch;
+      });
+    }
 
     return nameMatch || addressMatch || majorMatch;
   });
@@ -93,7 +104,9 @@ const Favorites = () => {
       </h1>
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        </div>
       ) : allCenters.length === 0 ? (
         <p>You haven’t liked any centers yet.</p>
       ) : (
