@@ -26,7 +26,6 @@
 //   const [error, setError] = useState(null);
 //   const { user } = useAuthStore();
 
-
 //   const { toggleLike, isLiked } = useLikedStore();
 //   const liked = isLiked(Number(id));
 
@@ -39,7 +38,7 @@
 //     loading: commentLoading,
 //     error: commentError,
 //   } = useCommentStore();
-  
+
 //   const [newComment, setNewComment] = useState({ text: "", star: 5 });
 //   const [isCommenting, setIsCommenting] = useState(false);
 //   const [editingCommentId, setEditingCommentId] = useState(null);
@@ -59,13 +58,13 @@
 //         comments.length > 0
 //           ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
 //           : 0;
-  
+
 //         setCenter({
 //           ...data,
 //           rating: avgRating,
 //           imageUrl: data.image ? `${ImageApi}/${data.image}` : null,
 //         });
-  
+
 //         await fetchCommentsByCenter(id);
 //       } catch (err) {
 //         setError("Failed to load center info");
@@ -75,14 +74,14 @@
 //         setLoading(false);
 //       }
 //     };
-  
+
 //     fetchData();
 //   }, [id, navigate]);
 
 //   const handleCommentSubmit = async (e) => {
 //     e.preventDefault();
 //     if (!newComment.text.trim()) return;
-  
+
 //     setIsCommenting(true);
 //     try {
 //       await postComment({ ...newComment, centerId: Number(id) });
@@ -107,7 +106,7 @@
 //       console.error("Failed to update comment", err);
 //     }
 //   };
-  
+
 //   const handleDeleteComment = async (commentId) => {
 //     if (!window.confirm("Are you sure you want to delete this comment?")) return;
 //     try {
@@ -116,10 +115,6 @@
 //       console.error("Failed to delete comment", err);
 //     }
 //   };
-
-
-
-
 
 //   const startEditingComment = (comment) => {
 //     setEditingCommentId(comment.id);
@@ -132,9 +127,6 @@
 //     setEditCommentText("");
 //     setEditCommentStar(5);
 //   };
-
-  
-
 
 //   if (loading) {
 //     return (
@@ -152,8 +144,8 @@
 //           <p>{error}</p>
 //           <p className="mt-2 text-sm">You will be redirected shortly...</p>
 //         </div>
-//         <Link 
-//           to="/" 
+//         <Link
+//           to="/"
 //           className="mt-4 text-purple-600 hover:text-purple-800 font-medium"
 //         >
 //           <ArrowLeft className="h-5 w-5 inline mr-1" />
@@ -206,7 +198,7 @@
 //                 <MapPin className="h-16 w-16 text-gray-400" />
 //               </div>
 //             )}
-            
+
 //             <motion.button
 //               className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-md"
 //               whileHover={{ scale: 1.1 }}
@@ -256,9 +248,9 @@
 //                   {center.website && (
 //                     <div className="md:col-span-2">
 //                       <h3 className="text-sm font-medium text-gray-500">Website</h3>
-//                       <a 
-//                         href={center.website} 
-//                         target="_blank" 
+//                       <a
+//                         href={center.website}
+//                         target="_blank"
 //                         rel="noopener noreferrer"
 //                         className="mt-1 text-lg font-medium text-purple-600 hover:underline"
 //                       >
@@ -403,13 +395,13 @@
 //                               </span>
 //                               {user?.data?.id === comment.user?.id && (
 //                                 <>
-//                                   <button 
+//                                   <button
 //                                     onClick={() => startEditingComment(comment)}
 //                                     className="text-blue-500 hover:text-blue-700"
 //                                   >
 //                                     Edit
 //                                   </button>
-//                                   <button 
+//                                   <button
 //                                     onClick={() => handleDeleteComment(comment.id)}
 //                                     className="text-red-500 hover:text-red-700"
 //                                   >
@@ -435,10 +427,6 @@
 // };
 // export default CenterDetail;
 
-
-
-
-
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -461,11 +449,11 @@ import {
   X,
   ChevronDown,
   Briefcase,
-  Bookmark
+  Bookmark,
 } from "lucide-react";
 import { useLikedStore, useCommentStore, useAuthStore } from "../Store";
 
-const API_BASE = "http://18.141.233.37:4000";
+const API_BASE = "https://findcourse.net.uz";
 const ImageApi = `${API_BASE}/api/image`;
 
 const CenterDetail = () => {
@@ -499,7 +487,7 @@ const CenterDetail = () => {
     loading: commentLoading,
     error: commentError,
   } = useCommentStore();
-  
+
   const [newComment, setNewComment] = useState({ text: "", star: 5 });
   const [isCommenting, setIsCommenting] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
@@ -510,27 +498,32 @@ const CenterDetail = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch center data
         const centerRes = await axios.get(`${API_BASE}/api/centers/${id}`);
         const centerData = centerRes.data?.data;
-        
+
         // Fetch majors for this center
         const majorsRes = await axios.get(`${API_BASE}/api/major/query`);
         const majorsData = majorsRes.data?.data || [];
-        
+
         // Mock branches data - replace with actual API call if available
         const mockBranches = [
           { id: 1, name: "Main Branch", address: centerData.address },
-          { id: 2, name: "Downtown Branch", address: "456 Business Ave, Tashkent" },
-          { id: 3, name: "North Branch", address: "789 Park Blvd, Tashkent" }
+          {
+            id: 2,
+            name: "Downtown Branch",
+            address: "456 Business Ave, Tashkent",
+          },
+          { id: 3, name: "North Branch", address: "789 Park Blvd, Tashkent" },
         ];
 
         const comments = centerData.comments || [];
-        const avgRating = comments.length > 0
-          ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
-          : 0;
-  
+        const avgRating =
+          comments.length > 0
+            ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
+            : 0;
+
         setCenter({
           ...centerData,
           rating: avgRating,
@@ -541,7 +534,7 @@ const CenterDetail = () => {
         setBranches(mockBranches);
         setSelectedBranch(mockBranches[0]);
         setSelectedMajor(majorsData[0]);
-  
+
         await fetchCommentsByCenter(id);
       } catch (err) {
         setError("Failed to load center info");
@@ -551,14 +544,14 @@ const CenterDetail = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [id, navigate]);
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.text.trim()) return;
-  
+
     setIsCommenting(true);
     try {
       await postComment({ ...newComment, centerId: Number(id) });
@@ -583,9 +576,10 @@ const CenterDetail = () => {
       console.error("Failed to update comment", err);
     }
   };
-  
+
   const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    if (!window.confirm("Are you sure you want to delete this comment?"))
+      return;
     try {
       await deleteComment(commentId);
     } catch (err) {
@@ -605,39 +599,39 @@ const CenterDetail = () => {
     setEditCommentStar(5);
   };
 
-  const handleReservationSubmit = async (e) => {
-    e.preventDefault();
-    if (!visitDate || !selectedBranch || !selectedMajor) return;
+  // const handleReservationSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!visitDate || !selectedBranch || !selectedMajor) return;
 
-    setIsSubmittingReservation(true);
-    setReservationError(null);
+  //   setIsSubmittingReservation(true);
+  //   setReservationError(null);
 
-    try {
-      const response = await axios.post(`${API_BASE}/api/resoption`, {
-        centerId: id,
-        filialId: selectedBranch.id,
-        majorId: selectedMajor.id,
-        visitDate: visitDate
-      });
+  //   try {
+  //     const response = await axios.post(`${API_BASE}/api/reseption`, {
+  //       centerId: id,
+  //       filialId: selectedBranch.id,
+  //       majorId: selectedMajor.id,
+  //       visitDate: visitDate,
+  //     });
 
-      if (response.status === 201) {
-        setReservationSuccess(true);
-        setTimeout(() => {
-          setShowReservationModal(false);
-          setReservationSuccess(false);
-          setVisitDate("");
-        }, 2000);
-      }
-    } catch (err) {
-      console.error("Reservation error:", err);
-      setReservationError(
-        err.response?.data?.message || 
-        "Failed to make reservation. Please try again."
-      );
-    } finally {
-      setIsSubmittingReservation(false);
-    }
-  };
+  //     if (response.status === 201) {
+  //       setReservationSuccess(true);
+  //       setTimeout(() => {
+  //         setShowReservationModal(false);
+  //         setReservationSuccess(false);
+  //         setVisitDate("");
+  //       }, 2000);
+  //     }
+  //   } catch (err) {
+  //     console.error("Reservation error:", err);
+  //     setReservationError(
+  //       err.response?.data?.message ||
+  //         "Failed to make reservation. Please try again."
+  //     );
+  //   } finally {
+  //     setIsSubmittingReservation(false);
+  //   }
+  // };
 
   if (loading) {
     return (
@@ -655,8 +649,8 @@ const CenterDetail = () => {
           <p>{error}</p>
           <p className="mt-2 text-sm">You will be redirected shortly...</p>
         </div>
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="mt-4 text-purple-600 hover:text-purple-800 font-medium"
         >
           <ArrowLeft className="h-5 w-5 inline mr-1" />
@@ -674,11 +668,28 @@ const CenterDetail = () => {
     );
   }
 
+  const PostRegisteration = () => {
+    const existingData = JSON.parse(localStorage.getItem("RegisterData")) || [];
+
+    const newRegister = {
+        id: id,
+        branchId: selectedBranch.id,
+        majorId: selectedMajor.id,
+        majorName: center.majors[0].name,
+        visitDate: visitDate,
+    };
+    existingData.push(newRegister);
+    localStorage.setItem("RegisterData", JSON.stringify(existingData));
+};
+
   return (
     <div className="min-h-screen bg-gray-100 mt-42 md:mt-36">
       {/* Back button */}
       <div className="container mx-auto px-4 mt-8 text-xl">
-        <Link to="/" className="inline-flex items-center text-[#441774] hover:text-purple-800">
+        <Link
+          to="/"
+          className="inline-flex items-center text-[#441774] hover:text-purple-800"
+        >
           <ArrowLeft className="h-5 w-5 mr-2" />
           Back to Centers
         </Link>
@@ -695,15 +706,15 @@ const CenterDetail = () => {
           {/* Left column with image and branches */}
           <div className="md:w-2/5 flex flex-col ">
             {/* Center image */}
-            <div className="relative h-100 w-120  overflow-hidden ">
+            <div className="relative h-100 w-100  overflow-hidden ">
               {center.imageUrl ? (
                 <img
                   src={center.imageUrl}
                   alt={center.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover overflow-hidden"
                   onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentElement.classList.add('bg-gray-200');
+                    e.target.style.display = "none";
+                    e.target.parentElement.classList.add("bg-gray-200");
                   }}
                 />
               ) : (
@@ -711,7 +722,7 @@ const CenterDetail = () => {
                   <MapPin className="h-16 w-16 text-gray-400" />
                 </div>
               )}
-              
+
               <motion.button
                 className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-md"
                 whileHover={{ scale: 1.1 }}
@@ -730,10 +741,14 @@ const CenterDetail = () => {
             <div className="p-4 bg-white border-t">
               <h3 className="font-medium text-xl mb-3">Our Branches</h3>
               <div className="space-y-3">
-                {branches.map(branch => (
-                  <div 
-                    key={branch.id} 
-                    className={`p-3 rounded-lg cursor-pointer transition-colors  ${selectedBranch?.id === branch.id ? 'bg-purple-100 border border-purple-300' : 'bg-gray-50 hover:bg-gray-100'}`}
+                {branches.map((branch) => (
+                  <div
+                    key={branch.id}
+                    className={`p-3 rounded-lg cursor-pointer transition-colors  ${
+                      selectedBranch?.id === branch.id
+                        ? "bg-purple-100 border border-purple-300"
+                        : "bg-gray-50 hover:bg-gray-100"
+                    }`}
                     onClick={() => setSelectedBranch(branch)}
                   >
                     <h4 className="font-medium">{branch.name}</h4>
@@ -743,39 +758,46 @@ const CenterDetail = () => {
               </div>
             </div>
             <div className="mt-5 mb-10">
-                  <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6 px-5">
-                    <GraduationCap className="h-5 w-5 mr-2" />
-                    Available Courses
-                  </h2>
-                  
-                  <div className=" gap-2 px-5 flex flex-row flex-wrap">
-                    {majors.map((major) => (
-                      <motion.div 
-                        key={major.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className={`bg-white border border-gray-200 rounded-xl  overflow-hidden shadow-sm hover:shadow-md transition-shadow ${selectedMajor?.id === major.id ? 'ring-2 ring-purple-500' : ''}`}
-                        onClick={() => setSelectedMajor(major)}
-                      >
-                        <div className="p-2 ">
-                          <div className="flex items-start  ">
-                          <div className="flex-shrink-0 p-2 bg-purple-100 rounded-lg text-purple-600">
+              <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6 px-5">
+                <GraduationCap className="h-5 w-5 mr-2" />
+                Available Courses
+              </h2>
+
+              <div className=" gap-2 px-5 flex flex-row flex-wrap">
+                {majors.map((major) => (
+                  <motion.div
+                    key={major.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className={`bg-white border border-gray-200 rounded-xl  overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
+                      selectedMajor?.id === major.id
+                        ? "ring-2 ring-purple-500"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedMajor(major)}
+                  >
+                    <div className="p-2 ">
+                      <div className="flex items-start  ">
+                        <div className="flex-shrink-0 p-2 bg-purple-100 rounded-lg text-purple-600">
                           <Bookmark className="h-4 w-4" />
-                            </div>
-                            <div className="ml-2 flex-1 cursor-pointer">
-                              <h3 className="text-lg font-semibold text-gray-900 mr-1">{major.name}</h3>
-                              <p className="mt-1 text-gray-600">{major.description || ""}</p>
-                            </div>
-                          </div>
                         </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
+                        <div className="ml-2 flex-1 cursor-pointer">
+                          <h3 className="text-lg font-semibold text-gray-900 mr-1">
+                            {major.name}
+                          </h3>
+                          <p className="mt-1 text-gray-600">
+                            {major.description || ""}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
 
-                {/* Registration button */}
-
+            {/* Registration button */}
           </div>
 
           {/* Right column with details */}
@@ -784,10 +806,14 @@ const CenterDetail = () => {
               {/* Main info */}
               <div>
                 <div className="flex items-center justify-between">
-                  <h1 className="text-3xl font-bold text-gray-900">{center.name}</h1>
+                  <h1 className="text-3xl font-bold text-gray-900">
+                    {center.name}
+                  </h1>
                   <div className="flex items-center bg-purple-100 px-3 py-1 rounded-full">
                     <Star className="h-5 w-5 text-yellow-500 mr-1 fill-yellow-500" />
-                    <span className="font-medium">{center.rating?.toFixed(1) || "4.8"}</span>
+                    <span className="font-medium">
+                      {center.rating?.toFixed(1) || "4.8"}
+                    </span>
                   </div>
                 </div>
 
@@ -812,10 +838,12 @@ const CenterDetail = () => {
                   </div>
                   {center.website && (
                     <div className="md:col-span-2">
-                      <h3 className="text-sm font-medium text-gray-500">Website</h3>
-                      <a 
-                        href={center.website} 
-                        target="_blank" 
+                      <h3 className="text-sm font-medium text-gray-500">
+                        Website
+                      </h3>
+                      <a
+                        href={center.website}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="mt-1 text-lg font-medium text-purple-600 hover:underline"
                       >
@@ -829,10 +857,10 @@ const CenterDetail = () => {
                 <div className="mt-8">
                   <h2 className="text-xl font-semibold text-gray-900">About</h2>
                   <p className="mt-4 text-gray-600 leading-relaxed">
-                    {center.description || "No description available for this center."}
+                    {center.description ||
+                      "No description available for this center."}
                   </p>
                 </div>
-
 
                 <div className="mt-5">
                   <button
@@ -843,7 +871,6 @@ const CenterDetail = () => {
                     Register for a Class
                   </button>
                 </div>
-
               </div>
 
               {/* Comments section */}
@@ -858,7 +885,9 @@ const CenterDetail = () => {
                   <div className="flex flex-col space-y-2">
                     <textarea
                       value={newComment.text}
-                      onChange={(e) => setNewComment({...newComment, text: e.target.value})}
+                      onChange={(e) =>
+                        setNewComment({ ...newComment, text: e.target.value })
+                      }
                       placeholder="Share your thoughts about this center..."
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       rows={3}
@@ -870,11 +899,15 @@ const CenterDetail = () => {
                         <button
                           type="button"
                           key={star}
-                          onClick={() => setNewComment({...newComment, star})}
+                          onClick={() => setNewComment({ ...newComment, star })}
                           className="focus:outline-none "
                         >
                           <Star
-                            className={`h-5 w-5 ${star <= newComment.star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                            className={`h-5 w-5 ${
+                              star <= newComment.star
+                                ? "text-yellow-500 fill-yellow-500"
+                                : "text-gray-300"
+                            }`}
                           />
                         </button>
                       ))}
@@ -895,98 +928,126 @@ const CenterDetail = () => {
                 {/* Comments list */}
                 <div className="mt-6 space-y-4">
                   {comments.length === 0 ? (
-                    <p className="text-gray-500">No comments yet. Be the first to share your thoughts!</p>
+                    <p className="text-gray-500">
+                      No comments yet. Be the first to share your thoughts!
+                    </p>
                   ) : (
                     comments
                       .slice()
-                      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                      .sort(
+                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                      )
                       .map((comment) => (
-                      <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
-                        {editingCommentId === comment.id ? (
-                          <div className="space-y-2">
-                            <textarea
-                              value={editCommentText}
-                              onChange={(e) => setEditCommentText(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                              rows={3}
-                            />
-                            <div className="flex items-center">
-                              <span className="mr-2">Rating:</span>
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                  type="button"
-                                  key={star}
-                                  onClick={() => setEditCommentStar(star)}
-                                  className="focus:outline-none"
-                                >
-                                  <Star
-                                    className={`h-5 w-5 ${star <= editCommentStar ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
-                                  />
-                                </button>
-                              ))}
-                            </div>
-                            <div className="flex justify-end space-x-2">
-                              <button
-                                onClick={cancelEditing}
-                                className="px-3 py-1 text-gray-600 hover:text-gray-800"
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                onClick={handleUpdateComment}
-                                className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
-                              >
-                                Save
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-center space-x-2">
-                                <User className="h-5 w-5 text-gray-400" />
-                                <span className="font-medium">
-                                  {comment.user?.firstName && comment.user?.lastName
-                                    ? `${comment.user.firstName} ${comment.user.lastName}`
-                                    : "Anonymous"}
-                                </span>
-                                <div className="flex items-center ml-2">
-                                  {[...Array(5)].map((_, i) => (
+                        <div
+                          key={comment.id}
+                          className="bg-gray-50 p-4 rounded-lg"
+                        >
+                          {editingCommentId === comment.id ? (
+                            <div className="space-y-2">
+                              <textarea
+                                value={editCommentText}
+                                onChange={(e) =>
+                                  setEditCommentText(e.target.value)
+                                }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                rows={3}
+                              />
+                              <div className="flex items-center">
+                                <span className="mr-2">Rating:</span>
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <button
+                                    type="button"
+                                    key={star}
+                                    onClick={() => setEditCommentStar(star)}
+                                    className="focus:outline-none"
+                                  >
                                     <Star
-                                      key={i}
-                                      className={`h-4 w-4 ${i < comment.star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                                      className={`h-5 w-5 ${
+                                        star <= editCommentStar
+                                          ? "text-yellow-500 fill-yellow-500"
+                                          : "text-gray-300"
+                                      }`}
                                     />
-                                  ))}
+                                  </button>
+                                ))}
+                              </div>
+                              <div className="flex justify-end space-x-2">
+                                <button
+                                  onClick={cancelEditing}
+                                  className="px-3 py-1 text-gray-600 hover:text-gray-800"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={handleUpdateComment}
+                                  className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex justify-between items-start">
+                                <div className="flex items-center space-x-2">
+                                  <User className="h-5 w-5 text-gray-400" />
+                                  <span className="font-medium">
+                                    {comment.user?.firstName &&
+                                    comment.user?.lastName
+                                      ? `${comment.user.firstName} ${comment.user.lastName}`
+                                      : "Anonymous"}
+                                  </span>
+                                  <div className="flex items-center ml-2">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        className={`h-4 w-4 ${
+                                          i < comment.star
+                                            ? "text-yellow-500 fill-yellow-500"
+                                            : "text-gray-300"
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                                  <Calendar className="h-4 w-4" />
+                                  <span>
+                                    {new Date(
+                                      comment.createdAt ||
+                                        comment.updatedAt ||
+                                        Date.now()
+                                    ).toLocaleDateString()}
+                                  </span>
+                                  {user?.data?.id === comment.user?.id && (
+                                    <>
+                                      <button
+                                        onClick={() =>
+                                          startEditingComment(comment)
+                                        }
+                                        className="text-blue-500 hover:text-blue-700"
+                                      >
+                                        Edit
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          handleDeleteComment(comment.id)
+                                        }
+                                        className="text-red-500 hover:text-red-700"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    </>
+                                  )}
                                 </div>
                               </div>
-                              <div className="flex items-center space-x-2 text-sm text-gray-500">
-                                <Calendar className="h-4 w-4" />
-                                <span>
-                                  {new Date(comment.createdAt || comment.updatedAt || Date.now()).toLocaleDateString()}
-                                </span>
-                                {user?.data?.id === comment.user?.id && (
-                                  <>
-                                    <button 
-                                      onClick={() => startEditingComment(comment)}
-                                      className="text-blue-500 hover:text-blue-700"
-                                    >
-                                      Edit
-                                    </button>
-                                    <button 
-                                      onClick={() => handleDeleteComment(comment.id)}
-                                      className="text-red-500 hover:text-red-700"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                            <p className="mt-2 text-gray-700">{comment.text || comment.content}</p>
-                          </>
-                        )}
-                      </div>
-                    ))
+                              <p className="mt-2 text-gray-700">
+                                {comment.text || comment.content}
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      ))
                   )}
                 </div>
               </div>
@@ -998,7 +1059,7 @@ const CenterDetail = () => {
       {/* Registration Modal */}
       {showReservationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -1010,7 +1071,7 @@ const CenterDetail = () => {
               <div className="p-6 bg-[#441774] text-white">
                 <div className="flex justify-between items-center">
                   <h3 className="text-xl font-bold">Class Registration</h3>
-                  <button 
+                  <button
                     onClick={() => {
                       setShowReservationModal(false);
                       setReservationError(null);
@@ -1021,7 +1082,9 @@ const CenterDetail = () => {
                     <X className="h-6 w-6" />
                   </button>
                 </div>
-                <p className="mt-1 text-sm opacity-90">Select your preferred date and time</p>
+                <p className="mt-1 text-sm opacity-90">
+                  Select your preferred date and time
+                </p>
               </div>
 
               {/* Modal body */}
@@ -1029,51 +1092,66 @@ const CenterDetail = () => {
                 {reservationSuccess ? (
                   <div className="text-center py-6">
                     <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                      <svg 
-                        className="h-6 w-6 text-green-600" 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
+                      <svg
+                        className="h-6 w-6 text-green-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M5 13l4 4L19 7" 
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
                         />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900">Registration Confirmed!</h3>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      Registration Confirmed!
+                    </h3>
                     <p className="mt-2 text-sm text-gray-500">
-                      Your class has been scheduled for {new Date(visitDate).toLocaleString()}.
+                      Your class has been scheduled for{" "}
+                      {new Date(visitDate).toLocaleString()}.
                     </p>
                     <div className="mt-4 space-y-2">
                       <p className="text-sm font-medium">Selected Branch:</p>
-                      <p className="text-sm text-gray-600">{selectedBranch?.name}</p>
-                      <p className="text-sm font-medium mt-2">Selected Major:</p>
-                      <p className="text-sm text-gray-600">{selectedMajor?.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {selectedBranch?.name}
+                      </p>
+                      <p className="text-sm font-medium mt-2">
+                        Selected Major:
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {selectedMajor?.name}
+                      </p>
                     </div>
                   </div>
                 ) : (
-                  <form onSubmit={handleReservationSubmit}>
+                  <form>
                     <div className="space-y-6">
                       {/* Selected branch display */}
                       <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
-                        <p className="text-sm font-medium text-purple-700">Selected Branch:</p>
+                        <p className="text-sm font-medium text-purple-700">
+                          Selected Branch:
+                        </p>
                         <p className="font-medium">{selectedBranch?.name}</p>
-                        <p className="text-sm text-gray-600">{selectedBranch?.address}</p>
+                        <p className="text-sm text-gray-600">
+                          {selectedBranch?.address}
+                        </p>
                       </div>
 
                       {/* Selected major display */}
                       <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
-                        <p className="text-sm font-medium text-purple-700">Selected Major:</p>
-                        <p className="font-medium">{selectedMajor?.name}</p>
+                        <p className="text-sm font-medium text-purple-700">
+                          Selected Major:
+                        </p>
+                        <p className="font-medium">{center.majors[0].name}</p>
                       </div>
 
                       {/* Date and time picker */}
                       <div>
-                        <label 
-                          htmlFor="visitDate" 
+                        <label
+                          htmlFor="visitDate"
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
                           Select Date & Time
@@ -1114,16 +1192,32 @@ const CenterDetail = () => {
                         >
                           Cancel
                         </button>
-                        <button
+                        <button onClick={() => PostRegisteration()}
                           type="submit"
                           disabled={isSubmittingReservation || !visitDate}
                           className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#441774] hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-70 transition-colors"
                         >
                           {isSubmittingReservation ? (
                             <>
-                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              <svg
+                                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
                               </svg>
                               Processing...
                             </>
