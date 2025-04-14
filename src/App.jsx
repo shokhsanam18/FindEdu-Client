@@ -5,6 +5,7 @@ import Login from "./Register/Login/Login.jsx";
 import { Layout } from "./components/Layout.jsx";
 import Forget from "./Register/Login/Forget.jsx";
 import VerifyOtp from "./Register/Login/VerifyOtp.jsx";
+import Otp from "./Register/Login/Otp.jsx";
 import ErrorPage from "./Register/Login/Error.jsx";
 import About from "./Register/Login/Aboutus.jsx";
 import { Index } from "./Pages/Index-page.jsx";
@@ -44,6 +45,7 @@ function App() {
           <Route path="/Login" element={<Login />} />
           <Route path="/Forget" element={<Forget />} />
           <Route path="/VerifyOtp" element={<VerifyOtp />} />
+          <Route path="/Otp" element={<Otp />} />
           <Route path="/Test" element={<Test />} />
           <Route path="*" element={<ErrorPage />} />
           <Route
