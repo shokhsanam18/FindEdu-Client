@@ -831,13 +831,19 @@ const CenterDetail = () => {
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Phone</h3>
-                    <p className="mt-1 text-lg font-medium flex items-center">
-                      <Phone className="h-5 w-5 mr-2" />
-                      {center.phone || "Not provided"}
-                    </p>
-                  </div>
+                <div>
+  <h3 className="text-sm font-medium text-gray-500">Phone</h3>
+  <p className="mt-1 text-lg font-medium flex items-center">
+    <Phone className="h-5 w-5 mr-2" />
+    {center.phone ? (
+      <a href={`tel:${center.phone.replace(/[^\d+]/g, '')}`} className="hover:text-purple-500">
+        {center.phone}
+      </a>
+    ) : (
+      "Not provided"
+    )}
+  </p>
+</div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Email</h3>
                     <p className="mt-1 text-lg font-medium">

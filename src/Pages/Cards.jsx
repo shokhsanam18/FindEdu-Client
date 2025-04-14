@@ -13,7 +13,7 @@ import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
 import { Link } from "react-router-dom";
-import { useLikedStore, useSearchStore } from "../../Store.jsx";
+import { useLikedStore, useSearchStore } from "../Store.jsx";
 const MajorsApi = "https://findcourse.net.uz/api/major";
 const RegionsApi = "https://findcourse.net.uz/api/regions/search";
 const CentersApi = "https://findcourse.net.uz/api/centers";

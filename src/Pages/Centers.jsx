@@ -1,5 +1,5 @@
 import React from "react";
-import { Cards } from "../components/ui/Cards";
+import { Cards } from "./Cards";
 
 
 export const Centers = () => {
