@@ -499,3 +499,4 @@ export const useModalStore = create((set) => ({
   openModal: () => set({ isModalOpen: true }),
   closeModal: () => set({ isModalOpen: false }),
 }));
+

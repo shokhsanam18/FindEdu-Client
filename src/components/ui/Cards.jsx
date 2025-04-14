@@ -252,7 +252,7 @@ export const Cards = () => {
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
         <div className="relative  mx-auto flex flex-col md:flex-row items-center  text-white">
-          <div className="md:w-1/2 text-center md:text-left pl-10">
+          <div className="md:w-1/2 text-center md:text-left lg:pl-10">
             <motion.h1
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -340,7 +340,9 @@ export const Cards = () => {
       />
 
       {loading ? (
-        <p className="text-center mt-10">Loading...</p>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        </div>
       ) : (
         <div className="Main_Cards flex flex-wrap justify-center xl:gap-20 gap-6 mt-10">
           {filteredCenters.length > 0 ? (
@@ -410,11 +412,13 @@ export const Cards = () => {
                   <p className="text-sm text-gray-600 line-clamp-1">
                     {center.address}
                   </p>
-
+                  {/* // i changed */}
                   <div className="flex items-center justify-between mt-1.5">
                     <div className="flex items-center space-x-1 text-sm text-gray-500">
                       <PhoneIcon className="h-4 w-4" />
-                      <span>{center.phone || "+1 (555) 123-4567"}</span>
+                      <a href={`tel:${center.phone || "+15551234567"}`}>
+                        <span>{center.phone || "+1 (555) 123-4567"}</span>
+                      </a>
                     </div>
                     <Link
                       to={`/centers/${center.id}`}

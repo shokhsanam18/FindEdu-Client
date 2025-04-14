@@ -19,7 +19,7 @@ import {
 } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-
+import { Eye, EyeOff } from "lucide-react"; 
 const API_BASE = "https://findcourse.net.uz";
 
 const formSchema = z.object({
@@ -68,7 +68,9 @@ axiosInstance.interceptors.response.use(
 );
 
 const Login = () => {
+  
   const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -195,20 +197,33 @@ const Login = () => {
               />
 
               <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="relative">
                       <Input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="Password"
                         {...field}
                       />
-                    </FormControl>{" "}
-                    <FormMessage />
-                  </FormItem>
-                )}
+                      <button
+                        type="button"
+                        className="absolute right-3 top-9 transform -translate-y-1/2"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <Eye className="h-5 w-5 text-green-500" />
+                        ) : (
+                          <EyeOff className="h-5 w-5 text-gray-500" />
+                        )}
+                      </button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
               />
 
               <Button
