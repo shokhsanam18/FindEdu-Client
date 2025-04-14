@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
-// import Register from "./Register/Login/Register.jsx";
 import Login from "./Register/Login/Login.jsx";
 import { Layout } from "./components/Layout.jsx";
 import Forget from "./Register/Login/Forget.jsx";
@@ -16,10 +15,11 @@ import { useAuthStore } from "./Store.jsx";
 import { Resources } from "./Pages/Resources.jsx";
 import Test from "./Test.jsx";
 import { Appointment } from "./Pages/appointment.jsx";
-
 import Favorites from "./Pages/Favorites.jsx";
 import FormTry from "./Register/Login/Register.jsx";
 import { Centers } from "./Pages/Centers.jsx";
+import { Toaster } from "sonner"; 
+
 function App() {
   const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
 
@@ -29,6 +29,8 @@ function App() {
 
   return (
     <AuthProvider>
+      <Toaster position="top-right" richColors expand={true} />
+      
       <div>
         <Routes>
           <Route path="/" element={<Layout />}>

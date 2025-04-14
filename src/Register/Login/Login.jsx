@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Toaster as Sonner, toast } from "sonner";
-import React, { useContext, useState } from "react";
+import { toast } from "sonner";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import purple from "/public/purple.png";
@@ -19,7 +19,8 @@ import {
 } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import { Eye, EyeOff } from "lucide-react"; 
+import { Eye, EyeOff } from "lucide-react";
+
 const API_BASE = "https://findcourse.net.uz";
 
 const formSchema = z.object({
@@ -27,50 +28,11 @@ const formSchema = z.object({
   password: z.string().min(6, { message: "Min 6 characters" }),
 });
 
-const axiosInstance = axios.create({
-  baseURL: API_BASE,
-});
-
-const refreshAccessToken = async (navigate) => {
-  try {
-    const storedRefreshToken = localStorage.getItem("refreshToken");
-    if (!storedRefreshToken) throw new Error("No refresh token available");
-
-    const response = await axios.post(`${API_BASE}/refresh`, {
-      refreshToken: storedRefreshToken,
-    });
-
-    localStorage.setItem("accessToken", response.data.accessToken);
-    return response.data.accessToken;
-  } catch (error) {
-    console.error("Refresh token failed:", error);
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    navigate("/login");
-    throw error;
-  }
-};
-
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      try {
-        const newAccessToken = await refreshAccessToken();
-        error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
-        return axiosInstance(error.config);
-      } catch {
-        console.error("Token refresh failed, redirecting to login.");
-      }
-    }
-    return Promise.reject(error);
-  }
-);
-
 const Login = () => {
-  
   const navigate = useNavigate();
-    const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -79,26 +41,8 @@ const Login = () => {
     },
   });
 
-  const refreshToken = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) throw new Error("No refresh token available");
-
-      const response = await axios.post(`${API_BASE}/users/refresh`, {
-        refreshToken,
-      });
-      localStorage.setItem("accessToken", response.data.accessToken);
-      return response.data.accessToken;
-    } catch (error) {
-      console.error("Refresh token failed:", error);
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      navigate("/login");
-      throw error;
-    }
-  };
-
   const loginUser = async (values) => {
+    setIsLoading(true);
     const login = useAuthStore.getState().login;
 
     try {
@@ -106,39 +50,28 @@ const Login = () => {
 
       if (result.success) {
         const role = result.role ? result.role.toUpperCase() : "USER";
-
-        console.log("Debug: Raw role received:", result.role);
-        console.log(" Debug: Processed role after cleanup:", role);
-
+        
+        toast.success("Login successful! Redirecting...");
         setTimeout(() => {
-          if (role === "USER") {
-            toast.success("Login successful! Redirecting...");
-            navigate("/");
-          } else if (role === "CEO") {
-            toast.success("Login successful! Redirecting...");
-            navigate("/ceo");
-          } else if (role === "ADMIN") {
-            toast.success("Login successful! Redirecting...");
-            navigate("/");
-          } else {
-            console.error(" Unexpected role received:", role);
-            toast.error("Unknown role, please contact support.");
-          }
+          if (role === "USER") navigate("/");
+          else if (role === "CEO") navigate("/ceo");
+          else if (role === "ADMIN") navigate("/");
+          else toast.error("Unknown role, please contact support.");
         }, 1500);
       } else {
-        if (!result.message?.includes("Password or email is wrong")) {
-          toast.error(result.message || "Invalid credentials");
-        }
+        toast.error(result.message || "Invalid credentials");
       }
     } catch (err) {
-      console.error(" Login error:", err);
-      toast.error("Something went wrong. Please try again.");
+      console.error("Login error:", err);
+      toast.error("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-[#6d24b719] ">
-      <Sonner theme="light" position="top-right" richColors />
+    <div className="flex flex-col md:flex-row h-screen bg-[#6d24b719]">
+      
       <Link to="/">
         <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold cursor-pointer">
           <p className="flex">
@@ -147,18 +80,18 @@ const Login = () => {
           </p>
         </div>
       </Link>
-      <div className="hidden md:flex md:w-2/5 bg-gradient-to-b from-white to-purple-100 items-center justify-center p-8 relative ">
+
+      <div className="hidden md:flex md:w-2/5 bg-gradient-to-b from-white to-purple-100 items-center justify-center p-8 relative">
         <div className="absolute top-8 left-14 flex items-center text-[#461773] text-[32px] font-bold">
           <Link to="/">
             <p className="flex">
-              F<img src={icon} alt="Logo" className="h-7  w-4 mx-1 mt-3 " />
+              F<img src={icon} alt="Logo" className="h-7 w-4 mx-1 mt-3" />
               ndedu.uz
             </p>
           </Link>
         </div>
         <div className="text-[#461773] text-center relative ml-20 cursor-pointer">
           <h2 className="text-4xl font-bold mb-20">Welcome Back!</h2>
-
           <motion.img
             src={register}
             alt="Illustration"
@@ -166,9 +99,8 @@ const Login = () => {
             whileHover={{ y: -20 }}
             transition={{ type: "spring", stiffness: 50, damping: 20 }}
           />
-
           <img
-            className="z-0 absolute bottom-[-32px] left-1/15  transform  w-[400px] h-[90px]"
+            className="z-0 absolute bottom-[-32px] left-1/15 transform w-[400px] h-[90px]"
             src={purple}
             alt="Shadow Effect"
           />
@@ -190,54 +122,55 @@ const Login = () => {
                   <FormItem>
                     <FormControl>
                       <Input placeholder="Email" {...field} />
-                    </FormControl>{" "}
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
               <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Password"
-                        {...field}
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-9 transform -translate-y-1/2"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <Eye className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <EyeOff className="h-5 w-5 text-gray-500" />
-                        )}
-                      </button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Password"
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-9 transform -translate-y-1/2"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <Eye className="h-5 w-5 text-green-500" />
+                          ) : (
+                            <EyeOff className="h-5 w-5 text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
 
               <Button
                 type="submit"
-                onClick={form.handleSubmit(loginUser)}
-                className="w-full bg-[#461773] text-white font-bold rounded-md hover:bg-purple-700 transition h-[50px] cursor-pointer"
+                disabled={isLoading}
+                className={`w-full bg-[#461773] text-white font-bold rounded-md hover:bg-purple-700 transition h-[50px] cursor-pointer ${
+                  isLoading ? "opacity-70" : ""
+                }`}
               >
-                Login
+                {isLoading ? "Logging in..." : "Login"}
               </Button>
-            </form>{" "}
+            </form>
           </Form>
 
           <p className="text-m text-gray-600 mt-4 text-center">
-            {" "}
             Don't have an account?{" "}
             <Link
               to="/register"
@@ -247,10 +180,9 @@ const Login = () => {
             </Link>
           </p>
           <Link to="/forget">
-            {" "}
             <h2 className="text-m text-center mt-6 underline cursor-pointer">
               Forgot Password?
-            </h2>{" "}
+            </h2>
           </Link>
         </div>
       </div>
