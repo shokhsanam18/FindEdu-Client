@@ -17,7 +17,7 @@ import home from "/public/home.png";
 import { useLocation } from "react-router-dom";
 
 import { Link } from "react-router-dom";
-import { useLikedStore, useSearchStore } from "../../Store.jsx";
+import { useLikedStore, useSearchStore } from "../Store.jsx";
 const MajorsApi = "https://findcourse.net.uz/api/major";
 const RegionsApi = "https://findcourse.net.uz/api/regions/search";
 const CentersApi = "https://findcourse.net.uz/api/centers";
@@ -353,13 +353,14 @@ export const Cards = () => {
         <div className="Main_Cards flex flex-wrap justify-center xl:gap-20 gap-6 mt-10">
           {filteredCenters.length > 0 ? (
             filteredCenters.map((center) => (
+
               <motion.div
                 key={center.id}
-                className="w-full max-w-sm overflow-hidden rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow"
+                className="w-full max-w-sm overflow-hidden rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow bg"
                 whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div className="relative h-48 overflow-hidden">
+                transition={{ duration: 0.2 }} >             
+                <Link to={`/centers/${center.id}`} onClick={() => window.scrollTo(0, 0)}>
+                <div className="relative h-48 overflow-hidden ">
                   {center.imageUrl ? (
                     <img
                       className="w-full h-full object-cover"
@@ -443,16 +444,10 @@ export const Cards = () => {
                         <span>{center.phone || "+1 (555) 123-4567"}</span>
                       </a>
                     </div>
-                    <Link
-                      to={`/centers/${center.id}`}
-                      className="text-sm font-medium text-purple-800 hover:underline"
-                      onClick={() => window.scrollTo(0, 0)}
-                    >
-                      Details
-                    </Link>
+
                   </div>
-                </div>
-              </motion.div>
+                </div> </Link>
+              </motion.div> 
             ))
           ) : (
             <p className="text-center text-gray-600">

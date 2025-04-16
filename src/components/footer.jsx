@@ -149,7 +149,7 @@ export const Footer = () => {
       <div className="flex flex-col md:flex-row justify-between items-center mt-8 text-sm opacity-75">
         <div className="flex space-x-4 mt-4 md:mt-0">
           <p className="text-center md:text-left">
-            © 2025 Findedu. All Rights Reserved. Best IT girls
+            © 2025 Findedu. All Rights Reserved. Best Girls
           </p>
         </div>
         <div className="flex gap-5 mt-4 md:mt-0">

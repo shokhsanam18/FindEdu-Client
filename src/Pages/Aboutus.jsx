@@ -47,11 +47,19 @@ const Counter = ({ target, label, icon: Icon }) => {
   return (
     <motion.div
       className="flex flex-col items-center bg-gray-100 p-6 rounded-lg shadow-lg"
-      initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} viewport={{ once: true }}>
+      initial={{ opacity: 0, y: 20 }} 
+      whileInView={{ opacity: 1, y: 0 }} 
+      transition={{ duration: 0.6 }} 
+      viewport={{ once: true }}
+    >
       <Icon className="text-[#461773] text-4xl mb-3" />
       <motion.h3
         className="text-4xl font-bold text-gray-900" 
-        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}  transition={{ duration: 1, delay: 0.2 }}> {count.toLocaleString()}+
+        initial={{ opacity: 0 }} 
+        whileInView={{ opacity: 1 }}  
+        transition={{ duration: 1, delay: 0.2 }}
+      >
+        {count.toLocaleString()}+
       </motion.h3>
       <p className="text-gray-600">{label}</p>
     </motion.div>
@@ -60,14 +68,13 @@ const Counter = ({ target, label, icon: Icon }) => {
 
 const ScrollingLogos = () => {
   const containerRef = useRef(null);
-  const [animationDuration, setAnimationDuration] = useState(40); // seconds
+  const [animationDuration, setAnimationDuration] = useState(40);
 
   useEffect(() => {
     const calculateDuration = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.scrollWidth;
         const viewportWidth = window.innerWidth;
-        // Adjust duration based on total width (wider content = longer duration)
         const newDuration = Math.max(30, containerWidth / viewportWidth * 20);
         setAnimationDuration(newDuration);
       }
@@ -79,7 +86,7 @@ const ScrollingLogos = () => {
   }, []);
 
   return (
-    <div className="overflow-hidden py-10">
+    <div className="overflow-hidden py-10 w-full">
       <motion.div
         ref={containerRef}
         className="flex"
@@ -102,18 +109,14 @@ const ScrollingLogos = () => {
               <img
                 src={logo.src}
                 alt="Education Center"
-                className={`max-w-full max-h-full cursor-pointer block ${
-                  logo.className || ""
-                }`}
+                className={`max-w-full max-h-full cursor-pointer block ${logo.className || ""}`}
                 style={{
-                  width: `${logo.width}px`,
+                  width: `${Math.min(logo.width, window.innerWidth * 0.8)}px`,
                   height: `${logo.height}px`,
                 }}
               />
             ) : (
-              <div
-                className={`text-center cursor-pointer ${logo.className}`}
-              >
+              <div className={`text-center cursor-pointer ${logo.className}`}>
                 {logo.text}
               </div>
             )}
@@ -126,66 +129,75 @@ const ScrollingLogos = () => {
 
 const About = () => {
   return (
-    <div className="mt-25 sm:mt-35 md:mt-35">
+    <div className="overflow-x-hidden mt-35">
+      {/* Hero Section */}
       <motion.div
-        initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
-        className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-6 min-h-[60vh] text-white bg-cover bg-center"
-        style={{ backgroundImage: "url('/aboutus.png')" }}>
+        initial={{ opacity: 0, y: -50 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.8 }}
+        className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-4 md:p-6 min-h-[60vh] text-white bg-cover bg-center"
+        style={{ backgroundImage: "url('/aboutus.png')" }}
+      >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
 
         <motion.div
-          initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative z-10 max-w-3xl px-6 md:p-8 text-start mt-50 md:mt-0" >
-          <p className="text-l md:text-xl  mt-6 md:mt-0"> {" "}Helping You Find the Best Education Centers!</p>
-          <h1 className="text-4xl md:text-7xl font-bold "> About Us</h1>
+          initial={{ opacity: 0, x: -50 }} 
+          animate={{ opacity: 1, x: 0 }} 
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="relative z-10 max-w-3xl px-4 md:px-8 text-start mt-16 md:mt-0"
+        >
+          <p className="text-lg md:text-xl mt-4 md:mt-0">Helping You Find the Best Education Centers!</p>
+          <h1 className="text-3xl md:text-7xl font-bold">About Us</h1>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.6 }}
-          className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-xl  mt-4 md:mt-0">
+          initial={{ opacity: 0, x: 50 }} 
+          animate={{ opacity: 1, x: 0 }} 
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-4 md:mr-10 md:text-xl mt-4 md:mt-0"
+        >
           <div className="flex gap-2">
-            <Link to="/" className="no-underline hover:underline text-white"> Home</Link>
+            <Link to="/" className="no-underline hover:underline text-white">Home</Link>
             <p>|</p>
-            <Link to="/" className="text-[#bbbbbb] no-underline hover:underline" >
-              About Us </Link>
+            <Link to="/" className="text-[#bbbbbb] no-underline hover:underline">
+              About Us
+            </Link>
           </div>
         </motion.div>
       </motion.div>
 
-      <div className="bg-gray-100 py-10">
+      {/* Main Content */}
+      <div className="bg-gray-100 py-8 md:py-10">
+        {/* Success Section */}
         <motion.div
           className="text-center px-4 md:px-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-3xl md:text-5xl font-semibold text-[#461773] mt-5 mx-4 md:mx-0">
+          <h2 className="text-2xl md:text-5xl font-semibold text-[#461773] mt-5 mx-4 md:mx-0">
             Preparing Students to Achieve Success
           </h2>
-          <div className="mt-4 w-16 h-1 bg-yellow-400 mx-auto mb-10"></div>
+          <div className="mt-4 w-16 h-1 bg-yellow-400 mx-auto mb-8 md:mb-10"></div>
 
-          <div className="mt-12 flex flex-col-reverse md:flex-row justify-center items-center ">
+          <div className="mt-8 md:mt-12 flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
               className="max-w-md text-center md:text-left mx-4 md:mx-0"
             >
-              <h3 className="text-2xl font-semibold text-gray-900">
-                {" "}
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900">
                 Developing Confident and Successful Learners
               </h3>
-              <p className="text-gray-600 mt-4 leading-relaxed">
+              <p className="text-gray-600 mt-3 md:mt-4 leading-relaxed">
                 Our platform helps students find education centers tailored to
                 their interests, budget, and region, ensuring the best learning
                 experience.
               </p>
 
               <Link to="/">
-                <button
-                  className="mt-6 px-9 py-4 bg-[#461773] text-white font-semibold rounded-full shadow-lg 
-              hover:bg-[#775fb0] cursor-pointer transition"
-                >
+                <button className="mt-4 md:mt-6 px-6 md:px-9 py-3 md:py-4 bg-[#461773] text-white font-semibold rounded-full shadow-lg hover:bg-[#775fb0] cursor-pointer transition">
                   View More
                 </button>
               </Link>
@@ -194,11 +206,10 @@ const About = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
-                className="mt-8 p-4 bg-gray-100 rounded-lg shadow-md flex items-start gap-4"
+                className="mt-6 md:mt-8 p-4 bg-gray-100 rounded-lg shadow-md flex items-start gap-4"
               >
                 <FaQuoteLeft className="text-[#461773] text-2xl" />
                 <p className="text-gray-700 italic leading-relaxed">
-                  {" "}
                   This platform made it easy for me to find the perfect learning
                   center. Highly recommended!"
                 </p>
@@ -214,15 +225,16 @@ const About = () => {
               <motion.img
                 src={students}
                 alt="Education Showcase"
-                className="w-full max-w-xs sm:max-w-sm md:max-w-md rounded-lg shadow-md mb-10"
+                className="w-full max-w-xs sm:max-w-sm md:max-w-md rounded-lg shadow-md mb-6 md:mb-10"
               />
             </motion.div>
           </div>
         </motion.div>
 
-        <div className="relative py-15 bg-gradient-to-b from-white to-gray-100 text-center">
+        {/* Impact Section */}
+        <div className="relative py-10 md:py-15 bg-gradient-to-b from-white to-gray-100 text-center">
           <motion.h2
-            className="text-5xl font-semibold text-[#461773] mb-14"
+            className="text-3xl md:text-5xl font-semibold text-[#461773] mb-8 md:mb-14"
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -230,7 +242,7 @@ const About = () => {
             Our Impact
           </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center mx-auto max-w-4xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 justify-center items-center mx-auto max-w-4xl px-4 md:px-0">
             <Counter
               target={250}
               label="Registered Users"
@@ -241,9 +253,10 @@ const About = () => {
           </div>
         </div>
 
-        <div className="relative py-20 bg-gradient-to-b from-gray-100 to-white text-center mt-[-30px] mb-[-50px]">
+        {/* Mission Section */}
+        <div className="relative py-12 md:py-20 bg-gradient-to-b from-gray-100 to-white text-center">
           <motion.h2
-            className="text-5xl font-semibold text-[#461773]"
+            className="text-3xl md:text-5xl font-semibold text-[#461773]"
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -252,17 +265,17 @@ const About = () => {
           </motion.h2>
           <div className="mt-4 w-16 h-1 bg-yellow-400 mx-auto"></div>
 
-          <div className="mt-12 flex flex-col md:flex-row justify-center items-center md:space-x-12 px-6 md:px-0">
+          <div className="mt-8 md:mt-12 flex flex-col md:flex-row justify-center items-center md:space-x-12 px-4 md:px-0">
             <motion.div
               className="max-w-md text-center md:text-left"
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h3 className="text-2xl font-semibold text-gray-900">
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900">
                 Empowering Learners for a Brighter Future
               </h3>
-              <p className="text-gray-600 mt-4 leading-relaxed">
+              <p className="text-gray-600 mt-3 md:mt-4 leading-relaxed">
                 We aim to bridge the gap between students and quality education
                 by providing a seamless platform that connects learners with top
                 educational institutions. Our goal is to ensure that every
@@ -271,8 +284,8 @@ const About = () => {
               </p>
               <Link to="/register">
                 <button
-                  className="mt-6 px-14 py-4 bg-[#461773] text-white font-semibold rounded-full shadow-lg 
-      hover:bg-[#775fb0] cursor-pointer transition w-full md:w-auto mx-auto block md:inline"
+                  className="mt-4 md:mt-6 px-8 md:px-14 py-3 md:py-4 bg-[#461773] text-white font-semibold rounded-full shadow-lg 
+                  hover:bg-[#775fb0] cursor-pointer transition w-full md:w-auto mx-auto block md:inline"
                 >
                   Register
                 </button>
@@ -280,7 +293,7 @@ const About = () => {
             </motion.div>
 
             <motion.div
-              className="mt-8 md:mt-0"
+              className="mt-6 md:mt-0"
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
@@ -288,15 +301,16 @@ const About = () => {
               <img
                 src={mission}
                 alt="Our Mission"
-                className="w-96 rounded-lg shadow-xl mx-auto md:mx-0"
+                className="w-64 md:w-96 rounded-lg shadow-xl mx-auto md:mx-0"
               />
             </motion.div>
           </div>
         </div>
 
-        <div className="relative py-20 bg-gradient-to-b from-white to-gray-100 text-center px-6 md:px-0">
+        {/* Vision Section */}
+        <div className="relative py-12 md:py-20 bg-gradient-to-b from-white to-gray-100 text-center px-4 md:px-0">
           <motion.h2
-            className="text-4xl md:text-5xl font-semibold text-[#461773]"
+            className="text-3xl md:text-5xl font-semibold text-[#461773]"
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -305,17 +319,17 @@ const About = () => {
           </motion.h2>
           <div className="mt-4 w-16 h-1 bg-yellow-400 mx-auto"></div>
 
-          <div className="mt-12 flex flex-col md:flex-row-reverse justify-center items-center gap-12 md:gap-20">
+          <div className="mt-8 md:mt-12 flex flex-col md:flex-row-reverse justify-center items-center gap-8 md:gap-20">
             <motion.div
               className="max-w-md text-center md:text-left"
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h3 className="text-2xl font-semibold text-gray-900">
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-900">
                 Shaping the Future of Education
               </h3>
-              <p className="text-gray-600 mt-4 leading-relaxed">
+              <p className="text-gray-600 mt-3 md:mt-4 leading-relaxed">
                 Our vision is to become the world's leading educational
                 matchmaking platform, ensuring every student finds the right
                 learning resources, institutions, and guidance to excel in their
@@ -323,8 +337,8 @@ const About = () => {
               </p>
               <Link to="/register">
                 <button
-                  className="mt-6 px-14 py-4 bg-[#461773] text-white font-semibold rounded-full shadow-lg 
-        hover:bg-[#775fb0] cursor-pointer transition w-full md:w-auto mx-auto block md:inline"
+                  className="mt-4 md:mt-6 px-8 md:px-14 py-3 md:py-4 bg-[#461773] text-white font-semibold rounded-full shadow-lg 
+                  hover:bg-[#775fb0] cursor-pointer transition w-full md:w-auto mx-auto block md:inline"
                 >
                   Register
                 </button>
@@ -332,7 +346,7 @@ const About = () => {
             </motion.div>
 
             <motion.div
-              className="mt-8 md:mt-0"
+              className="mt-6 md:mt-0"
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
@@ -340,17 +354,18 @@ const About = () => {
               <img
                 src={about1}
                 alt="Our Vision"
-                className="w-11/12 md:w-96 rounded-lg shadow-xl mx-auto"
+                className="w-64 md:w-96 rounded-lg shadow-xl mx-auto"
               />
             </motion.div>
           </div>
         </div>
 
-        <div className="text-center ">
-          <h2 className="text-3xl md:text-5xl font-semibold text-[#461773] ">
+        {/* Logos Section */}
+        <div className="text-center px-4">
+          <h2 className="text-2xl md:text-5xl font-semibold text-[#461773]">
             Your Guide to Education Centers
           </h2>
-          <div className="mt-4 w-16 h-1 bg-yellow-400 mx-auto mb-17"></div>
+          <div className="mt-4 w-16 h-1 bg-yellow-400 mx-auto mb-8 md:mb-17"></div>
           <ScrollingLogos />
         </div>
       </div>

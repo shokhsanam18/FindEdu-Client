@@ -42,28 +42,28 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  login: async (values) => {
-    try {
-      const res = await axios.post(`${API_BASE}/users/login`, values);
-      const { accessToken, refreshToken } = res.data;
+login: async (values) => {
+  try {
+    const res = await axios.post(`${API_BASE}/users/login`, values);
+    const { accessToken, refreshToken } = res.data;
 
-      if (accessToken && refreshToken) {
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        set({ accessToken, refreshToken });
+    if (accessToken && refreshToken) {
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      set({ accessToken, refreshToken });
 
-        const user = await get().fetchUserData();
-        toast.success("Login successful!");
-        return { success: true, role: user?.role };
-      }
-
-      toast.error("Invalid credentials");
-      return { success: false };
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed");
-      return { success: false, message: error.response?.data?.message };
+      const user = await get().fetchUserData();
+      return { success: true, role: user?.role };
     }
-  },
+
+    return { success: false, message: "Invalid credentials" };
+  } catch (error) {
+    return { 
+      success: false, 
+      message: error.response?.data?.message || "Login failed" 
+    };
+  }
+},
 
   refreshTokenFunc: async (shouldLogout = true) => {
     const refreshToken = get().refreshToken;
@@ -339,7 +339,7 @@ export const useCommentStore = create((set, get) => ({
       }
     } catch (err) {
       console.error("Post comment error", err);
-      toast.error(err.response?.data?.message || "Failed to post comment");
+      toast.error(err.response?.data?.message || "Failed to post comment. Login first!");
     }
   },
 

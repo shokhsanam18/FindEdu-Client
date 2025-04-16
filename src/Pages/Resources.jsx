@@ -4,8 +4,11 @@ import { MdComputer, MdBusiness } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../Store";
 import { AuthContext } from "../context/auth";
+import { toast } from "sonner";
+import "react-toastify/dist/ReactToastify.css";
 
 const API_BASE_URL = "https://findcourse.net.uz/api/resources";
+const CATEGORIES_URL = "https://findcourse.net.uz/api/categories";
 
 export const Resources = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,98 +23,52 @@ export const Resources = () => {
   });
   const [categories, setCategories] = useState([]);
   const [resources, setResources] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    itemsPerPage: 9,
+    totalItems: 0
+  });
   const navigate = useNavigate();
   
-  // Get user data from auth store
   const { userData } = useContext(AuthContext);
   const user = useAuthStore(state => state.user);
   const currentUser = userData || user;
-  
-  console.log("Current user from context:", userData);
-  console.log("Current user from store:", user);
-  console.log("Using user:", currentUser);
 
-  // Helper function to check if a resource belongs to the current user
+  const isLoggedIn = !!localStorage.getItem("accessToken");
+
+  const handleAddResourceClick = () => {
+    if (!isLoggedIn) {
+      toast.error("Please login first to add resources!");
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
   const isUserResource = (resource) => {
     if (!currentUser) return false;
-    
-    // Check all possible fields where user information might be stored
-    const resourceUserId = resource.userId || resource.createdBy || resource.user?.id;
-    
-    console.log("Checking resource:", resource.name, 
-                "Resource user ID:", resourceUserId, 
-                "Current user ID:", currentUser?.id);
-    
-    // For testing purposes, show delete buttons for all resources
-    return true; // Allow deleting any resource for testing
-    
-    // In production, use this:
-    // return resourceUserId === currentUser?.id;
+    return resource.userId === currentUser?.id;
   };
 
-  // Get user ID from localStorage if available
-  const getUserId = () => {
+  // Fetch resources with pagination
+  const fetchResources = async (page = 1) => {
     try {
       const token = localStorage.getItem("accessToken");
-      if (!token) return null;
+      const { itemsPerPage } = pagination;
       
-      // Try to get user ID from the auth store
-      if (currentUser && currentUser.id) {
-        return currentUser.id;
+      let url = `${API_BASE_URL}?page=${page}&limit=${itemsPerPage}`;
+      
+      if (activeFilter === "myResources") {
+        url += `&userId=${currentUser?.id}`;
+      } else if (activeFilter !== "all") {
+        url += `&categoryId=${activeFilter}`;
       }
       
-      // Fallback to localStorage
-      const userInfo = localStorage.getItem("userInfo");
-      if (userInfo) {
-        try {
-          const parsedInfo = JSON.parse(userInfo);
-          return parsedInfo.id;
-        } catch (e) {
-          console.error("Error parsing userInfo:", e);
-        }
+      if (searchTerm) {
+        url += `&search=${searchTerm}`;
       }
-      
-      return null;
-    } catch (error) {
-      console.error("Error getting user ID:", error);
-      return null;
-    }
-  };
 
-  // Get the current user ID when component mounts
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      // If we have the user data from context or store, we don't need to do anything
-      if (currentUser) {
-        console.log("User already loaded:", currentUser);
-        return;
-      }
-      
-      // Otherwise try to get it from localStorage
-      try {
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-        if (userInfo && userInfo.id) {
-          console.log("Found user info in localStorage:", userInfo);
-        }
-      } catch (error) {
-        console.error("Error parsing user info:", error);
-      }
-    }
-  }, [currentUser]);
-
-  // Fetch resources on component mount
-  useEffect(() => {
-    fetchResources();
-    fetchCategories();
-  }, []);
-
-  // Fetch categories from API
-  const fetchCategories = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      
-      const response = await fetch("https://findcourse.net.uz/api/categories", {
+      const response = await fetch(url, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -120,101 +77,49 @@ export const Resources = () => {
       
       if (response.ok) {
         const data = await response.json();
-        if (data && data.data) {
-          setCategories(data.data);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  // Fetch resources from API
-  const fetchResources = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      
-      const response = await fetch(API_BASE_URL, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data && data.data) {
-          console.log("Fetched resources:", data.data); // Debug log
-          
-          // Log each resource's author for debugging
-          data.data.forEach(resource => {
-            const author = resource.user?.firstName || resource.author || "";
-            console.log(`Resource: ${resource.name}, Author: ${author}, Is User's: ${author === "Fffff"}`);
-          });
-          
-          setResources(data.data);
-        }
+        setResources(data.data || []);
+        setPagination(prev => ({
+          ...prev,
+          currentPage: page,
+          totalItems: data.total || 0
+        }));
       }
     } catch (error) {
       console.error("Error fetching resources:", error);
+      toast.error("Failed to load resources");
     }
   };
 
-  const filteredResources = resources.filter((resource) => {
-    // Debug log for My Resources filter
-    if (activeFilter === "myResources") {
-      console.log("Checking resource for My Resources filter:", resource.name);
-    }
-    
-    // Improved search logic
-    const searchTermLower = searchTerm.toLowerCase().trim();
-    
-    // If search term is empty, don't filter by search
-    if (!searchTermLower) {
-      // For My Resources filter, check if the resource belongs to the current user
-      const matchesFilter =
-        activeFilter === "all"
-          ? true
-          : activeFilter === "myResources"
-          ? isUserResource(resource) // Only show user's resources
-          : resource.category?.name?.toLowerCase() === activeFilter.toLowerCase() || 
-            resource.categoryId?.toString() === activeFilter;
+  // Fetch categories
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(CATEGORIES_URL, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
       
-      return matchesFilter;
-    }
-    
-    // Check if any resource property matches the search term
-    const matchesSearch = 
-      (resource.name || "").toLowerCase().includes(searchTermLower) ||
-      (resource.description || "").toLowerCase().includes(searchTermLower) ||
-      (resource.user?.firstName || "").toLowerCase().includes(searchTermLower) ||
-      (resource.user?.lastName || "").toLowerCase().includes(searchTermLower) ||
-      (resource.category?.name || "").toLowerCase().includes(searchTermLower);
-    
-    // Apply both search and filter criteria
-    const matchesFilter =
-      activeFilter === "all"
-        ? true
-        : activeFilter === "myResources"
-        ? isUserResource(resource) // Only show user's resources
-        : resource.category?.name?.toLowerCase() === activeFilter.toLowerCase() || 
-          resource.categoryId?.toString() === activeFilter;
-    
-    return matchesSearch && matchesFilter;
-  });
-
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case "ebook":
-        return <FaBook className="text-blue-500" />;
-      case "video":
-        return <FaVideo className="text-red-500" />;
-      case "pdf":
-        return <FaFilePdf className="text-red-600" />;
-      default:
-        return <FaBook className="text-gray-500" />;
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast.error("Failed to load categories");
     }
   };
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    fetchResources(page);
+  };
+
+  useEffect(() => {
+    fetchResources();
+    fetchCategories();
+  }, [activeFilter, searchTerm]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -223,17 +128,31 @@ export const Resources = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting:", newResource); // For debugging
-
-    // Retrieve token from localStorage
-    const token = localStorage.getItem("accessToken");
-
-    if (!token) {
-      alert("You must be logged in to add a resource.");
+    
+    if (!isLoggedIn) {
+      toast.error("Please login first!");
       return;
     }
 
+    if (!newResource.categoryId) {
+      toast.error("Please select a category");
+      return;
+    }
+
+    if (!newResource.name.trim()) {
+      toast.error("Please enter a resource name");
+      return;
+    }
+
+    if (!newResource.media) {
+      toast.error("Please enter a media URL");
+      return;
+    }
+
+    setIsUploading(true);
+
     try {
+      const token = localStorage.getItem("accessToken");
       const response = await fetch(API_BASE_URL, {
         method: "POST",
         headers: {
@@ -244,11 +163,12 @@ export const Resources = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json(); // Try to get more specific error info
-        throw new Error(`Failed to add resource: ${response.status} - ${JSON.stringify(errorData)}`);
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to add resource");
       }
 
-      alert("Resource added successfully!");
+      const data = await response.json();
+      toast.success("Resource added successfully!");
       setIsModalOpen(false);
       setNewResource({
         categoryId: 1,
@@ -257,55 +177,132 @@ export const Resources = () => {
         media: "",
         image: "",
       });
-      
-      // Fetch updated resources
       fetchResources();
     } catch (error) {
       console.error("Error adding resource:", error);
-      alert(error.message);
+      toast.error(error.message || "Failed to add resource");
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  // Handle delete resource
   const handleDelete = async (resourceId) => {
-    if (!confirm("Are you sure you want to delete this resource?")) {
-      return;
-    }
-    
-    const token = localStorage.getItem("accessToken");
-    
-    if (!token) {
-      alert("You must be logged in to delete a resource.");
-      return;
-    }
+    if (!confirm("Are you sure you want to delete this resource?")) return;
     
     try {
-      console.log(`Deleting resource with ID: ${resourceId}`);
-      
-      // Use the correct API endpoint format from the memory
-      const response = await fetch(`https://findcourse.net.uz/api/resources/${resourceId}`, {
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(`${API_BASE_URL}/${resourceId}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
         },
       });
-      
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Failed to delete resource: ${response.status} - ${JSON.stringify(errorData)}`);
+        throw new Error("Failed to delete resource");
       }
-      
-      // Remove the deleted resource from the state
-      setResources(resources.filter(resource => resource.id !== resourceId));
-      alert("Resource deleted successfully!");
+
+      setResources(resources.filter(r => r.id !== resourceId));
+      toast.success("Resource deleted successfully");
     } catch (error) {
       console.error("Error deleting resource:", error);
-      alert(error.message);
+      toast.error(error.message);
     }
   };
 
+  // Filter resources client-side for additional filtering
+  const filteredResources = resources.filter(resource => {
+    const matchesSearch = searchTerm 
+      ? resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        resource.description.toLowerCase().includes(searchTerm.toLowerCase())
+      : true;
+
+    const matchesFilter = 
+      activeFilter === "all" ? true :
+      activeFilter === "myResources" ? isUserResource(resource) :
+      resource.categoryId?.toString() === activeFilter;
+
+    return matchesSearch && matchesFilter;
+  });
+
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case "ebook": return <FaBook className="text-blue-500" />;
+      case "video": return <FaVideo className="text-red-500" />;
+      case "pdf": return <FaFilePdf className="text-red-600" />;
+      default: return <FaBook className="text-gray-500" />;
+    }
+  };
+
+  // Generate pagination buttons
+  const totalPages = Math.ceil(pagination.totalItems / pagination.itemsPerPage);
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const maxVisibleButtons = 5;
+    let startPage = Math.max(1, pagination.currentPage - Math.floor(maxVisibleButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+
+    if (endPage - startPage + 1 < maxVisibleButtons) {
+      startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+    }
+
+    if (startPage > 1) {
+      buttons.push(
+        <button
+          key={1}
+          onClick={() => handlePageChange(1)}
+          className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+        >
+          1
+        </button>
+      );
+      if (startPage > 2) {
+        buttons.push(
+          <span key="start-ellipsis" className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+            ...
+          </span>
+        );
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-3 py-2 border border-gray-300 text-sm font-medium ${
+            pagination.currentPage === i ? "bg-blue-100 text-blue-800" : "bg-white text-gray-500 hover:bg-gray-50"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        buttons.push(
+          <span key="end-ellipsis" className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+            ...
+          </span>
+        );
+      }
+      buttons.push(
+        <button
+          key={totalPages}
+          onClick={() => handlePageChange(totalPages)}
+          className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    return buttons;
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-40">
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}
         <div className="text-center mb-12">
@@ -339,52 +336,34 @@ export const Resources = () => {
               >
                 All Resources
               </button>
-              <button
-                onClick={() => setActiveFilter("myResources")}
-                className={`px-4 py-2 rounded-full text-sm font-medium ${activeFilter === "myResources" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
-              >
-                My Resources
-              </button>
-              
-              {/* Dynamic category buttons */}
-              {categories.length > 0 ? (
-                categories.map(category => (
-                  <button
-                    key={category.id}
-                    onClick={() => setActiveFilter(category.id.toString())}
-                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${
-                      activeFilter === category.id.toString() ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {category.name === "Hobbi" && <FaBook className="mr-2" />}
-                    {category.name === "IT" && <MdComputer className="mr-2" />}
-                    {!["Hobbi", "IT"].includes(category.name) && <MdBusiness className="mr-2" />}
-                    {category.name}
-                  </button>
-                ))
-              ) : (
-                <>
-                  <button
-                    onClick={() => setActiveFilter("2")}
-                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "2" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
-                  >
-                    <FaBook className="mr-2" /> Hobbi
-                  </button>
-                  <button
-                    onClick={() => setActiveFilter("3")}
-                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${activeFilter === "3" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
-                  >
-                    <MdComputer className="mr-2" /> IT
-                  </button>
-                </>
+              {isLoggedIn && (
+                <button
+                  onClick={() => setActiveFilter("myResources")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${activeFilter === "myResources" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
+                >
+                  My Resources
+                </button>
               )}
+              
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveFilter(category.id.toString())}
+                  className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${
+                    activeFilter === category.id.toString() ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {category.name === "IT" ? <MdComputer className="mr-2" /> : <MdBusiness className="mr-2" />}
+                  {category.name}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Add Resource Button */}
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleAddResourceClick}
           className="px-4 py-2 bg-[#451774] text-white text-sm rounded-lg hover:bg-[#3a115a] transition duration-300 mx-auto block mb-8"
         >
           Add Resource
@@ -402,6 +381,7 @@ export const Resources = () => {
                   value={newResource.categoryId}
                   onChange={handleInputChange}
                   className="block w-full mb-2 p-2 border border-gray-300 rounded"
+                  required
                 >
                   {categories.length > 0 ? (
                     categories.map(category => (
@@ -426,6 +406,7 @@ export const Resources = () => {
                   value={newResource.name}
                   onChange={handleInputChange}
                   className="block w-full mb-2 p-2 border border-gray-300 rounded"
+                  required
                 />
 
                 {/* Description */}
@@ -445,6 +426,7 @@ export const Resources = () => {
                   value={newResource.media}
                   onChange={handleInputChange}
                   className="block w-full mb-2 p-2 border border-gray-300 rounded"
+                  required
                 />
 
                 {/* Image URL */}
@@ -462,15 +444,27 @@ export const Resources = () => {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 bg-gray-400 text-white rounded"
+                    className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                    disabled={isUploading}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center"
+                    disabled={isUploading}
                   >
-                    Add Resource
+                    {isUploading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Uploading...
+                      </>
+                    ) : (
+                      "Add Resource"
+                    )}
                   </button>
                 </div>
               </form>
@@ -483,6 +477,15 @@ export const Resources = () => {
           {filteredResources.length > 0 ? (
             filteredResources.map((resource) => (
               <div key={resource.id} className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow duration-300">
+                {resource.image && (
+                  <div className="h-48 overflow-hidden">
+                    <img 
+                      src={resource.image} 
+                      alt={resource.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <div className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
@@ -498,37 +501,40 @@ export const Resources = () => {
                   </div>
                   <div className="mt-4">
                     <h3 className="text-lg font-medium text-gray-900 line-clamp-2">{resource.name}</h3>
-                    <p className="mt-1 text-sm text-gray-500">by {resource.user?.firstName || resource.author || "Unknown"}</p>
+                    <p className="mt-1 text-sm text-gray-500">by {resource.user?.firstName || "Unknown"}</p>
+                    <p className="mt-2 text-sm text-gray-600 line-clamp-3">{resource.description}</p>
                   </div>
                   <div className="mt-6 flex items-center justify-between">
                     <div className="flex items-center text-sm text-gray-500">
-                      <span>{resource.downloads ? resource.downloads.toLocaleString() : "0"} downloads</span>
+                      <span>{resource.downloads?.toLocaleString() || "0"} downloads</span>
                     </div>
                     <div className="text-sm text-gray-500">
-                      {resource.date ? new Date(resource.date).toLocaleDateString() : "N/A"}
+                      {new Date(resource.createdAt).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
                 <div className="bg-gray-50 px-6 py-4 flex justify-between">
                   <a
-                    href={resource.previewLink || resource.media || "#"}
+                    href={resource.media}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-sm font-medium text-[#451774] hover:text-[#451774]"
                   >
                     Preview
                   </a>
                   <div className="flex space-x-2">
-                    {/* Delete Button - Only show for resources created by current user */}
                     {isUserResource(resource) && (
                       <button
                         onClick={() => handleDelete(resource.id)}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700"
                       >
                         <FaTrash className="mr-1" /> Delete
                       </button>
                     )}
                     <a
-                      href={resource.downloadLink || resource.media || "#"}
-                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#451774] hover:bg-[#3a115a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      href={resource.media}
+                      download
+                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#451774] hover:bg-[#3a115a]"
                     >
                       <FaDownload className="mr-1" /> Download
                     </a>
@@ -544,50 +550,28 @@ export const Resources = () => {
           )}
         </div>
 
-        {/* Pagination (would be dynamic in a real application) */}
-        <div className="mt-12 flex justify-center">
-          <nav className="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-            <a
-              href="#"
-              className="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              Previous
-            </a>
-            <a
-              href="#"
-              className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-blue-600 hover:bg-gray-50"
-            >
-              1
-            </a>
-            <a
-              href="#"
-              className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              2
-            </a>
-            <a
-              href="#"
-              className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              3
-            </a>
-            <span className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-              ...
-            </span>
-            <a
-              href="#"
-              className="px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              8
-            </a>
-            <a
-              href="#"
-              className="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-            >
-              Next
-            </a>
-          </nav>
-        </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex justify-center">
+            <nav className="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              <button
+                onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+                disabled={pagination.currentPage === 1}
+                className="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              {renderPaginationButtons()}
+              <button
+                onClick={() => handlePageChange(Math.min(totalPages, pagination.currentPage + 1))}
+                disabled={pagination.currentPage === totalPages}
+                className="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </nav>
+          </div>
+        )}
       </div>
     </div>
   );
