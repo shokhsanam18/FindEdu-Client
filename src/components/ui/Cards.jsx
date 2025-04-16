@@ -10,8 +10,12 @@ import {
 import axios from "axios";
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
+import { useLocation } from "react-router-dom";
+
 import { Link } from "react-router-dom";
 import { useLikedStore, useSearchStore } from "../../Store.jsx";
 const MajorsApi = "https://findcourse.net.uz/api/major";
@@ -137,6 +141,7 @@ export const Cards = () => {
   useEffect(() => {
     fetchLiked(); // ← make sure likes are ready before rendering
   }, []);
+  const isMyCentersPage = location.pathname === "/MyCenters";
 
   // Fetch all data on component mount
   useEffect(() => {
@@ -239,6 +244,7 @@ export const Cards = () => {
 
   const getMajorName = (id) => majors.find((m) => m.id === id)?.name || id;
   const getRegionName = (id) => regions.find((r) => r.id === id)?.name || id;
+  const navigate = useNavigate();
 
   return (
     <div className="mb-16 mt-36">
@@ -382,6 +388,23 @@ export const Cards = () => {
                       <HeartOutline className="h-5 w-5 text-red-500" />
                     )}
                   </motion.button>
+
+                  {isMyCentersPage && (
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      key={center.id}
+                      className="absolute p-2 rounded-full top-3 right-3 mt-10 flex text-center items-center justify-center  bg-white/70 backdrop-blur-sm"
+                    >
+
+                      <button
+                        onClick={() => navigate(`/ceo/edit/${center.id}`)} // Ensure you're passing the correct ID
+                        className="flex items-center text-sm h-5 w-5  text-yellow-600"
+                      >
+                        <PencilSquareIcon className="w-4 h-4 ml-[2px]" />
+                      </button>
+                    </motion.div>
+                  )}
                 </div>
 
                 <div className="px-4 py-7 space-y-1.5">
