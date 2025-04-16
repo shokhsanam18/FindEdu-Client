@@ -353,29 +353,33 @@ export const Cards = () => {
         <div className="Main_Cards flex flex-wrap justify-center xl:gap-20 gap-6 mt-10">
           {filteredCenters.length > 0 ? (
             filteredCenters.map((center) => (
-
               <motion.div
                 key={center.id}
                 className="w-full max-w-sm overflow-hidden rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow bg"
                 whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }} >             
-                <Link to={`/centers/${center.id}`} onClick={() => window.scrollTo(0, 0)}>
+                transition={{ duration: 0.2 }}
+              >
                 <div className="relative h-48 overflow-hidden ">
-                  {center.imageUrl ? (
-                    <img
-                      className="w-full h-full object-cover"
-                      src={center.imageUrl}
-                      alt={center.name}
-                      onError={(e) => {
-                        e.target.style.display = "none";
-                        e.target.parentElement.classList.add("bg-gray-100");
-                      }}
-                    />
-                  ) : (
-                    <div className="h-full bg-gray-100 flex items-center justify-center">
-                      <MapPinIcon className="h-10 w-10 text-gray-400" />
-                    </div>
-                  )}
+                  <Link
+                    to={`/centers/${center.id}`}
+                    onClick={() => window.scrollTo(0, 0)}
+                  >
+                    {center.imageUrl ? (
+                      <img
+                        className="w-full h-full object-cover"
+                        src={center.imageUrl}
+                        alt={center.name}
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          e.target.parentElement.classList.add("bg-gray-100");
+                        }}
+                      />
+                    ) : (
+                      <div className="h-full bg-gray-100 flex items-center justify-center">
+                        <MapPinIcon className="h-10 w-10 text-gray-400" />
+                      </div>
+                    )}{" "}
+                  </Link>
 
                   <motion.button
                     className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm"
@@ -397,7 +401,6 @@ export const Cards = () => {
                       key={center.id}
                       className="absolute p-2 rounded-full top-3 right-3 mt-10 flex text-center items-center justify-center  bg-white/70 backdrop-blur-sm"
                     >
-
                       <button
                         onClick={() => navigate(`/ceo/edit/${center.id}`)} // Ensure you're passing the correct ID
                         className="flex items-center text-sm h-5 w-5  text-yellow-600"
@@ -408,46 +411,50 @@ export const Cards = () => {
                   )}
                 </div>
 
-                <div className="px-4 py-7 space-y-1.5">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-semibold truncate">
-                      {center.name}
-                    </h3>
-                    <div className="flex items-center space-x-1">
-                      <div className="relative w-5 h-5">
-                        {/* Gray base star (background) */}
-                        <StarIcon className="absolute text-gray-300 w-5 h-5" />
+                <Link
+                  to={`/centers/${center.id}`}
+                  onClick={() => window.scrollTo(0, 0)}
+                >
+                  <div className="px-4 py-7 space-y-1.5">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-xl font-semibold truncate">
+                        {center.name}
+                      </h3>
+                      <div className="flex items-center space-x-1">
+                        <div className="relative w-5 h-5">
+                          {/* Gray base star (background) */}
+                          <StarIcon className="absolute text-gray-300 w-5 h-5" />
 
-                        {/* Yellow overlay with dynamic width */}
-                        <div
-                          className="absolute overflow-hidden h-5"
-                          style={{ width: `${(center.rating / 5) * 100}%` }}
-                        >
-                          <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
+                          {/* Yellow overlay with dynamic width */}
+                          <div
+                            className="absolute overflow-hidden h-5"
+                            style={{ width: `${(center.rating / 5) * 100}%` }}
+                          >
+                            <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
+                          </div>
                         </div>
+
+                        <span className="text-sm font-medium text-gray-800">
+                          {center.rating?.toFixed(1) || "4.8"}
+                        </span>
                       </div>
-
-                      <span className="text-sm font-medium text-gray-800">
-                        {center.rating?.toFixed(1) || "4.8"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-gray-600 line-clamp-1">
-                    {center.address}
-                  </p>
-                  {/* // i changed */}
-                  <div className="flex items-center justify-between mt-1.5">
-                    <div className="flex items-center space-x-1 text-sm text-gray-500">
-                      <PhoneIcon className="h-4 w-4" />
-                      <a href={`tel:${center.phone || "+15551234567"}`}>
-                        <span>{center.phone || "+1 (555) 123-4567"}</span>
-                      </a>
                     </div>
 
-                  </div>
-                </div> </Link>
-              </motion.div> 
+                    <p className="text-sm text-gray-600 line-clamp-1">
+                      {center.address}
+                    </p>
+                    {/* // i changed */}
+                    <div className="flex items-center justify-between mt-1.5">
+                      <div className="flex items-center space-x-1 text-sm text-gray-500">
+                        <PhoneIcon className="h-4 w-4" />
+                        <a href={`tel:${center.phone || "+15551234567"}`}>
+                          <span>{center.phone || "+1 (555) 123-4567"}</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>{" "}
+                </Link>
+              </motion.div>
             ))
           ) : (
             <p className="text-center text-gray-600">
