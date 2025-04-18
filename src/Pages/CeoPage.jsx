@@ -142,7 +142,7 @@ export default function CeoPage() {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-white bg-cover bg-center mt-37 "
+        className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-white bg-cover bg-center mt-20 "
         style={{ backgroundImage: "url('/ceopage.png')" }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
