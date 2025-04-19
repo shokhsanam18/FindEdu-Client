@@ -229,7 +229,7 @@ const CenterDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 mt-42 md:mt-36">
+    <div className="min-h-screen bg-gray-100 mt-22 md:mt-20">
       {/* Back button */}
       <div className="container mx-auto px-4 mt-8 text-xl">
         <Link

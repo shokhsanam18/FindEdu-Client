@@ -9,9 +9,8 @@ import { MapPinIcon, PhoneIcon, StarIcon } from "lucide-react";
 import {
   HeartIcon as HeartOutline,
   HeartIcon as HeartSolid,
-} from "@heroicons/react/24/solid"; // or outline if needed
+} from "@heroicons/react/24/solid";
 
-const CentersApi = "https://findcourse.net.uz/api/centers";
 const ImageApi = "https://findcourse.net.uz/api/image";
 
 const Favorites = () => {
@@ -28,9 +27,14 @@ const Favorites = () => {
     const fetchLikedCenters = async () => {
       try {
         setLoading(true);
-        await fetchLiked(); // fetch likedItems first
+        await fetchLiked(); // Ensure we have the latest liked items
 
         const token = localStorage.getItem("accessToken");
+        if (!token) {
+          setAllCenters([]);
+          return;
+        }
+
         const res = await axios.get(
           "https://findcourse.net.uz/api/liked/query",
           {
@@ -43,24 +47,30 @@ const Favorites = () => {
         // Get detailed info for liked centers
         const centerDetails = await Promise.all(
           likedData.map(async (like) => {
-            const res = await axios.get(
-              `https://findcourse.net.uz/api/centers/${like.centerId}`
-            );
-            const center = res.data?.data;
-            const avgRating =
-              center.comments?.length > 0
-                ? center.comments.reduce((sum, c) => sum + c.star, 0) /
-                  center.comments.length
-                : 0;
-            return {
-              ...center,
-              imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
-              rating: avgRating,
-            };
+            try {
+              const res = await axios.get(
+                `https://findcourse.net.uz/api/centers/${like.centerId}`
+              );
+              const center = res.data?.data;
+              const avgRating =
+                center.comments?.length > 0
+                  ? center.comments.reduce((sum, c) => sum + c.star, 0) /
+                    center.comments.length
+                  : 0;
+              return {
+                ...center,
+                imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
+                rating: avgRating,
+              };
+            } catch (err) {
+              console.error("Failed to fetch center details", err);
+              return null;
+            }
           })
         );
 
-        setAllCenters(centerDetails);
+        // Filter out any null values from failed requests
+        setAllCenters(centerDetails.filter(center => center !== null));
       } catch (err) {
         console.error("Failed to fetch liked centers", err);
       } finally {
@@ -69,30 +79,55 @@ const Favorites = () => {
     };
 
     fetchLikedCenters();
-  }, []);
+  }, [fetchLiked]);
 
-  // const favoriteCenters = allCenters.filter((center) =>
-  //   isLiked(center.id)
-  // );
+  const handleLikeToggle = async (centerId) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      if (isLiked(centerId)) {
+        // Unlike the center
+        await axios.delete(
+          `https://findcourse.net.uz/api/liked/${centerId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+      } else {
+        // Like the center
+        await axios.post(
+          `https://findcourse.net.uz/api/liked/${centerId}`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+      }
+
+      // Toggle in local state
+      toggleLike(centerId);
+
+      // Update the centers list by removing the unliked center
+      setAllCenters(prev => 
+        isLiked(centerId) 
+          ? prev.filter(center => center.id !== centerId)
+          : prev
+      );
+    } catch (err) {
+      console.error("Failed to toggle like", err);
+    }
+  };
 
   const filteredFavorites = allCenters.filter((center) => {
+    if (!center) return false;
+    
     const term = searchTerm.toLowerCase();
     const nameMatch = center.name?.toLowerCase().includes(term);
     const addressMatch = center.address?.toLowerCase().includes(term);
     const majorMatch = center.majors?.some((major) =>
       major.name?.toLowerCase().includes(term)
     );
-    if (searchTerm.trim() !== "") {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter((center) => {
-        const nameMatch = center.name?.toLowerCase().includes(term);
-        const addressMatch = center.address?.toLowerCase().includes(term);
-        const majorMatch = center.majors?.some((major) =>
-          major.name?.toLowerCase().includes(term)
-        );
-        return nameMatch || addressMatch || majorMatch;
-      });
-    }
 
     return nameMatch || addressMatch || majorMatch;
   });
@@ -108,7 +143,7 @@ const Favorites = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
         </div>
       ) : allCenters.length === 0 ? (
-        <p>You haven’t liked any centers yet.</p>
+        <p>You haven't liked any centers yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFavorites.map((center) => (
@@ -139,7 +174,7 @@ const Favorites = () => {
                   className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => toggleLike(center.id)}
+                  onClick={() => handleLikeToggle(center.id)}
                 >
                   {isLiked(center.id) ? (
                     <HeartSolid className="h-5 w-5 text-red-500" />
@@ -156,10 +191,7 @@ const Favorites = () => {
                   </h3>
                   <div className="flex items-center space-x-1">
                     <div className="relative w-5 h-5">
-                      {/* Gray base star (background) */}
                       <StarIcon className="absolute text-gray-300 w-5 h-5" />
-
-                      {/* Yellow overlay with dynamic width */}
                       <div
                         className="absolute overflow-hidden h-5"
                         style={{ width: `${(center.rating / 5) * 100}%` }}
@@ -167,7 +199,6 @@ const Favorites = () => {
                         <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
                       </div>
                     </div>
-
                     <span className="text-sm font-medium text-gray-800">
                       {center.rating?.toFixed(1) || "4.8"}
                     </span>

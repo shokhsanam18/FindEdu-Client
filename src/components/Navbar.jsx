@@ -357,7 +357,7 @@ export default function Navbar() {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="bg-white flex justify-center w-full md:w-3/4 mx-auto items-center">
+      {/* <div className="bg-white flex justify-center w-full md:w-3/4 mx-auto items-center">
         <div className="container  flex items-center rounded-full border-2 border-[#461773] text-[#000000]">
           <div className="flex-grow">
             <Input
@@ -387,85 +387,10 @@ export default function Navbar() {
                 </SelectContent>
               </Select>
             </div>
-            {/* <div className="border-l border-[#000000]">
-              <Select onValueChange={handleLevelChange} value={level}>
-                <SelectTrigger
-                  className="w-[80px] md:w-[100px] lg:w-[140px] border-none bg-transparent text-left rounded-none focus-visible:ring-0 pl-2 md:pl-4"
-                  style={{ color: "#000000" }}
-                >
-                  <SelectValue placeholder="Darajasi →" />
-                </SelectTrigger>
-                <SelectContent>
-                  {levels
-                    .filter((item) => item.value !== "")
-                    .map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="border-l border-[#000000]">
-              <Select onValueChange={handleStudyTypeChange} value={studyType}>
-                <SelectTrigger
-                  className="w-[90px] md:w-[120px] lg:w-[160px] border-none bg-transparent text-left rounded-none focus-visible:ring-0 pl-2 md:pl-4"
-                  style={{ color: "#000000" }}
-                >
-                  <SelectValue placeholder="O'qish turi →" />
-                </SelectTrigger>
-                <SelectContent>
-                  {studyTypes
-                    .filter((item) => item.value !== "")
-                    .map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="border-l border-[#000000]">
-              <Select onValueChange={handleDirectionChange} value={direction}>
-                <SelectTrigger
-                  className="w-[80px] md:w-[100px] lg:w-[140px] border-none bg-transparent text-left rounded-none focus-visible:ring-0 pl-2 md:pl-4"
-                  style={{ color: "#000000" }}
-                >
-                  <SelectValue placeholder="Yo'nalish →" />
-                </SelectTrigger>
-                <SelectContent>
-                  {directions
-                    .filter((item) => item.value !== "")
-                    .map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="border-l border-[#000000]">
-              <Select onValueChange={handlePriceChange} value={price}>
-                <SelectTrigger
-                  className="w-[60px] md:w-[80px] lg:w-[100px] border-none bg-transparent text-left rounded-none focus-visible:ring-0 pl-2 md:pl-4"
-                  style={{ color: "#000000" }}
-                >
-                  <SelectValue placeholder="Narxi →" />
-                </SelectTrigger>
-                <SelectContent>
-                  {prices
-                    .filter((item) => item.value !== "")
-                    .map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div> */}
+            
           </div>
         </div>
-      </div>
+      </div> */}
     </nav>
   );
 }
