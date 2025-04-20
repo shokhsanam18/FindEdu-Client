@@ -100,6 +100,14 @@ const Favorites = () => {
 
     fetchAll();
   }, []);
+
+
+  useEffect(() => {
+    if (!user) {
+      // User has just logged out
+      setAllCenters([]);  // Clear displayed centers
+    }
+  }, [user]);
   
   useEffect(() => {
     const user = useAuthStore.getState().user;

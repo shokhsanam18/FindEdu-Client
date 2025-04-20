@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import axios from "axios";
 import {
   MapPin,
@@ -69,43 +70,53 @@ const CenterDetail = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        // Fetch center data
+    
+        // Fetch center
         const centerRes = await axios.get(`${API_BASE}/api/centers/${id}`);
         const centerData = centerRes.data?.data;
-
-        // Fetch majors for this center
+    
+        // Fetch majors
         const majorsRes = await axios.get(`${API_BASE}/api/major/query`);
         const majorsData = majorsRes.data?.data || [];
-
-        // Mock branches data - replace with actual API call if available
-        const mockBranches = [
-          { id: 1, name: "Main Branch", address: centerData.address },
+    
+        // Fetch branches (filials)
+        const filialRes = await axios.get(`${API_BASE}/api/filials`, {
+          params: { centerId: centerData.id },
+        });
+        const filials = filialRes.data?.data || [];
+    
+        // Construct dynamic branch list
+        const dynamicBranches = [
           {
-            id: 2,
-            name: "Downtown Branch",
-            address: "456 Business Ave, Tashkent",
+            id: "main",
+            name: "Main Branch",
+            address: centerData.address,
           },
-          { id: 3, name: "North Branch", address: "789 Park Blvd, Tashkent" },
+          ...filials.map((filial) => ({
+            id: filial.id,
+            name: filial.region?.name || `Region ${filial.regionId}`,
+            address: filial.address,
+          })),
         ];
-
+    
+        // Calculate avg rating
         const comments = centerData.comments || [];
         const avgRating =
           comments.length > 0
             ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
             : 0;
-
+    
         setCenter({
           ...centerData,
           rating: avgRating,
           imageUrl: centerData.image ? `${ImageApi}/${centerData.image}` : null,
         });
-
+    
+        setBranches(dynamicBranches);
+        setSelectedBranch(dynamicBranches[0]);
         setMajors(majorsData);
-        setBranches(mockBranches);
-        setSelectedBranch(mockBranches[0]);
         setSelectedMajor(majorsData[0]);
-
+    
         await fetchCommentsByCenter(id);
       } catch (err) {
         setError("Failed to load center info");
@@ -176,6 +187,8 @@ const CenterDetail = () => {
     setEditCommentText("");
     setEditCommentStar(5);
   };
+
+  
 
  
   if (loading) {
@@ -389,12 +402,12 @@ const CenterDetail = () => {
     )}
   </p>
 </div>
-                  <div>
+                  {/* <div>
                     <h3 className="text-sm font-medium text-gray-500">Email</h3>
                     <p className="mt-1 text-lg font-medium">
                       {center.email || "Not provided"}
                     </p>
-                  </div>
+                  </div> */}
                   {center.website && (
                     <div className="md:col-span-2">
                       <h3 className="text-sm font-medium text-gray-500">
@@ -422,13 +435,19 @@ const CenterDetail = () => {
                 </div>
 
                 <div className="mt-5">
-                  <button
-                    onClick={() => setShowReservationModal(true)}
-                    className="px-4 py-3 text-lg bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
-                  >
-                    <Clock className="h-5 w-5 mr-2 " />
-                    Register for a Class
-                  </button>
+                <button
+                  onClick={() => {
+                    if (!user || !user?.data?.id) {
+                      toast.warning("Please login to register for a class.");
+                      return;
+                    }
+                    setShowReservationModal(true);
+                  }}
+                  className="px-4 py-3 text-lg bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
+                >
+                  <Clock className="h-5 w-5 mr-2" />
+                  Register for a Class
+                </button>
                 </div>
               </div>
 
