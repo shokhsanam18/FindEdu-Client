@@ -42,28 +42,28 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-login: async (values) => {
-  try {
-    const res = await axios.post(`${API_BASE}/users/login`, values);
-    const { accessToken, refreshToken } = res.data;
+  login: async (values) => {
+    try {
+      const res = await axios.post(`${API_BASE}/users/login`, values);
+      const { accessToken, refreshToken } = res.data;
 
-    if (accessToken && refreshToken) {
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      set({ accessToken, refreshToken });
+      if (accessToken && refreshToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        set({ accessToken, refreshToken });
 
-      const user = await get().fetchUserData();
-      return { success: true, role: user?.role };
+        const user = await get().fetchUserData();
+        return { success: true, role: user?.role };
+      }
+
+      return { success: false, message: "Invalid credentials" };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Login failed",
+      };
     }
-
-    return { success: false, message: "Invalid credentials" };
-  } catch (error) {
-    return { 
-      success: false, 
-      message: error.response?.data?.message || "Login failed" 
-    };
-  }
-},
+  },
 
   refreshTokenFunc: async (shouldLogout = true) => {
     const refreshToken = get().refreshToken;
@@ -223,74 +223,133 @@ export const useSidebarStore = create((set) => ({
   openSidebar: () => set(() => ({ side: true })),
 }));
 
-export const useLikedStore = create((set, get) => ({
-  likedItems: [], // Array of { centerId, id (likeId) }
-  loading: false,
+export const useLikedStore = create(
+  persist(
+    (set, get) => ({
+      likedItems: [],
+      loading: false,
 
-  fetchLiked: async () => {
-    set({ loading: true });
-    try {
-      const token = localStorage.getItem("accessToken");
-      const res = await axios.get(`${API_BASE}/liked/query`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const liked = res.data?.data || [];
+      fetchLiked: async () => {
+        set({ loading: true });
+        try {
+          const token = localStorage.getItem("accessToken");
+          if (!token) return;
 
-      // Save both centerId and the likeId (id) from the backend
-      const likedItems = liked.map((item) => ({
-        centerId: item.centerId,
-        id: item.id,
-      }));
-
-      set({ likedItems });
-    } catch (err) {
-      console.error("Failed to fetch liked centers", err);
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  toggleLike: async (centerId) => {
-    const { likedItems } = get();
-    const token = localStorage.getItem("accessToken");
-
-    const existing = likedItems.find((item) => item.centerId === centerId);
-
-    try {
-      if (existing) {
-        // Unlike using `likeId` (not centerId)
-        await axios.delete(`${API_BASE}/liked/${existing.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        set({
-          likedItems: likedItems.filter((item) => item.centerId !== centerId),
-        });
-      } else {
-        // Like
-        const res = await axios.post(
-          `${API_BASE}/liked`,
-          { centerId },
-          {
+          const res = await axios.get(`${API_BASE}/liked`, {
             headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const newLike = res.data?.data;
-        if (newLike?.id) {
-          set({
-            likedItems: [...likedItems, { centerId, id: newLike.id }],
           });
+
+          set({
+            likedItems: res.data.data.map((item) => ({
+              centerId: item.centerId,
+              likeId: item.id, // Changed from 'id' to 'likeId' for clarity
+            })),
+          });
+        } catch (err) {
+          console.error("Failed to fetch likes:", err);
+          toast.error("Failed to load favorites");
+        } finally {
+          set({ loading: false });
         }
-      }
-    } catch (err) {
-      console.error("Toggle like error", err);
+      },
+
+      toggleLike: async (centerId) => {
+        const { likedItems, fetchLiked } = get();
+        const token = localStorage.getItem("accessToken");
+
+        if (!token) {
+          toast.error("Please login to manage favorites");
+          return false;
+        }
+
+        set({ loading: true });
+        const existing = likedItems.find((item) => item.centerId === centerId);
+
+        try {
+          if (existing) {
+            // First try: Delete with centerId in body
+            try {
+              const res = await axios.delete(`${API_BASE}/liked`, {
+                data: { centerId },
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              });
+
+              if (res.data.success) {
+                set({
+                  likedItems: likedItems.filter(
+                    (item) => item.centerId !== centerId
+                  ),
+                });
+                toast.success("Removed from favorites");
+                return true;
+              }
+            } catch (firstError) {
+              console.log("First delete attempt failed, trying alternative...");
+
+              // Fallback: Delete with likeId in URL
+              const res = await axios.delete(
+                `${API_BASE}/liked/${existing.likeId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+
+              if (res.data.success) {
+                set({
+                  likedItems: likedItems.filter(
+                    (item) => item.centerId !== centerId
+                  ),
+                });
+                toast.success("Removed from favorites");
+              }
+            }
+          } else {
+            // Add like
+            const res = await axios.post(
+              `${API_BASE}/liked`,
+              { centerId },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            if (res.data?.data?.id) {
+              set({
+                likedItems: [
+                  ...likedItems,
+                  {
+                    centerId,
+                    likeId: res.data.data.id,
+                  },
+                ],
+              });
+              toast.success("Added to favorites");
+            }
+          }
+          return true;
+        } catch (err) {
+          console.error("Error:", err.response?.data || err.message);
+          toast.error(err.response?.data?.message || "Operation failed");
+          return false;
+        } finally {
+          set({ loading: false });
+          await fetchLiked(); // Refresh the list
+        }
+      },
+
+      isLiked: (centerId) =>
+        get().likedItems.some((item) => item.centerId === centerId),
+    }),
+    {
+      name: "liked-storage",
+      storage: createJSONStorage(() => localStorage),
     }
-  },
-
-  isLiked: (centerId) =>
-    get().likedItems.some((item) => item.centerId === centerId),
-}));
-
+  )
+);
 export const useCommentStore = create((set, get) => ({
   comments: [],
   loading: false,
@@ -339,7 +398,9 @@ export const useCommentStore = create((set, get) => ({
       }
     } catch (err) {
       console.error("Post comment error", err);
-      toast.error(err.response?.data?.message || "Failed to post comment. Login first!");
+      toast.error(
+        err.response?.data?.message || "Failed to post comment. Login first!"
+      );
     }
   },
 
@@ -417,19 +478,20 @@ export const useCardStore = create((set, get) => ({
       const majors = majorsRes.data.data || [];
       const regions = regionsRes.data.data || [];
 
-      const centers = centersRes.data.data?.map((center) => {
-        const comments = center.comments || [];
-        const avgRating =
-          comments.length > 0
-            ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
-            : 0;
+      const centers =
+        centersRes.data.data?.map((center) => {
+          const comments = center.comments || [];
+          const avgRating =
+            comments.length > 0
+              ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
+              : 0;
 
-        return {
-          ...center,
-          imageUrl: center.image ? `${API_BASE}/image/${center.image}` : null,
-          rating: avgRating,
-        };
-      }) || [];
+          return {
+            ...center,
+            imageUrl: center.image ? `${API_BASE}/image/${center.image}` : null,
+            rating: avgRating,
+          };
+        }) || [];
 
       set({
         majors,
@@ -448,7 +510,7 @@ export const useCardStore = create((set, get) => ({
     if (!Array.isArray(selected)) selected = [];
     set({ selectedMajors: selected }, get().filterCenters);
   },
-  
+
   setSelectedRegions: (selected) => {
     if (!Array.isArray(selected)) selected = [];
     set({ selectedRegions: selected }, get().filterCenters);
@@ -489,10 +551,9 @@ export const useCardStore = create((set, get) => ({
     }
 
     set({ filteredCenters: filtered });
-    console.log(filtered)
+    console.log(filtered);
   },
 }));
-
 
 export const useModalStore = create((set) => ({
   isModalOpen: false,

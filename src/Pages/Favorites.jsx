@@ -1,127 +1,93 @@
-// src/pages/Favorites.jsx
-
 import { useEffect, useState } from "react";
 import { useLikedStore, useSearchStore } from "../Store";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MapPinIcon, PhoneIcon, StarIcon } from "lucide-react";
-import {
-  HeartIcon as HeartOutline,
-  HeartIcon as HeartSolid,
-} from "@heroicons/react/24/solid";
+import { MapPin, Phone, Star, Loader2 } from "lucide-react";
+import { Heart as HeartSolid } from "lucide-react";
+import { toast } from "sonner";
 
-const ImageApi = "https://findcourse.net.uz/api/image";
+const API_BASE = "https://findcourse.net.uz";
+const ImageApi = `${API_BASE}/api/image`;
 
 const Favorites = () => {
-  const { likedItems, isLiked, toggleLike, fetchLiked } = useLikedStore();
-  const [allCenters, setAllCenters] = useState([]);
+  const {
+    likedItems,
+    isLiked,
+    toggleLike,
+    loading: likesLoading,
+  } = useLikedStore();
+  const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const searchTerm = useSearchStore((state) => state.searchTerm);
-
-  useEffect(() => {
-    fetchLiked();
-  }, []);
 
   useEffect(() => {
     const fetchLikedCenters = async () => {
       try {
         setLoading(true);
-        await fetchLiked(); // Ensure we have the latest liked items
 
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-          setAllCenters([]);
+        if (likedItems.length === 0) {
+          setCenters([]);
           return;
         }
 
-        const res = await axios.get(
-          "https://findcourse.net.uz/api/liked/query",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const likedData = res.data?.data || [];
-
-        // Get detailed info for liked centers
-        const centerDetails = await Promise.all(
-          likedData.map(async (like) => {
+        // Fetch all liked centers details
+        const centersData = await Promise.all(
+          likedItems.map(async (item) => {
             try {
               const res = await axios.get(
-                `https://findcourse.net.uz/api/centers/${like.centerId}`
+                `${API_BASE}/api/centers/${item.centerId}`
               );
               const center = res.data?.data;
+
+              // Calculate average rating
+              const comments = center.comments || [];
               const avgRating =
-                center.comments?.length > 0
-                  ? center.comments.reduce((sum, c) => sum + c.star, 0) /
-                    center.comments.length
+                comments.length > 0
+                  ? comments.reduce((sum, c) => sum + c.star, 0) /
+                    comments.length
                   : 0;
+
               return {
                 ...center,
                 imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
                 rating: avgRating,
               };
             } catch (err) {
-              console.error("Failed to fetch center details", err);
+              console.error(`Failed to fetch center ${item.centerId}`, err);
               return null;
             }
           })
         );
 
-        // Filter out any null values from failed requests
-        setAllCenters(centerDetails.filter(center => center !== null));
+        // Filter out any failed requests
+        setCenters(centersData.filter((center) => center !== null));
       } catch (err) {
         console.error("Failed to fetch liked centers", err);
+        toast.error("Failed to load favorites");
       } finally {
         setLoading(false);
       }
     };
 
     fetchLikedCenters();
-  }, [fetchLiked]);
+  }, [likedItems]);
 
   const handleLikeToggle = async (centerId) => {
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
+      await toggleLike(centerId);
 
       if (isLiked(centerId)) {
-        // Unlike the center
-        await axios.delete(
-          `https://findcourse.net.uz/api/liked/${centerId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-      } else {
-        // Like the center
-        await axios.post(
-          `https://findcourse.net.uz/api/liked/${centerId}`,
-          {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        setCenters((prev) => prev.filter((center) => center.id !== centerId));
       }
-
-      // Toggle in local state
-      toggleLike(centerId);
-
-      // Update the centers list by removing the unliked center
-      setAllCenters(prev => 
-        isLiked(centerId) 
-          ? prev.filter(center => center.id !== centerId)
-          : prev
-      );
     } catch (err) {
-      console.error("Failed to toggle like", err);
+      toast.error("Failed to update favorites");
     }
   };
 
-  const filteredFavorites = allCenters.filter((center) => {
+  const filteredFavorites = centers.filter((center) => {
     if (!center) return false;
-    
+
     const term = searchTerm.toLowerCase();
     const nameMatch = center.name?.toLowerCase().includes(term);
     const addressMatch = center.address?.toLowerCase().includes(term);
@@ -133,17 +99,34 @@ const Favorites = () => {
   });
 
   return (
-    <div className="mt-50 mb-20 mx-auto flex flex-col px-[5%]">
+    <div className="mt-20 mb-20 mx-auto flex flex-col px-[5%]">
       <h1 className="text-4xl font-bold text-[#451774] text-center mb-12">
         Your Favorite Centers
       </h1>
 
-      {loading ? (
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      {loading || likesLoading ? (
+        <div className="flex justify-center items-center min-h-[300px]">
+          <Loader2 className="animate-spin h-12 w-12 text-purple-500" />
         </div>
-      ) : allCenters.length === 0 ? (
-        <p>You haven't liked any centers yet.</p>
+      ) : centers.length === 0 ? (
+        <div className="text-center py-12">
+          <HeartSolid className="mx-auto h-12 w-12 text-gray-400" />
+          <p className="mt-4 text-lg text-gray-600">
+            You haven't liked any centers yet.
+          </p>
+          <Link
+            to="/"
+            className="mt-4 inline-block text-purple-600 hover:text-purple-800 font-medium"
+          >
+            Browse Centers
+          </Link>
+        </div>
+      ) : filteredFavorites.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-lg text-gray-600">
+            No favorites match your search.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFavorites.map((center) => (
@@ -166,7 +149,7 @@ const Favorites = () => {
                   />
                 ) : (
                   <div className="h-full bg-gray-100 flex items-center justify-center">
-                    <MapPinIcon className="h-10 w-10 text-gray-400" />
+                    <MapPin className="h-10 w-10 text-gray-400" />
                   </div>
                 )}
 
@@ -176,11 +159,13 @@ const Favorites = () => {
                   whileTap={{ scale: 0.9 }}
                   onClick={() => handleLikeToggle(center.id)}
                 >
-                  {isLiked(center.id) ? (
-                    <HeartSolid className="h-5 w-5 text-red-500" />
-                  ) : (
-                    <HeartOutline className="h-5 w-5 text-red-500" />
-                  )}
+                  <HeartSolid
+                    className={`h-5 w-5 ${
+                      isLiked(center.id)
+                        ? "text-red-500 fill-red-500"
+                        : "text-gray-400"
+                    }`}
+                  />
                 </motion.button>
               </div>
 
@@ -191,12 +176,12 @@ const Favorites = () => {
                   </h3>
                   <div className="flex items-center space-x-1">
                     <div className="relative w-5 h-5">
-                      <StarIcon className="absolute text-gray-300 w-5 h-5" />
+                      <Star className="absolute text-gray-300 w-5 h-5" />
                       <div
                         className="absolute overflow-hidden h-5"
                         style={{ width: `${(center.rating / 5) * 100}%` }}
                       >
-                        <StarIcon className="text-yellow-500 w-5 h-5 fill-yellow-500" />
+                        <Star className="text-yellow-500 w-5 h-5 fill-yellow-500" />
                       </div>
                     </div>
                     <span className="text-sm font-medium text-gray-800">
@@ -211,14 +196,14 @@ const Favorites = () => {
 
                 <div className="flex items-center justify-between mt-1.5">
                   <div className="flex items-center space-x-1 text-sm text-gray-500">
-                    <PhoneIcon className="h-4 w-4" />
-                    <span>{center.phone || "+1 (555) 123-4567"}</span>
+                    <Phone className="h-4 w-4" />
+                    <span>{center.phone || "Not provided"}</span>
                   </div>
                   <Link
                     to={`/centers/${center.id}`}
                     className="text-sm font-medium text-purple-800 hover:underline"
                   >
-                    Details
+                    View Details
                   </Link>
                 </div>
               </div>

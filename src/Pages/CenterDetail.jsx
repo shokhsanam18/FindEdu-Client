@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { toast } from "sonner";
 import {
   MapPin,
   Star,
@@ -21,6 +22,7 @@ import {
   ChevronDown,
   Briefcase,
   Bookmark,
+  Loader2,
 } from "lucide-react";
 import { useLikedStore, useCommentStore, useAuthStore } from "../Store";
 
@@ -46,7 +48,12 @@ const CenterDetail = () => {
   const [reservationError, setReservationError] = useState(null);
   const [reservationSuccess, setReservationSuccess] = useState(false);
 
-  const { toggleLike, isLiked } = useLikedStore();
+  const {
+    toggleLike,
+    isLiked,
+    loading: likeLoading,
+    fetchLikes,
+  } = useLikedStore();
   const liked = isLiked(Number(id));
 
   const {
@@ -107,6 +114,11 @@ const CenterDetail = () => {
         setSelectedMajor(majorsData[0]);
 
         await fetchCommentsByCenter(id);
+
+        // Fetch likes if user is authenticated
+        if (user) {
+          await fetchLikes();
+        }
       } catch (err) {
         setError("Failed to load center info");
         console.error(err);
@@ -117,7 +129,20 @@ const CenterDetail = () => {
     };
 
     fetchData();
-  }, [id, navigate]);
+  }, [id, navigate, user]);
+
+  const handleLikeClick = async () => {
+    if (!user) {
+      navigate("/login", { state: { from: `/centers/${id}` } });
+      return;
+    }
+
+    try {
+      await toggleLike(Number(id));
+    } catch (err) {
+      console.error("Failed to toggle like:", err);
+    }
+  };
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
@@ -170,7 +195,28 @@ const CenterDetail = () => {
     setEditCommentStar(5);
   };
 
- 
+  const PostRegisteration = () => {
+    const existingData = JSON.parse(localStorage.getItem("RegisterData")) || [];
+
+    const newRegister = {
+      id: id,
+      branch: selectedBranch.name,
+      address: center.address,
+      majorId: selectedMajor.id,
+      majorName: center.name,
+      visitDate: visitDate,
+    };
+    const index = existingData.findIndex((item) => item.id === id);
+
+    if (index !== -1) {
+      existingData[index] = newRegister;
+    } else {
+      existingData.push(newRegister);
+    }
+
+    localStorage.setItem("RegisterData", JSON.stringify(existingData));
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -206,28 +252,6 @@ const CenterDetail = () => {
     );
   }
 
-  const PostRegisteration = () => {
-    const existingData = JSON.parse(localStorage.getItem("RegisterData")) || [];
-
-    const newRegister = {
-      id: id,
-      branch: selectedBranch.name,
-      address: center.address,
-      majorId: selectedMajor.id,
-      majorName: center.name,
-      visitDate: visitDate,
-    };
-    const index = existingData.findIndex((item) => item.id === id);
-
-    if (index !== -1) {
-      existingData[index] = newRegister;
-    } else {
-      existingData.push(newRegister);
-    }
-
-    localStorage.setItem("RegisterData", JSON.stringify(existingData));
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 mt-22 md:mt-20">
       {/* Back button */}
@@ -242,7 +266,7 @@ const CenterDetail = () => {
       </div>
 
       {/* Main content */}
-      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row  ">
+      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -250,38 +274,41 @@ const CenterDetail = () => {
           className="flex rounded-xl shadow-lg overflow-hidden flex-col md:flex-row w-full bg-white"
         >
           {/* Left column with image and branches */}
-          <div className="md:w-2/5 flex flex-col ">
+          <div className="md:w-2/5 flex flex-col">
             {/* Center image */}
             <div className="relative w-full h-64 sm:h-100 overflow-hidden">
-  {center.imageUrl ? (
-    <img
-      src={center.imageUrl}
-      alt={center.name}
-      className="w-full h-full object-cover"
-      onError={(e) => {
-        e.currentTarget.style.display = "none";
-        e.currentTarget.parentElement.classList.add("bg-gray-200");
-      }}
-    />
-  ) : (
-    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-      <MapPin className="h-16 w-16 text-gray-400" />
-    </div>
-  )}
+              {center.imageUrl ? (
+                <img
+                  src={center.imageUrl}
+                  alt={center.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                    e.currentTarget.parentElement.classList.add("bg-gray-200");
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <MapPin className="h-16 w-16 text-gray-400" />
+                </div>
+              )}
 
-  <motion.button
-    className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-md"
-    whileHover={{ scale: 1.1 }}
-    whileTap={{ scale: 0.9 }}
-    onClick={() => toggleLike(Number(id))}
-  >
-    {liked ? (
-      <Heart className="h-6 w-6 text-red-500 fill-red-500" />
-    ) : (
-      <Heart className="h-6 w-6 text-red-500" />
-    )}
-  </motion.button>
-</div>
+              <motion.button
+                className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-md"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleLikeClick}
+                disabled={likeLoading}
+              >
+                {likeLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
+                ) : liked ? (
+                  <Heart className="h-6 w-6 text-red-500 fill-red-500" />
+                ) : (
+                  <Heart className="h-6 w-6 text-red-500" />
+                )}
+              </motion.button>
+            </div>
 
             {/* Branches section */}
             <div className="p-4 bg-white border-t">
@@ -290,7 +317,7 @@ const CenterDetail = () => {
                 {branches.map((branch) => (
                   <div
                     key={branch.id}
-                    className={`p-3 rounded-lg cursor-pointer transition-colors  ${
+                    className={`p-3 rounded-lg cursor-pointer transition-colors ${
                       selectedBranch?.id === branch.id
                         ? "bg-purple-100 border border-purple-300"
                         : "bg-gray-50 hover:bg-gray-100"
@@ -309,22 +336,22 @@ const CenterDetail = () => {
                 Available Courses
               </h2>
 
-              <div className=" gap-2 px-5 flex flex-row flex-wrap">
+              <div className="gap-2 px-5 flex flex-row flex-wrap">
                 {majors.map((major) => (
                   <motion.div
                     key={major.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className={`bg-white border border-gray-200 rounded-xl  overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
+                    className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
                       selectedMajor?.id === major.id
                         ? "ring-2 ring-purple-500"
                         : ""
                     }`}
                     onClick={() => setSelectedMajor(major)}
                   >
-                    <div className="p-2 ">
-                      <div className="flex items-start  ">
+                    <div className="p-2">
+                      <div className="flex items-start">
                         <div className="flex-shrink-0 p-2 bg-purple-100 rounded-lg text-purple-600">
                           <Bookmark className="h-4 w-4" />
                         </div>
@@ -342,8 +369,6 @@ const CenterDetail = () => {
                 ))}
               </div>
             </div>
-
-            {/* Registration button */}
           </div>
 
           {/* Right column with details */}
@@ -369,19 +394,22 @@ const CenterDetail = () => {
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-  <h3 className="text-sm font-medium text-gray-500">Phone</h3>
-  <p className="mt-1 text-lg font-medium flex items-center">
-    <Phone className="h-5 w-5 mr-2" />
-    {center.phone ? (
-      <a href={`tel:${center.phone.replace(/[^\d+]/g, '')}`} className="hover:text-purple-500">
-        {center.phone}
-      </a>
-    ) : (
-      "Not provided"
-    )}
-  </p>
-</div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Phone</h3>
+                    <p className="mt-1 text-lg font-medium flex items-center">
+                      <Phone className="h-5 w-5 mr-2" />
+                      {center.phone ? (
+                        <a
+                          href={`tel:${center.phone.replace(/[^\d+]/g, "")}`}
+                          className="hover:text-purple-500"
+                        >
+                          {center.phone}
+                        </a>
+                      ) : (
+                        "Not provided"
+                      )}
+                    </p>
+                  </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Email</h3>
                     <p className="mt-1 text-lg font-medium">
@@ -419,7 +447,7 @@ const CenterDetail = () => {
                     onClick={() => setShowReservationModal(true)}
                     className="px-4 py-3 text-lg bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
                   >
-                    <Clock className="h-5 w-5 mr-2 " />
+                    <Clock className="h-5 w-5 mr-2" />
                     Register for a Class
                   </button>
                 </div>
@@ -452,7 +480,7 @@ const CenterDetail = () => {
                           type="button"
                           key={star}
                           onClick={() => setNewComment({ ...newComment, star })}
-                          className="focus:outline-none "
+                          className="focus:outline-none"
                         >
                           <Star
                             className={`h-5 w-5 ${
@@ -490,106 +518,115 @@ const CenterDetail = () => {
                         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
                       )
                       .map((comment) => (
-<div
-  key={comment.id}
-  className="bg-gray-50 p-4 rounded-lg"
->
-  {editingCommentId === comment.id ? (
-    <div className="space-y-2">
-      <textarea
-        value={editCommentText}
-        onChange={(e) => setEditCommentText(e.target.value)}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-        rows={3}
-      />
-      <div className="flex items-center">
-        <span className="mr-2">Rating:</span>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            type="button"
-            key={star}
-            onClick={() => setEditCommentStar(star)}
-            className="focus:outline-none"
-          >
-            <Star
-              className={`h-5 w-5 ${
-                star <= editCommentStar
-                  ? "text-yellow-500 fill-yellow-500"
-                  : "text-gray-300"
-              }`}
-            />
-          </button>
-        ))}
-      </div>
-      <div className="flex justify-end space-x-2">
-        <button
-          onClick={cancelEditing}
-          className="px-3 py-1 text-gray-600 hover:text-gray-800"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleUpdateComment}
-          className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  ) : (
-    <>
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-        <div className="flex items-center flex-wrap gap-2">
-          <User className="h-5 w-5 text-gray-400" />
-          <span className="font-medium text-sm sm:text-base break-words max-w-full">
-            {comment.user?.firstName && comment.user?.lastName
-              ? `${comment.user.firstName} ${comment.user.lastName}`
-              : "Anonymous"}
-          </span>
-          <div className="flex items-center">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`h-4 w-4 ${
-                  i < comment.star
-                    ? "text-yellow-500 fill-yellow-500"
-                    : "text-gray-300"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
-          <Calendar className="h-4 w-4 flex-shrink-0" />
-          <span className="whitespace-nowrap">
-            {new Date(
-              comment.createdAt || comment.updatedAt || Date.now()
-            ).toLocaleDateString()}
-          </span>
-          {user?.data?.id === comment.user?.id && (
-            <div className="flex items-center gap-2 ml-1">
-              <button
-                onClick={() => startEditingComment(comment)}
-                className="text-blue-500 hover:text-blue-700 whitespace-nowrap"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDeleteComment(comment.id)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-      <p className="mt-2 text-gray-700 text-sm sm:text-base break-words">
-        {comment.text || comment.content}
-      </p>
-    </>
-  )}
-</div>
+                        <div
+                          key={comment.id}
+                          className="bg-gray-50 p-4 rounded-lg"
+                        >
+                          {editingCommentId === comment.id ? (
+                            <div className="space-y-2">
+                              <textarea
+                                value={editCommentText}
+                                onChange={(e) =>
+                                  setEditCommentText(e.target.value)
+                                }
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                rows={3}
+                              />
+                              <div className="flex items-center">
+                                <span className="mr-2">Rating:</span>
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <button
+                                    type="button"
+                                    key={star}
+                                    onClick={() => setEditCommentStar(star)}
+                                    className="focus:outline-none"
+                                  >
+                                    <Star
+                                      className={`h-5 w-5 ${
+                                        star <= editCommentStar
+                                          ? "text-yellow-500 fill-yellow-500"
+                                          : "text-gray-300"
+                                      }`}
+                                    />
+                                  </button>
+                                ))}
+                              </div>
+                              <div className="flex justify-end space-x-2">
+                                <button
+                                  onClick={cancelEditing}
+                                  className="px-3 py-1 text-gray-600 hover:text-gray-800"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={handleUpdateComment}
+                                  className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                                <div className="flex items-center flex-wrap gap-2">
+                                  <User className="h-5 w-5 text-gray-400" />
+                                  <span className="font-medium text-sm sm:text-base break-words max-w-full">
+                                    {comment.user?.firstName &&
+                                    comment.user?.lastName
+                                      ? `${comment.user.firstName} ${comment.user.lastName}`
+                                      : "Anonymous"}
+                                  </span>
+                                  <div className="flex items-center">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        className={`h-4 w-4 ${
+                                          i < comment.star
+                                            ? "text-yellow-500 fill-yellow-500"
+                                            : "text-gray-300"
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+                                  <Calendar className="h-4 w-4 flex-shrink-0" />
+                                  <span className="whitespace-nowrap">
+                                    {new Date(
+                                      comment.createdAt ||
+                                        comment.updatedAt ||
+                                        Date.now()
+                                    ).toLocaleDateString()}
+                                  </span>
+                                  {user?.data?.id === comment.user?.id && (
+                                    <div className="flex items-center gap-2 ml-1">
+                                      <button
+                                        onClick={() =>
+                                          startEditingComment(comment)
+                                        }
+                                        className="text-blue-500 hover:text-blue-700 whitespace-nowrap"
+                                      >
+                                        Edit
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          handleDeleteComment(comment.id)
+                                        }
+                                        className="text-red-500 hover:text-red-700"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <p className="mt-2 text-gray-700 text-sm sm:text-base break-words">
+                                {comment.text || comment.content}
+                              </p>
+                            </>
+                          )}
+                        </div>
                       ))
                   )}
                 </div>
@@ -709,9 +746,6 @@ const CenterDetail = () => {
                             required
                             min={new Date().toISOString().slice(0, 16)}
                           />
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            {/* <Calendar className="h-5 w-5" /> */}
-                          </div>
                         </div>
                         <p className="mt-2 text-xs text-gray-500">
                           Please select a future date and time for your class.
