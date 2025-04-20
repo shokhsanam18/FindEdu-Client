@@ -389,12 +389,12 @@ const CenterDetail = () => {
     )}
   </p>
 </div>
-                  <div>
+                  {/* <div>
                     <h3 className="text-sm font-medium text-gray-500">Email</h3>
                     <p className="mt-1 text-lg font-medium">
                       {center.email || "Not provided"}
                     </p>
-                  </div>
+                  </div> */}
                   {center.website && (
                     <div className="md:col-span-2">
                       <h3 className="text-sm font-medium text-gray-500">

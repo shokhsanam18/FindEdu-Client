@@ -2,15 +2,16 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { toast } from "sonner"; // If you're using Sonner for notifications
-import { ArrowLeftIcon } from "@heroicons/react/24/outline"; // Correct icon import
-import { MapPinIcon } from "@heroicons/react/24/outline"; // Correct icon import
+import { toast } from "sonner";
+import { ArrowLeftIcon, MapPinIcon } from "@heroicons/react/24/outline";
+
 const API_BASE = "https://findcourse.net.uz/api";
-const ImageApi = `${API_BASE}/api/image`;
+const ImageApi = `${API_BASE}/image`;
 
 const CenterEditForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [center, setCenter] = useState(null);
   const [newData, setNewData] = useState({
     name: "",
@@ -19,6 +20,7 @@ const CenterEditForm = () => {
     email: "",
     website: "",
   });
+  const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -26,34 +28,36 @@ const CenterEditForm = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch the existing center data
-        const centerRes = await axios.get(`${API_BASE}/api/centers/${id}`);
-        const centerData = centerRes.data?.data;
+        const res = await axios.get(`${API_BASE}/centers/${id}`);
+        const centerData = res.data?.data;
+
+        const comments = centerData.comments || [];
+        const avgRating =
+          comments.length > 0
+            ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
+            : 0;
 
         setCenter({
           ...centerData,
           rating: avgRating,
           imageUrl: centerData.image ? `${ImageApi}/${centerData.image}` : null,
         });
-        
+
         setNewData({
-          name: centerData.name,
-          address: centerData.address,
-          phone: centerData.phone,
-          email: centerData.email,
-          website: centerData.website,
+          name: centerData.name || "",
+          address: centerData.address || "",
+          phone: centerData.phone || "",
         });
       } catch (err) {
         setError("Failed to load center info");
         console.error(err);
-        navigate("/", { replace: true });
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [id, navigate]);
+  }, [id]);
 
   const handleImageChange = (e) => {
     setImageFile(e.target.files[0]);
@@ -64,30 +68,73 @@ const CenterEditForm = () => {
     setNewData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleDelete = (e) => {
-    const { name, value } = e.target;
-    setNewData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("name", newData.name);
-    formData.append("address", newData.address);
-    formData.append("phone", newData.phone);
-    formData.append("email", newData.email);
-    formData.append("website", newData.website);
-    if (imageFile) formData.append("image", imageFile);
-
+    let uploadedImageFilename = null;
+  
     try {
-      await axios.put(`${API_BASE}/api/centers/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        toast.error("You must be logged in to update a center.");
+        return;
+      }
+  
+      // console.log("Access token:", accessToken);
+  
+      // 1. Upload image if selected
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+  
+        // console.log("Uploading image:", imageFile.name);
+  
+        const uploadRes = await axios.post(`${API_BASE}/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+  
+        uploadedImageFilename = uploadRes.data?.data;
+        // console.log("Uploaded image filename:", uploadedImageFilename);
+      }
+  
+      // 2. Build payload with only allowed fields
+      const allowedFields = {};
+if (newData.name !== center.name) {
+  allowedFields.name = newData.name;
+}
+  if (newData.address !== center.address) {
+          allowedFields.address = newData.address;
+        }
+      if (newData.phone !== center.phone) {
+        allowedFields.phone = newData.phone;
+      }
+      if (uploadedImageFilename) {
+        allowedFields.image = uploadedImageFilename;
+      }
+      
+  
+      // console.log("Final payload being sent:", allowedFields);
+  
+      // 3. Send PATCH request
+      const res = await axios.patch(`${API_BASE}/centers/${id}`, allowedFields, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
+  
+      // console.log("Update response:", res.data);
       toast.success("Center updated successfully!");
       navigate(`/centers/${id}`);
     } catch (err) {
+      console.error("Error updating center:", err);
+      if (err.response) {
+        console.error("Response data:", err.response.data);
+        console.error("Status code:", err.response.status);
+      }
       toast.error("Failed to update center.");
-      console.error("Error updating center", err);
     }
   };
 
@@ -105,7 +152,6 @@ const CenterEditForm = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 mt-42 md:mt-36">
-      {/* Back button */}
       <div className="container mx-auto px-4 mt-8 text-xl">
         <Link
           to={`/centers/${id}`}
@@ -116,7 +162,6 @@ const CenterEditForm = () => {
         </Link>
       </div>
 
-      {/* Edit form */}
       <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -124,7 +169,6 @@ const CenterEditForm = () => {
           transition={{ duration: 0.5 }}
           className="flex rounded-xl shadow-lg overflow-hidden flex-col md:flex-row w-full bg-white"
         >
-          {/* Left column with image and branches */}
           <div className="md:w-2/5 flex flex-col">
             <div className="relative h-100 w-100 overflow-hidden">
               {center.imageUrl ? (
@@ -152,114 +196,33 @@ const CenterEditForm = () => {
             </div>
           </div>
 
-          {/* Right column with editable form fields */}
           <div className="md:w-2/3 p-6 md:p-8">
-            <div className="flex flex-col">
-              {/* Center Name */}
-              <div className="mb-4">
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-600"
-                >
-                  Center Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={newData.name}
-                  onChange={handleChange}
-                  className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
+            <div className="flex flex-col space-y-4">
+              {["name", "address", "phone"].map((field) => (
+                <div key={field}>
+                  <label
+                    htmlFor={field}
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    {field.charAt(0).toUpperCase() + field.slice(1)}
+                  </label>
+                  <input
+                    type="text"
+                    id={field}
+                    name={field}
+                    value={newData[field]}
+                    onChange={handleChange}
+                    className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+              ))}
 
-              {/* Center Address */}
-              <div className="mb-4">
-                <label
-                  htmlFor="address"
-                  className="block text-sm font-medium text-gray-600"
-                >
-                  Address
-                </label>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  value={newData.address}
-                  onChange={handleChange}
-                  className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-
-              {/* Phone */}
-              <div className="mb-4">
-                <label
-                  htmlFor="phone"
-                  className="block text-sm font-medium text-gray-600"
-                >
-                  Phone
-                </label>
-                <input
-                  type="text"
-                  id="phone"
-                  name="phone"
-                  value={newData.phone}
-                  onChange={handleChange}
-                  className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-
-              {/* Email */}
-              <div className="mb-4">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-600"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={newData.email}
-                  onChange={handleChange}
-                  className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-
-              {/* Website */}
-              <div className="mb-4">
-                <label
-                  htmlFor="website"
-                  className="block text-sm font-medium text-gray-600"
-                >
-                  Website
-                </label>
-                <input
-                  type="text"
-                  id="website"
-                  name="website"
-                  value={newData.website}
-                  onChange={handleChange}
-                  className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-
-              {/* Submit button */}
               <button
                 type="submit"
                 onClick={handleSubmit}
                 className="mt-6 w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700"
               >
                 Save Changes
-              </button>
-
-              <button
-                type="delete"
-                onClick={handleDelete}
-                className="mt-6 w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700"
-              >
-                Delete
               </button>
             </div>
           </div>

@@ -520,3 +520,45 @@ export const useModalStore = create((set) => ({
   openModal: () => set({ isModalOpen: true }),
   closeModal: () => set({ isModalOpen: false }),
 }));
+
+
+
+export const useMyCentersStore = create((set) => ({
+  myCenters: [],
+  loading: false,
+  error: null,
+
+  fetchMyCenters: async () => {
+    set({ loading: true, error: null });
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.get("https://findcourse.net.uz/api/users/mycenters", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const centers = res.data?.data || [];
+
+      const processed = centers.map((center) => {
+        const comments = center.comments || [];
+        const avgRating =
+          comments.length > 0
+            ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
+            : 0;
+
+        return {
+          ...center,
+          rating: avgRating,
+          imageUrl: center.image ? `https://findcourse.net.uz/api/image/${center.image}` : null,
+        };
+      });
+
+      set({ myCenters: processed });
+    } catch (error) {
+      console.error("❌ Failed to fetch my centers:", error);
+      set({ error: "Failed to load your centers" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+}));
