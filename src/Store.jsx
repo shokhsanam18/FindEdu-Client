@@ -255,13 +255,20 @@ export const useLikedStore = create(
       },
 
       toggleLike: async (centerId) => {
+        const user = useAuthStore.getState().user;
+      
+        if (!user || !user?.data?.id) {
+          toast.warning("Please log in to like centers.");
+          return;
+        }
+      
         const { likedItems } = get();
         const token = await useAuthStore.getState().refreshTokenFunc(false);
-
+      
         if (!token) return;
-
+      
         const existing = likedItems.find((item) => item.centerId === centerId);
-
+      
         try {
           if (existing) {
             // Unlike
@@ -278,7 +285,7 @@ export const useLikedStore = create(
               { centerId },
               { headers: { Authorization: `Bearer ${token}` } }
             );
-
+      
             const newLike = res.data?.data;
             if (newLike?.id) {
               set({
