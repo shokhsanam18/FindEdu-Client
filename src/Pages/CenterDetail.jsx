@@ -48,12 +48,7 @@ const CenterDetail = () => {
   const [reservationError, setReservationError] = useState(null);
   const [reservationSuccess, setReservationSuccess] = useState(false);
 
-  const {
-    toggleLike,
-    isLiked,
-    loading: likeLoading,
-    fetchLikes,
-  } = useLikedStore();
+  const { toggleLike, isLiked, fetchLiked } = useLikedStore();
   const liked = isLiked(Number(id));
 
   const {
@@ -129,20 +124,14 @@ const CenterDetail = () => {
     };
 
     fetchData();
-  }, [id, navigate, user]);
+  }, [id, navigate]);
 
-  const handleLikeClick = async () => {
-    if (!user) {
-      navigate("/login", { state: { from: `/centers/${id}` } });
-      return;
+  useEffect(() => {
+    const user = useAuthStore.getState().user;
+    if (user && useLikedStore.getState().likedItems.length === 0) {
+      fetchLiked();
     }
-
-    try {
-      await toggleLike(Number(id));
-    } catch (err) {
-      console.error("Failed to toggle like:", err);
-    }
-  };
+  }, [user]);
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();

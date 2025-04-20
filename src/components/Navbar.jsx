@@ -51,7 +51,7 @@ export default function Navbar() {
   const isLoggedIn = useAuthStore((state) => !!state.user?.data?.isActive);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const fetchImage = useAuthStore((state) => state.fetchProfileImage);
-  const categories = useCategoryStore((state) => state.categories);
+  // const categories = useCategoryStore((state) => state.categories);
 
   const closeMenu = () => setIsMenuOpen(false);
 

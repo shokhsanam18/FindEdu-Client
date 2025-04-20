@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLikedStore, useSearchStore } from "../Store";
+import { useLikedStore, useSearchStore, useAuthStore } from "../Store";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -11,90 +11,123 @@ const API_BASE = "https://findcourse.net.uz";
 const ImageApi = `${API_BASE}/api/image`;
 
 const Favorites = () => {
-  const {
-    likedItems,
-    isLiked,
-    toggleLike,
-    loading: likesLoading,
-  } = useLikedStore();
-  const [centers, setCenters] = useState([]);
+  const { isLiked, toggleLike, fetchLiked } = useLikedStore();
+  const [allCenters, setAllCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const searchTerm = useSearchStore((state) => state.searchTerm);
+  const user = useAuthStore((state) => state.user);
 
+  // 🧠 Function that now takes userId directly
+  const fetchLikedCenters = async (userId) => {
+    try {
+      setLoading(true);
+
+      const token = localStorage.getItem("accessToken");
+
+      if (!token || !userId) {
+        console.warn("⛔ No token or user ID, skipping fetch");
+        setAllCenters([]);
+        setLoading(false); // 🔧 Critical to avoid infinite spinner
+        return;
+      }
+
+      const res = await axios.get("https://findcourse.net.uz/api/liked/query", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const likedData = res.data?.data || [];
+      console.log("✅ Raw liked response from backend:", likedData);
+
+      const userLikes = likedData.filter((like) => like.userId === userId);
+      console.log("🔐 Filtered likes for user:", userLikes);
+
+      const centerDetails = await Promise.all(
+        userLikes.map(async (like) => {
+          try {
+            const res = await axios.get(
+              `https://findcourse.net.uz/api/centers/${like.centerId}`
+            );
+            const center = res.data?.data;
+            const avgRating =
+              center.comments?.length > 0
+                ? center.comments.reduce((sum, c) => sum + c.star, 0) / center.comments.length
+                : 0;
+
+            return {
+              ...center,
+              imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
+              rating: avgRating,
+            };
+          } catch (err) {
+            console.error("❌ Error fetching center:", err);
+            return null;
+          }
+        })
+      );
+
+      setAllCenters(centerDetails.filter(Boolean));
+    } catch (err) {
+      console.error("🚨 Error in fetchLikedCenters:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Fetch user and centers on mount
   useEffect(() => {
-    const fetchLikedCenters = async () => {
-      try {
-        setLoading(true);
+    const fetchAll = async () => {
+      const authState = useAuthStore.getState();
 
-        if (likedItems.length === 0) {
-          setCenters([]);
-          return;
-        }
+      // 👇 Fetch user if not already loaded
+      if (!authState.user?.data?.id) {
+        await authState.fetchUserData();
+      }
 
-        // Fetch all liked centers details
-        const centersData = await Promise.all(
-          likedItems.map(async (item) => {
-            try {
-              const res = await axios.get(
-                `${API_BASE}/api/centers/${item.centerId}`
-              );
-              const center = res.data?.data;
+      const updatedUser = useAuthStore.getState().user;
+      console.log("🧑🏻 User in store:", updatedUser);
 
-              // Calculate average rating
-              const comments = center.comments || [];
-              const avgRating =
-                comments.length > 0
-                  ? comments.reduce((sum, c) => sum + c.star, 0) /
-                    comments.length
-                  : 0;
-
-              return {
-                ...center,
-                imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
-                rating: avgRating,
-              };
-            } catch (err) {
-              console.error(`Failed to fetch center ${item.centerId}`, err);
-              return null;
-            }
-          })
-        );
-
-        // Filter out any failed requests
-        setCenters(centersData.filter((center) => center !== null));
-      } catch (err) {
-        console.error("Failed to fetch liked centers", err);
-        toast.error("Failed to load favorites");
-      } finally {
-        setLoading(false);
+      if (updatedUser?.data?.id) {
+        await fetchLiked();
+        await fetchLikedCenters(updatedUser.data.id);
+      } else {
+        console.warn("⚠️ Still no user after fetchUserData");
+        setLoading(false); // don't forget this
       }
     };
 
-    fetchLikedCenters();
-  }, [likedItems]);
+    fetchAll();
+  }, []);
+
+
+  useEffect(() => {
+    if (!user) {
+      // User has just logged out
+      setAllCenters([]);  // Clear displayed centers
+    }
+  }, [user]);
+  
+  useEffect(() => {
+    const user = useAuthStore.getState().user;
+    if (user && useLikedStore.getState().likedItems.length === 0) {
+      fetchLiked();
+    }
+  }, [user]);
 
   const handleLikeToggle = async (centerId) => {
-    try {
-      await toggleLike(centerId);
-
-      if (isLiked(centerId)) {
-        setCenters((prev) => prev.filter((center) => center.id !== centerId));
-      }
-    } catch (err) {
-      toast.error("Failed to update favorites");
-    }
+    console.log("🔘 Toggling like for centerId:", centerId);
+    await toggleLike(centerId);
+    const currentUser = useAuthStore.getState().user;
+    await fetchLikedCenters(currentUser?.data?.id);
   };
 
   const filteredFavorites = centers.filter((center) => {
     if (!center) return false;
-
     const term = searchTerm.toLowerCase();
     const nameMatch = center.name?.toLowerCase().includes(term);
     const addressMatch = center.address?.toLowerCase().includes(term);
     const majorMatch = center.majors?.some((major) =>
       major.name?.toLowerCase().includes(term)
     );
-
     return nameMatch || addressMatch || majorMatch;
   });
 

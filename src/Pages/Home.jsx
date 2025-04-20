@@ -489,7 +489,7 @@ import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import home from "/public/home.png";
-import { useLikedStore, useSearchStore } from "../Store.jsx";
+import { useLikedStore, useSearchStore, useAuthStore } from "../Store.jsx";
 
 const MajorsApi = "https://findcourse.net.uz/api/major";
 const RegionsApi = "https://findcourse.net.uz/api/regions/search";
@@ -615,10 +615,14 @@ export const Cards = () => {
   
   const { searchTerm, setSearchTerm } = useSearchStore();
   const { toggleLike, isLiked, fetchLiked } = useLikedStore();
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
-    fetchLiked();
-  }, []);
+    const user = useAuthStore.getState().user;
+    if (user && useLikedStore.getState().likedItems.length === 0) {
+      fetchLiked();
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -920,9 +924,15 @@ export const Cards = () => {
                     <div className="flex items-center justify-between mt-1.5">
                       <div className="flex items-center space-x-1 text-sm text-gray-500">
                         <PhoneIcon className="h-4 w-4" />
-                        <a href={`tel:${center.phone || "+15551234567"}`}>
-                          <span>{center.phone || "+1 (555) 123-4567"}</span>
-                        </a>
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.location.href = `tel:${center.phone}`;
+                          }}
+                          className="cursor-pointer"
+                        >
+                          {center.phone || "+1 (555) 123-4567"}
+                        </span>
                       </div>
                     </div>
                   </div>
