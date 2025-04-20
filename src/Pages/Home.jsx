@@ -268,26 +268,26 @@ export const Cards = () => {
             className="relative py-25 flex items-center justify-center bg-cover bg-center mb-15 -z-20"
             style={{ backgroundImage: `url(${home})` }}
           >
-            <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+            <div className="absolute inset-0 bg-white bg-opacity-55"></div>
     
-            <div className="relative mx-auto flex flex-col md:flex-row items-center text-white">
-              <div className="md:w-1/2 text-center md:text-left lg:pl-10">
+            <div className="relative mx-auto flex flex-col md:flex-row items-center text-[#2d0e4e]">
+              <div className="md:w-1/2 text-center md:text-left lg:pl-10 ">
                 <motion.h1
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 1, delay: 0.3 }}
-                  className="text-5xl font-bold mt-2 leading-tight"
+                  className="text-[47px] font-bold mt-2 leading-tight text-[#2d0e4e]"
                 >
-                  Empowering Students, <br /> One Search at a Time.
+                  One Search, Infinite Potential
                 </motion.h1>
     
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 1, delay: 0.6 }}
-                  className="text-gray-300 mt-4"
+                  className=" mt-4 text-[#34115a]"
                 >
-                  We help students discover the best courses, universities, and
+                  We help students discover the best courses, centers, and
                   learning opportunities worldwide. With expert insights and real
                   student reviews, we make your education journey effortless.
                 </motion.p>
@@ -301,10 +301,10 @@ export const Cards = () => {
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-white bg-cover bg-center mt-20 mb-30"
-      style={{ backgroundImage: "url('/ceopage.png')" }}
+      className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-[#2d0e4e] bg-cover bg-center mt-20 mb-30"
+      style={{ backgroundImage: "url('/aboutus.png')" }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+      <div className="absolute inset-0 bg-white bg-opacity-70"></div>
 
       <motion.div
         initial={{ opacity: 0, x: -50 }}

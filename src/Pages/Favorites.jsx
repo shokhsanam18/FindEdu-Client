@@ -391,10 +391,10 @@ const Favorites = () => {
   initial={{ opacity: 0, y: -50 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.8 }}
-  className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-white bg-cover bg-center mt-20"
+  className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-[#2d0e4e] bg-cover bg-center mt-20"
   style={{ backgroundImage: "url('/aboutus.png')" }}
 >
-  <div className="absolute inset-0 bg-black bg-opacity-45"></div>
+  <div className="absolute inset-0 bg-white bg-opacity-70"></div>
 
   <motion.div
     initial={{ opacity: 0, x: -50 }}
@@ -402,13 +402,13 @@ const Favorites = () => {
     transition={{ duration: 0.8, delay: 0.3 }}
     className="relative z-10 max-w-2xl px-3 text-center md:px-6 md:text-start mt-2 md:mt-8"
   >
-    <p className="text-xl md:text-2xl mt-6 md:mt-0 font-light">
+    <p className="text-lg md:text-xl mt-6 md:mt-0 font-light">
       Discover Most Loved Learning Spaces
     </p>
-    <p className="text-lg md:text-xl mt-4 md:mt-2 font-light">
+    <p className="text-l md:text-lg mt-4 md:mt-2 font-light">
       Explore the education centers our community loves the most.
     </p>
-    <h1 className="text-4xl md:text-6xl font-bold mt-2 md:mt-4 bg-clip-text text-white">
+    <h1 className="text-4xl md:text-5xl font-bold mt-2 md:mt-4 bg-clip-text text-[#34115a]">
       Favorite Centers
     </h1>
     
@@ -447,7 +447,7 @@ const Favorites = () => {
       </motion.span>
       <Link
         to="/favorites"
-        className="text-blue-200 no-underline hover:underline transition-all"
+        className="text-[#2d0e4e] no-underline hover:underline transition-all"
       >
         Favorites
       </Link>

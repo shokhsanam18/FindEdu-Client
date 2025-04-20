@@ -587,10 +587,10 @@ const About = () => {
         initial={{ opacity: 0, y: -50 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ duration: 0.8 }}
-        className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-4 md:p-6 min-h-[60vh] text-white bg-cover bg-center"
+        className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-4 md:p-6 min-h-[60vh] text-[#34115a] bg-cover bg-center"
         style={{ backgroundImage: `url(${aboutus})` }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-45"></div>
+        <div className="absolute inset-0 bg-white bg-opacity-65"></div>
 
         <motion.div
           initial={{ opacity: 0, x: -50 }} 
@@ -611,7 +611,7 @@ const About = () => {
           <div className="flex gap-2">
             <Link to="/" className="no-underline hover:underline text-white">Home</Link>
             <p>|</p>
-            <Link to="/" className="text-[#bbbbbb] no-underline hover:underline">
+            <Link to="/" className="text-[#2d0e4e] no-underline hover:underline">
               About Us
             </Link>
           </div>

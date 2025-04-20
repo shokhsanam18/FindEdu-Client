@@ -142,10 +142,10 @@ export default function CeoPage() {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-white bg-cover bg-center mt-20 "
-        style={{ backgroundImage: "url('/ceopage.png')" }}
+        className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-[#2d0e4e] bg-cover bg-center mt-20 "
+        style={{ backgroundImage: "url('/aboutus.png')" }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div className="absolute inset-0 bg-white bg-opacity-70"></div>
 
         <motion.div
           initial={{ opacity: 0, x: -50 }}
@@ -177,7 +177,7 @@ export default function CeoPage() {
             <p>|</p>
             <Link
               to="/ceo"
-              className="text-[#bbbbbb] no-underline hover:underline"
+              className="text-[#2d0e4e] no-underline hover:underline"
             >
               CEO Page{" "}
             </Link>
