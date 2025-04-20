@@ -330,18 +330,18 @@ const CenterDetail = () => {
               </h2>
 
               <div className=" gap-2 px-5 flex flex-row flex-wrap">
-                {majors.map((major) => (
+                {center.majors[0].name.length > 0 && (
                   <motion.div
-                    key={major.id}
+                    key={majors.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
                     className={`bg-white border border-gray-200 rounded-xl  overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
-                      selectedMajor?.id === major.id
+                      selectedMajor?.id === center.majors.id
                         ? "ring-2 ring-purple-500"
                         : ""
                     }`}
-                    onClick={() => setSelectedMajor(major)}
+                    onClick={() => setSelectedMajor(center.majors[0].name)}
                   >
                     <div className="p-2 ">
                       <div className="flex items-start  ">
@@ -350,16 +350,16 @@ const CenterDetail = () => {
                         </div>
                         <div className="ml-2 flex-1 cursor-pointer">
                           <h3 className="text-lg font-semibold text-gray-900 mr-1">
-                            {major.name}
+                            {center.majors[0].name}
                           </h3>
                           <p className="mt-1 text-gray-600">
-                            {major.description || ""}
+                            {center.majors[0].name.description || ""}
                           </p>
                         </div>
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                )}
               </div>
             </div>
 
