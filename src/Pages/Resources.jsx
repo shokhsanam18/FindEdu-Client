@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FaSearch, FaBook, FaVideo, FaFilePdf, FaStar, FaDownload, FaTrash } from "react-icons/fa";
 import { MdComputer, MdBusiness } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import { useAuthStore } from "../Store";
 import { AuthContext } from "../context/auth";
 import { toast } from "sonner";
 import "react-toastify/dist/ReactToastify.css";
-
+import { motion } from 'framer-motion';
 const API_BASE_URL = "https://findcourse.net.uz/api/resources";
 const CATEGORIES_URL = "https://findcourse.net.uz/api/categories";
 
@@ -302,17 +302,56 @@ export const Resources = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-21">
+    <div className="">
+<motion.div
+  initial={{ opacity: 0, y: -50 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8 }}
+  className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-white bg-cover bg-center mt-20"
+  style={{ backgroundImage: "url('/aboutus.png')" }}
+>
+  <div className="absolute inset-0 bg-black bg-opacity-45"></div>
+
+  <motion.div
+    initial={{ opacity: 0, x: -50 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.8, delay: 0.3 }}
+    className="relative z-10 max-w-2xl px-3 text-center md:px-6 md:text-start mt-2 md:mt-8"
+  >
+    <p className="text-xl md:text-xl mt-6 md:mt-0">
+      Discover Teaching Resources
+    </p>
+    <p className="text-lg md:text-l mt-4 md:mt-2">
+      Access high-quality materials to enhance your educational programs.
+    </p>
+    <h1 className="text-4xl md:text-5xl font-bold mt-2 md:mt-4">Educational Resources</h1>
+  </motion.div>
+
+  <motion.div
+    initial={{ opacity: 0, x: 50 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.8, delay: 0.6 }}
+    className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-xl mt-4 md:mt-0"
+  >
+    <div className="flex gap-2">
+      <Link to="/" className="no-underline hover:underline text-white">
+        Home
+      </Link>
+      <p>|</p>
+      <Link
+        to="/resources"
+        className="text-[#bbbbbb] no-underline hover:underline"
+      >
+        Resources
+      </Link>
+    </div>
+  </motion.div>
+</motion.div>
+
+    <div className="min-h-screen  py-8 px-4 sm:px-6 lg:px-8 mt-5">
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Educational Resources
-          </h1>
-          <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-            High-quality materials for learning center administrators and educators
-          </p>
-        </div>
+
 
         {/* Search and Filter Section */}
         <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
@@ -573,6 +612,6 @@ export const Resources = () => {
           </div>
         )}
       </div>
-    </div>
+    </div>     </div>
   );
 };

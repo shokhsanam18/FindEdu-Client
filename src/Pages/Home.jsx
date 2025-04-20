@@ -258,45 +258,94 @@ export const Cards = () => {
       setSelectedRegions((prev) => prev.filter((i) => i !== id));
     };
 
-  return (
-    <div className="mb-16 mt-20 ">
+    return (
+      <div className="mb-16 mt-20 ">
+        {!isMyCentersPage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="relative py-25 flex items-center justify-center bg-cover bg-center mb-15 -z-20"
+            style={{ backgroundImage: `url(${home})` }}
+          >
+            <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+    
+            <div className="relative mx-auto flex flex-col md:flex-row items-center text-white">
+              <div className="md:w-1/2 text-center md:text-left lg:pl-10">
+                <motion.h1
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 1, delay: 0.3 }}
+                  className="text-5xl font-bold mt-2 leading-tight"
+                >
+                  Empowering Students, <br /> One Search at a Time.
+                </motion.h1>
+    
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1, delay: 0.6 }}
+                  className="text-gray-300 mt-4"
+                >
+                  We help students discover the best courses, universities, and
+                  learning opportunities worldwide. With expert insights and real
+                  student reviews, we make your education journey effortless.
+                </motion.p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+      {isMyCentersPage && (
       <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className="relative py-25 flex items-center justify-center bg-cover bg-center mb-15 -z-20"
-        style={{ backgroundImage: `url(${home})` }}
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-white bg-cover bg-center mt-20 mb-30"
+      style={{ backgroundImage: "url('/ceopage.png')" }}
+    >
+      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+        className="relative z-10 max-w-sm px-3 text-center md:px-6 md:text-start mt-2 md:mt-8 text-sm"
       >
-        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        <p className="text-l md:text-xl  mt-6 md:mt-0">
+          {" "}
+          You can edit your Education Center
+        </p>
 
-        <div className="relative  mx-auto flex flex-col md:flex-row items-center  text-white">
-          <div className="md:w-1/2 text-center md:text-left lg:pl-10">
-            <motion.h1
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.3 }}
-              className="text-5xl font-bold mt-2 leading-tight"
-            >
-              Empowering Students, <br /> One Search at a Time.
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.6 }}
-              className="text-gray-300 mt-4"
-            >
-              We help students discover the best courses, universities, and
-              learning opportunities worldwide. With expert insights and real
-              student reviews, we make your education journey effortless.
-            </motion.p>
-          </div>
-        </div>
+        <h1 className="text-4xl md:text-7xl font-bold "> CEO Page</h1>
       </motion.div>
 
-
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+        className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-xl  mt-4 md:mt-0"
+      >
+        <div className="flex gap-2">
+          <Link to="/" className="no-underline hover:underline text-white">
+            {" "}
+            Home
+          </Link>
+          <p>|</p>
+          <Link
+            to="/MyCenters"
+            className="text-[#bbbbbb] no-underline hover:underline"
+          >
+            My centers{" "}
+          </Link>
+        </div>
+      </motion.div>
+    </motion.div>
+                  )}
+     
       {/* MODIFIED SEARCH DESIGN - ONLY THIS PART CHANGED */}
-      <div className="flex flex-col items-center w-full px-4 mb-8">
+      {!isMyCentersPage && (
+      <div className="flex flex-col items-center w-full px-4 mb-15">
   {/* Search bar with filters row */}
   <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-6xl gap-4">
     {/* Search input */}
@@ -364,7 +413,8 @@ export const Cards = () => {
       ))}
     </div>
   )}
-</div>
+</div> 
+      )}
 
 
 
@@ -436,7 +486,10 @@ export const Cards = () => {
                       className="absolute p-2 rounded-full top-3 right-3 mt-10 flex text-center items-center justify-center bg-white/70 backdrop-blur-sm"
                     >
                       <button
-                        onClick={() => navigate(`/ceo/edit/${center.id}`)}
+                       onClick={() => {
+                        navigate(`/ceo/edit/${center.id}`);
+                        window.scrollTo(0, 0);
+                      }}
                         className="flex items-center text-sm h-5 w-5 text-yellow-600"
                       >
                         <PencilSquareIcon className="w-4 h-4 ml-[2px]" />

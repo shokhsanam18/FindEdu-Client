@@ -16,23 +16,13 @@
 //   MenuItem,
 //   Avatar,
 //   Spinner,
-//   // Card,
-//   // IconButton,
 // } from "@material-tailwind/react";
 // import {
-//   // CubeTransparentIcon,
 //   UserCircleIcon,
-//   // CodeBracketSquareIcon,
-//   // Square3Stack3DIcon,
 //   ChevronDownIcon,
-//   // Cog6ToothIcon,
 //   BuildingOffice2Icon,
-//   // InboxArrowDownIcon,
-//   // LifebuoyIcon,
 //   CalendarIcon,
 //   PowerIcon,
-//   // RocketLaunchIcon,
-//   // Bars2Icon,
 // } from "@heroicons/react/24/solid";
 // import {
 //   Select,
@@ -115,76 +105,12 @@
 //     setSearchTerm(e.target.value);
 //   };
 
-//   // const [region, setRegion] = useState("");
-//   // const [level, setLevel] = useState("");
-//   // const [studyType, setStudyType] = useState("");
-//   // const [direction, setDirection] = useState("");
-//   // const [price, setPrice] = useState("");
-//   // const [searchText, setSearchText] = useState("");
-
-//   // const handleRegionChange = (value) => {
-//   //   setRegion(value);
-//   //   console.log("Selected Region:", value);
-//   //   // Implement your filtering logic here
-//   // };
-
-//   // const handleLevelChange = (value) => {
-//   //   setLevel(value);
-//   //   console.log("Selected Level:", value);
-//   //   // Implement your filtering logic here
-//   // };
-
-//   // const handleStudyTypeChange = (value) => {
-//   //   setStudyType(value);
-//   //   console.log("Selected Study Type:", value);
-//   //   // Implement your filtering logic here
-//   // };
-
-//   // const handleDirectionChange = (value) => {
-//   //   setDirection(value);
-//   //   console.log("Selected Direction:", value);
-//   //   // Implement your filtering logic here
-//   // };
-
-//   // const handlePriceChange = (value) => {
-//   //   setPrice(value);
-//   //   console.log("Selected Price:", value);
-//   //   // Implement your filtering logic here
-//   // };
-
-//   // const handleSearchTextChange = (e) => {
-//   //   setSearchText(e.target.value);
-//   //   console.log("Search Text:", e.target.value);
-//   //   // Implement your search logic here (could be debounced)
-//   // };
-
 //   const regions = [
 //     { value: "", label: "Mintaqa →" },
 //     { value: "tashkent", label: "Tashkent" },
 //     { value: "samarkand", label: "Samarkand" },
 //   ];
-//   // const levels = [
-//   //   { value: "", label: "Darajasi →" },
-//   //   { value: "beginner", label: "Beginner" },
-//   //   { value: "advanced", label: "Advanced" },
-//   // ];
-//   // const studyTypes = [
-//   //   { value: "", label: "O'qish turi →" },
-//   //   { value: "online", label: "Online" },
-//   //   { value: "offline", label: "Offline" },
-//   // ];
-//   // const directions = [
-//   //   { value: "", label: "Yo'nalish →" },
-//   //   { value: "it", label: "IT" },
-//   //   { value: "marketing", label: "Marketing" },
-//   //   { value: "sat", label: "SAT" },
-//   //   { value: "IELTS", label: "IELTS" },
-//   // ];
-//   // const prices = [
-//   //   { value: "", label: "Narxi →" },
-//   //   { value: "free", label: "Free" },
-//   //   { value: "paid", label: "Paid" },
-//   // ];
+  
 //   const toggleSidebar = useSidebarSt((state) => state.toggleSidebar);
 //   return (
 //     <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-7 w-full z-40 bg-white shadow-md backdrop-blur-md">
@@ -200,29 +126,6 @@
 //             <AlignJustify />
 //           </button>
 //         </div>
-
-//         {/* <div className="hidden bg gap-4 md:gap-8 text-gray-700 font-semibold text-lg md:text-xl lg:flex">
-//         <Link 
-//   to="/" 
-//   className="hover:text-[#461773]"
-//   onClick={() => window.scrollTo(0, 0)}
-// >
-//   Home
-// </Link>
-//           <Link to="/About" className="hover:text-[#461773]"   onClick={() => window.scrollTo(0, 0)}>
-//             About Us
-//           </Link>
-//           <Link to="/Resources" className="hover:text-[#461773]"   onClick={() => window.scrollTo(0, 0)}>
-//             Resources
-//           </Link>
-//           <Link
-//             to="/Favorites"
-//             className="hover:text-[#461773] flex gap-2 items-center"   onClick={() => window.scrollTo(0, 0)}
-//           >
-//             <HeartIcon className="h-5 w-5" />
-//             Favorites
-//           </Link>
-//         </div> */}
 
 //         <div className="hidden lg:flex items-center gap-6 xl:gap-8 px-6 py-3  ">
 //           <Link
@@ -355,46 +258,9 @@
 //           </div>
 //         )}
 //       </div>
-
-//       {/* Bottom Navigation */}
-//       {/* <div className="bg-white flex justify-center w-full md:w-3/4 mx-auto items-center">
-//         <div className="container  flex items-center rounded-full border-2 border-[#461773] text-[#000000]">
-//           <div className="flex-grow">
-//             <Input
-//               type="text"
-//               placeholder="Kasb, fan yoki o'quv markaz nomini kiriting..."
-//               value={searchTerm}
-//               onChange={handleSearchTextChange}
-//               className="border-0 rounded-l-full md:rounded-l-md shadow-none focus-visible:ring-0 pl-2 md:pl-4"
-//               style={{ color: "#000000" }}
-//             />
-//           </div>
-//           <div className="flex items-center">
-//             <div className="border-l border-[#000000]">
-//               <Select>
-//                 <SelectTrigger
-//                   className="w-[80px] md:w-[120px] lg:w-[160px] border-none bg-transparent text-left rounded-none focus-visible:ring-0 pl-2 md:pl-4"
-//                   style={{ color: "#000000" }}
-//                 >
-//                   <SelectValue placeholder="Categories" />
-//                 </SelectTrigger>
-//                 <SelectContent>
-//                   {categories.map((category) => (
-//                     <SelectItem key={category.id} value={category.name}>
-//                       {category.name}
-//                     </SelectItem>
-//                   ))}
-//                 </SelectContent>
-//               </Select>
-//             </div>
-            
-//           </div>
-//         </div>
-//       </div> */}
 //     </nav>
 //   );
 // }
-
 
 
 
@@ -423,11 +289,12 @@ import {
   PlusCircleIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/solid";
-import { useAuthStore, useSidebarStore, useSearchStore } from "../Store";
+import { useAuthStore, useSearchStore } from "../Store";
+import { useSidebarSt } from "@/Store";
 import { AlignJustify } from "lucide-react";
 
 export default function Navbar() {
-  const { openSidebar, toggleSidebar } = useSidebarStore();
+  const toggleSidebar = useSidebarSt((state) => state.toggleSidebar);
   const user = useAuthStore((state) => state.user);
   const isLoggedIn = useAuthStore((state) => !!state.user?.data?.isActive);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -459,6 +326,23 @@ export default function Navbar() {
   };
 
   const profileMenuItems = [
+    ...(user?.role === "CEO"
+      ? [
+          {
+            label: "My Centers",
+            icon: BuildingOffice2Icon,
+            link: "/MyCenters",
+          },
+        ]
+      : user?.role === "USER"
+      ? [
+          {
+            label: "My Appointments",
+            icon: CalendarIcon,
+            link: "/Appointment",
+          },
+        ]
+      : []),
     {
       label: "Sign Out",
       icon: PowerIcon,
@@ -502,8 +386,6 @@ export default function Navbar() {
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
           </Link>
 
-
-
           <Link
             to="/Resources"
             className="text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
@@ -526,6 +408,7 @@ export default function Navbar() {
             <Link
               to="/Appointment"
               className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
+              onClick={() => window.scrollTo(0, 0)}
             >
               <CalendarIcon className="h-5 w-5" />
               Appointments
@@ -544,6 +427,7 @@ export default function Navbar() {
                 <Link
                   to="/Ceo"
                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]"
+                  onClick={() => window.scrollTo(0, 0)}
                 >
                   <PlusCircleIcon className="h-4 w-4" />
                   Create Center
@@ -551,6 +435,7 @@ export default function Navbar() {
                 <Link
                   to="/MyCenters"
                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]"
+                  onClick={() => window.scrollTo(0, 0)}
                 >
                   <BuildingOffice2Icon className="h-4 w-4" />
                   My Centers
@@ -590,38 +475,41 @@ export default function Navbar() {
               </Button>
             </MenuHandler>
             <MenuList className="p-1">
-              {profileMenuItems.map(({ label, icon, link }, key) => {
-                const isLastItem = key === profileMenuItems.length - 1;
-                return (
-                  <Link to={`${isLastItem ? "#" : link}`} key={label}>
-                    <MenuItem
-                      onClick={isLastItem ? handleLogout : closeMenu}
-                      className={`flex items-center gap-2 rounded ${
-                        isLastItem
-                          ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
-                          : "hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff]"
-                      }`}
-                    >
-                      {React.createElement(icon, {
-                        className: `h-4 w-4 ${
-                          isLastItem ? "text-red-500" : "text-[#290a3f]"
-                        }`,
-                        strokeWidth: 2,
-                      })}
-                      <Typography
-                        as="span"
-                        variant="small"
-                        className={`font-normal ${
-                          isLastItem ? "text-red-500" : "text-[#290a3f]"
-                        }`}
-                      >
-                        {label}
-                      </Typography>
-                    </MenuItem>
-                  </Link>
-                );
-              })}
-            </MenuList>
+  {profileMenuItems.map(({ label, icon, link }, key) => {
+    const isLastItem = key === profileMenuItems.length - 1;
+    // Skip rendering if it's the "My Centers" item
+    if (label === "My Centers") return null;
+    
+    return (
+      <Link to={`${isLastItem ? "#" : link}`} key={label}>
+        <MenuItem
+          onClick={isLastItem ? handleLogout : closeMenu}
+          className={`flex items-center gap-2 rounded ${
+            isLastItem
+              ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
+              : "hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff]"
+          }`}
+        >
+          {React.createElement(icon, {
+            className: `h-4 w-4 ${
+              isLastItem ? "text-red-500" : "text-[#290a3f]"
+            }`,
+            strokeWidth: 2,
+          })}
+          <Typography
+            as="span"
+            variant="small"
+            className={`font-normal ${
+              isLastItem ? "text-red-500" : "text-[#290a3f]"
+            }`}
+          >
+            {label}
+          </Typography>
+        </MenuItem>
+      </Link>
+    );
+  })}
+</MenuList>
           </Menu>
         ) : (
           <div className="flex gap-3 md:gap-4">

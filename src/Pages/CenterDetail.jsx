@@ -359,8 +359,22 @@ const CenterDetail = () => {
                       </div>
                     </div>
                   </motion.div>
-                )}
-              </div>
+                )} 
+              </div>                <div className="mt-5 px-5">
+                <button
+                  onClick={() => {
+                    if (!user || !user?.data?.id) {
+                      toast.warning("Please login to register for a class.");
+                      return;
+                    }
+                    setShowReservationModal(true);
+                  }}
+                  className="px-[120px] py-3 text-lg bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
+                >
+                  <Clock className="h-5 w-5 mr-2" />
+                  Register for a Class
+                </button>
+                </div>
             </div>
 
             {/* Registration button */}
@@ -434,21 +448,7 @@ const CenterDetail = () => {
                   </p>
                 </div>
 
-                <div className="mt-5">
-                <button
-                  onClick={() => {
-                    if (!user || !user?.data?.id) {
-                      toast.warning("Please login to register for a class.");
-                      return;
-                    }
-                    setShowReservationModal(true);
-                  }}
-                  className="px-4 py-3 text-lg bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
-                >
-                  <Clock className="h-5 w-5 mr-2" />
-                  Register for a Class
-                </button>
-                </div>
+
               </div>
 
               {/* Comments section */}

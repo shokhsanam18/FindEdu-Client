@@ -137,7 +137,7 @@ export default function CeoPage() {
   };
 
   return (
-    <div className="bg-[#f1edfa] ">
+    <div className="bg-white ">
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -176,7 +176,7 @@ export default function CeoPage() {
             </Link>
             <p>|</p>
             <Link
-              to="/"
+              to="/ceo"
               className="text-[#bbbbbb] no-underline hover:underline"
             >
               CEO Page{" "}
@@ -184,7 +184,7 @@ export default function CeoPage() {
           </div>
         </motion.div>
       </motion.div>
-<div className="flex flex-col md:flex-row w-full bg-[#f1edfa] gap-8 justify-center items-center p-4 md:p-0   min-h-screen md:h-screen md:my-30 ">       
+<div className="flex flex-col md:flex-row w-full bg-white gap-8 justify-center items-center p-4 md:p-0   min-h-screen md:h-screen md:my-30 ">       
 <div className="hidden md:flex h-screen justify-center items-center">
   <motion.img
     src={ceo}
