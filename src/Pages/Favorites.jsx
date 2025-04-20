@@ -1,7 +1,7 @@
 // src/pages/Favorites.jsx
 
 import { useEffect, useState } from "react";
-import { useLikedStore, useSearchStore } from "../Store";
+import { useLikedStore, useSearchStore, useAuthStore } from "../Store";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -14,121 +14,115 @@ import {
 const ImageApi = "https://findcourse.net.uz/api/image";
 
 const Favorites = () => {
-  const { likedItems, isLiked, toggleLike, fetchLiked } = useLikedStore();
+  const { isLiked, toggleLike, fetchLiked } = useLikedStore();
   const [allCenters, setAllCenters] = useState([]);
   const [loading, setLoading] = useState(true);
   const searchTerm = useSearchStore((state) => state.searchTerm);
+  const user = useAuthStore((state) => state.user);
 
-  useEffect(() => {
-    fetchLiked();
-  }, []);
+  // 🧠 Function that now takes userId directly
+  const fetchLikedCenters = async (userId) => {
+    try {
+      setLoading(true);
 
-  useEffect(() => {
-    const fetchLikedCenters = async () => {
-      try {
-        setLoading(true);
-        await fetchLiked(); // Ensure we have the latest liked items
+      const token = localStorage.getItem("accessToken");
 
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-          setAllCenters([]);
-          return;
-        }
+      if (!token || !userId) {
+        console.warn("⛔ No token or user ID, skipping fetch");
+        setAllCenters([]);
+        setLoading(false); // 🔧 Critical to avoid infinite spinner
+        return;
+      }
 
-        const res = await axios.get(
-          "https://findcourse.net.uz/api/liked/query",
-          {
-            headers: { Authorization: `Bearer ${token}` },
+      const res = await axios.get("https://findcourse.net.uz/api/liked/query", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const likedData = res.data?.data || [];
+      console.log("✅ Raw liked response from backend:", likedData);
+
+      const userLikes = likedData.filter((like) => like.userId === userId);
+      console.log("🔐 Filtered likes for user:", userLikes);
+
+      const centerDetails = await Promise.all(
+        userLikes.map(async (like) => {
+          try {
+            const res = await axios.get(
+              `https://findcourse.net.uz/api/centers/${like.centerId}`
+            );
+            const center = res.data?.data;
+            const avgRating =
+              center.comments?.length > 0
+                ? center.comments.reduce((sum, c) => sum + c.star, 0) / center.comments.length
+                : 0;
+
+            return {
+              ...center,
+              imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
+              rating: avgRating,
+            };
+          } catch (err) {
+            console.error("❌ Error fetching center:", err);
+            return null;
           }
-        );
+        })
+      );
 
-        const likedData = res.data?.data || [];
+      setAllCenters(centerDetails.filter(Boolean));
+    } catch (err) {
+      console.error("🚨 Error in fetchLikedCenters:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        // Get detailed info for liked centers
-        const centerDetails = await Promise.all(
-          likedData.map(async (like) => {
-            try {
-              const res = await axios.get(
-                `https://findcourse.net.uz/api/centers/${like.centerId}`
-              );
-              const center = res.data?.data;
-              const avgRating =
-                center.comments?.length > 0
-                  ? center.comments.reduce((sum, c) => sum + c.star, 0) /
-                    center.comments.length
-                  : 0;
-              return {
-                ...center,
-                imageUrl: center.image ? `${ImageApi}/${center.image}` : null,
-                rating: avgRating,
-              };
-            } catch (err) {
-              console.error("Failed to fetch center details", err);
-              return null;
-            }
-          })
-        );
+  // ✅ Fetch user and centers on mount
+  useEffect(() => {
+    const fetchAll = async () => {
+      const authState = useAuthStore.getState();
 
-        // Filter out any null values from failed requests
-        setAllCenters(centerDetails.filter(center => center !== null));
-      } catch (err) {
-        console.error("Failed to fetch liked centers", err);
-      } finally {
-        setLoading(false);
+      // 👇 Fetch user if not already loaded
+      if (!authState.user?.data?.id) {
+        await authState.fetchUserData();
+      }
+
+      const updatedUser = useAuthStore.getState().user;
+      console.log("🧑🏻 User in store:", updatedUser);
+
+      if (updatedUser?.data?.id) {
+        await fetchLiked();
+        await fetchLikedCenters(updatedUser.data.id);
+      } else {
+        console.warn("⚠️ Still no user after fetchUserData");
+        setLoading(false); // don't forget this
       }
     };
 
-    fetchLikedCenters();
-  }, [fetchLiked]);
+    fetchAll();
+  }, []);
+  
+  useEffect(() => {
+    const user = useAuthStore.getState().user;
+    if (user && useLikedStore.getState().likedItems.length === 0) {
+      fetchLiked();
+    }
+  }, [user]);
 
   const handleLikeToggle = async (centerId) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
-
-      if (isLiked(centerId)) {
-        // Unlike the center
-        await axios.delete(
-          `https://findcourse.net.uz/api/liked/${centerId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-      } else {
-        // Like the center
-        await axios.post(
-          `https://findcourse.net.uz/api/liked/${centerId}`,
-          {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-      }
-
-      // Toggle in local state
-      toggleLike(centerId);
-
-      // Update the centers list by removing the unliked center
-      setAllCenters(prev => 
-        isLiked(centerId) 
-          ? prev.filter(center => center.id !== centerId)
-          : prev
-      );
-    } catch (err) {
-      console.error("Failed to toggle like", err);
-    }
+    console.log("🔘 Toggling like for centerId:", centerId);
+    await toggleLike(centerId);
+    const currentUser = useAuthStore.getState().user;
+    await fetchLikedCenters(currentUser?.data?.id);
   };
 
   const filteredFavorites = allCenters.filter((center) => {
     if (!center) return false;
-    
     const term = searchTerm.toLowerCase();
     const nameMatch = center.name?.toLowerCase().includes(term);
     const addressMatch = center.address?.toLowerCase().includes(term);
     const majorMatch = center.majors?.some((major) =>
       major.name?.toLowerCase().includes(term)
     );
-
     return nameMatch || addressMatch || majorMatch;
   });
 
