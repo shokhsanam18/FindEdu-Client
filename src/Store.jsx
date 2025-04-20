@@ -235,6 +235,7 @@ export const useLikedStore = create((set, get) => ({
         headers: { Authorization: `Bearer ${token}` },
       });
       const liked = res.data?.data || [];
+      console.log("✅ Raw liked response from backend:", liked);
 
       // Save both centerId and the likeId (id) from the backend
       const likedItems = liked.map((item) => ({
@@ -252,38 +253,55 @@ export const useLikedStore = create((set, get) => ({
 
   toggleLike: async (centerId) => {
     const { likedItems } = get();
-    const token = localStorage.getItem("accessToken");
-
+    const refreshTokenFunc = useAuthStore.getState().refreshTokenFunc;
+    const token = await refreshTokenFunc(false); // don't log out if expired
+  
+    console.log("🔐 Access token used for toggleLike:", token);
+    console.log("📝 Liked items before toggle:", likedItems);
+  
+    if (!token) {
+      console.warn("⛔ No token available. Skipping like toggle.");
+      return;
+    }
+  
     const existing = likedItems.find((item) => item.centerId === centerId);
-
+    console.log("🎯 Center to toggle:", centerId);
+    console.log("🔍 Found existing like?", existing);
+  
     try {
       if (existing) {
-        // Unlike using `likeId` (not centerId)
-        await axios.delete(`${API_BASE}/liked/${existing.id}`, {
+        console.log(`🗑️ Attempting to unlike (DELETE /liked/${existing.id})`);
+        const res = await axios.delete(`${API_BASE}/liked/${existing.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        set({
-          likedItems: likedItems.filter((item) => item.centerId !== centerId),
-        });
+        console.log("✅ Unlike response:", res?.data);
+  
+        const updatedItems = likedItems.filter((item) => item.centerId !== centerId);
+        set({ likedItems: updatedItems });
+        console.log("🆕 likedItems after unlike:", updatedItems);
       } else {
-        // Like
+        console.log("❤️ Attempting to like (POST /liked)");
         const res = await axios.post(
           `${API_BASE}/liked`,
           { centerId },
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
-
+  
         const newLike = res.data?.data;
         if (newLike?.id) {
-          set({
-            likedItems: [...likedItems, { centerId, id: newLike.id }],
-          });
+          const newItems = [...likedItems, { centerId, id: newLike.id }];
+          set({ likedItems: newItems });
+          console.log("🆕 likedItems after like:", newItems);
         }
       }
     } catch (err) {
-      console.error("Toggle like error", err);
+      console.error("❌ Error during like toggle:", err);
+      console.log("📬 Error response:", err.response?.data);
+      console.log("📛 Error status:", err.response?.status);
     }
   },
 
