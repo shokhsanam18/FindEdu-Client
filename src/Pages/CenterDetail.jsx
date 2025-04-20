@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import axios from "axios";
 import {
   MapPin,
@@ -434,13 +435,19 @@ const CenterDetail = () => {
                 </div>
 
                 <div className="mt-5">
-                  <button
-                    onClick={() => setShowReservationModal(true)}
-                    className="px-4 py-3 text-lg bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
-                  >
-                    <Clock className="h-5 w-5 mr-2 " />
-                    Register for a Class
-                  </button>
+                <button
+                  onClick={() => {
+                    if (!user || !user?.data?.id) {
+                      toast.warning("Please login to register for a class.");
+                      return;
+                    }
+                    setShowReservationModal(true);
+                  }}
+                  className="px-4 py-3 text-lg bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
+                >
+                  <Clock className="h-5 w-5 mr-2" />
+                  Register for a Class
+                </button>
                 </div>
               </div>
 
