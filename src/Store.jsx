@@ -97,6 +97,7 @@ login: async (values) => {
   logout: () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    useLikedStore.setState({ likedItems: [] });
     set({
       user: null,
       accessToken: null,
@@ -223,91 +224,86 @@ export const useSidebarStore = create((set) => ({
   openSidebar: () => set(() => ({ side: true })),
 }));
 
-export const useLikedStore = create((set, get) => ({
-  likedItems: [], // Array of { centerId, id (likeId) }
-  loading: false,
+export const useLikedStore = create(
+  persist(
+    (set, get) => ({
+      likedItems: [],
+      loading: false,
 
-  fetchLiked: async () => {
-    set({ loading: true });
-    try {
-      const token = localStorage.getItem("accessToken");
-      const res = await axios.get(`${API_BASE}/liked/query`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const liked = res.data?.data || [];
-      console.log("✅ Raw liked response from backend:", liked);
+      fetchLiked: async () => {
+        set({ loading: true });
+        try {
+          const token = localStorage.getItem("accessToken");
+          const res = await axios.get(`${API_BASE}/liked/query`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
 
-      // Save both centerId and the likeId (id) from the backend
-      const likedItems = liked.map((item) => ({
-        centerId: item.centerId,
-        id: item.id,
-      }));
+          const user = useAuthStore.getState().user;
+          const liked = (res.data?.data || []).filter(item => item.userId === user?.data?.id);
 
-      set({ likedItems });
-    } catch (err) {
-      console.error("Failed to fetch liked centers", err);
-    } finally {
-      set({ loading: false });
-    }
-  },
+          const likedItems = liked.map((item) => ({
+            centerId: item.centerId,
+            id: item.id,
+          }));
 
-  toggleLike: async (centerId) => {
-    const { likedItems } = get();
-    const refreshTokenFunc = useAuthStore.getState().refreshTokenFunc;
-    const token = await refreshTokenFunc(false); // don't log out if expired
-  
-    console.log("🔐 Access token used for toggleLike:", token);
-    console.log("📝 Liked items before toggle:", likedItems);
-  
-    if (!token) {
-      console.warn("⛔ No token available. Skipping like toggle.");
-      return;
-    }
-  
-    const existing = likedItems.find((item) => item.centerId === centerId);
-    console.log("🎯 Center to toggle:", centerId);
-    console.log("🔍 Found existing like?", existing);
-  
-    try {
-      if (existing) {
-        console.log(`🗑️ Attempting to unlike (DELETE /liked/${existing.id})`);
-        const res = await axios.delete(`${API_BASE}/liked/${existing.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        console.log("✅ Unlike response:", res?.data);
-  
-        const updatedItems = likedItems.filter((item) => item.centerId !== centerId);
-        set({ likedItems: updatedItems });
-        console.log("🆕 likedItems after unlike:", updatedItems);
-      } else {
-        console.log("❤️ Attempting to like (POST /liked)");
-        const res = await axios.post(
-          `${API_BASE}/liked`,
-          { centerId },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-  
-        const newLike = res.data?.data;
-        if (newLike?.id) {
-          const newItems = [...likedItems, { centerId, id: newLike.id }];
-          set({ likedItems: newItems });
-          console.log("🆕 likedItems after like:", newItems);
+          set({ likedItems });
+        } catch (err) {
+          console.error("❌ Failed to fetch liked centers:", err);
+        } finally {
+          set({ loading: false });
         }
-      }
-    } catch (err) {
-      console.error("❌ Error during like toggle:", err);
-      console.log("📬 Error response:", err.response?.data);
-      console.log("📛 Error status:", err.response?.status);
-    }
-  },
+      },
 
-  isLiked: (centerId) =>
-    get().likedItems.some((item) => item.centerId === centerId),
-}));
+      toggleLike: async (centerId) => {
+        const { likedItems } = get();
+        const token = await useAuthStore.getState().refreshTokenFunc(false);
+
+        if (!token) return;
+
+        const existing = likedItems.find((item) => item.centerId === centerId);
+
+        try {
+          if (existing) {
+            // Unlike
+            await axios.delete(`${API_BASE}/liked/${existing.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            set({
+              likedItems: likedItems.filter((item) => item.centerId !== centerId),
+            });
+          } else {
+            // Like
+            const res = await axios.post(
+              `${API_BASE}/liked`,
+              { centerId },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            const newLike = res.data?.data;
+            if (newLike?.id) {
+              set({
+                likedItems: [...likedItems, { centerId, id: newLike.id }],
+              });
+            }
+          }
+        } catch (err) {
+          const msg = err?.response?.data?.message;
+          if (msg === "You allready clicked like.") {
+            console.warn("💡 Already liked, skipping...");
+          } else {
+            console.error("❌ toggleLike error:", msg || err);
+          }
+        }
+      },
+
+      isLiked: (centerId) => get().likedItems.some((item) => item.centerId === centerId),
+    }),
+    {
+      name: "liked-storage",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
 
 export const useCommentStore = create((set, get) => ({
   comments: [],

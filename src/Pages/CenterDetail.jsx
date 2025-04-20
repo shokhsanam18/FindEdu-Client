@@ -46,7 +46,7 @@ const CenterDetail = () => {
   const [reservationError, setReservationError] = useState(null);
   const [reservationSuccess, setReservationSuccess] = useState(false);
 
-  const { toggleLike, isLiked } = useLikedStore();
+  const { toggleLike, isLiked, fetchLiked } = useLikedStore();
   const liked = isLiked(Number(id));
 
   const {
@@ -118,6 +118,13 @@ const CenterDetail = () => {
 
     fetchData();
   }, [id, navigate]);
+
+  useEffect(() => {
+    const user = useAuthStore.getState().user;
+    if (user && useLikedStore.getState().likedItems.length === 0) {
+      fetchLiked();
+    }
+  }, [user]);
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();

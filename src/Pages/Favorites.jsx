@@ -100,6 +100,13 @@ const Favorites = () => {
 
     fetchAll();
   }, []);
+  
+  useEffect(() => {
+    const user = useAuthStore.getState().user;
+    if (user && useLikedStore.getState().likedItems.length === 0) {
+      fetchLiked();
+    }
+  }, [user]);
 
   const handleLikeToggle = async (centerId) => {
     console.log("🔘 Toggling like for centerId:", centerId);
