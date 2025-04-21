@@ -329,38 +329,39 @@ const CenterDetail = () => {
                 Available Courses
               </h2>
 
-              <div className=" gap-2 px-5 flex flex-row flex-wrap">
-                {center.majors[0].name.length > 0 && (
-                  <motion.div
-                    key={majors.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className={`bg-white border border-gray-200 rounded-xl  overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
-                      selectedMajor?.id === center.majors.id
-                        ? "ring-2 ring-purple-500"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedMajor(center.majors[0].name)}
-                  >
-                    <div className="p-2 ">
-                      <div className="flex items-start  ">
-                        <div className="flex-shrink-0 p-2 bg-purple-100 rounded-lg text-purple-600">
-                          <Bookmark className="h-4 w-4" />
-                        </div>
-                        <div className="ml-2 flex-1 cursor-pointer">
-                          <h3 className="text-lg font-semibold text-gray-900 mr-1">
-                            {center.majors[0].name}
-                          </h3>
-                          <p className="mt-1 text-gray-600">
-                            {center.majors[0].name.description || ""}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )} 
-              </div>                <div className="mt-5 px-5">
+              <div className="gap-2 px-5 flex flex-row flex-wrap">
+  {center.majors.map((major) => (
+    major.name.length > 0 && (
+      <motion.div
+        key={major.id}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
+          selectedMajor?.id === major.id ? "ring-2 ring-purple-500" : ""
+        }`}
+        onClick={() => setSelectedMajor(major)}
+      >
+        <div className="p-2">
+          <div className="flex items-start">
+            <div className="flex-shrink-0 p-2 bg-purple-100 rounded-lg text-purple-600">
+              <Bookmark className="h-4 w-4" />
+            </div>
+            <div className="ml-2 flex-1 cursor-pointer">
+              <h3 className="text-lg font-semibold text-gray-900 mr-1">
+                {major.name}
+              </h3>
+              <p className="mt-1 text-gray-600">
+                {major.description || ""}
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    )
+  ))}
+</div>       
+                     <div className="mt-5 px-5">
                 <button
                   onClick={() => {
                     if (!user || !user?.data?.id) {
@@ -714,7 +715,10 @@ const CenterDetail = () => {
                         <p className="text-sm font-medium text-purple-700">
                           Selected Major:
                         </p>
-                        <p className="font-medium">{center.majors[0].name}</p>
+                        <p className="font-medium">{selectedMajor?.name}</p>
+                        <p className="text-sm text-gray-600">
+                          {selectedMajor?.address}
+                        </p>
                       </div>
 
                       {/* Date and time picker */}
