@@ -20,6 +20,7 @@ import CenterEditForm from "./Pages/CenterEditForm.jsx";
 import Favorites from "./Pages/Favorites.jsx";
 import FormTry from "./Register/Login/Register.jsx";
 import { Centers } from "./Pages/Centers.jsx";
+import BranchDetails from "./Pages/Branches";
 import { Toaster } from "sonner";
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
             <Route path="/Appointment" element={<Appointment />} />
             <Route path="/MyCenters" element={<Centers />} />
             <Route path="/ceo/edit/:id" element={<CenterEditForm />} />
+            <Route path="/branches/:id" element={<BranchDetails />} />
           </Route>
           <Route path="/Register" element={<FormTry />} />
           <Route path="/Login" element={<Login />} />

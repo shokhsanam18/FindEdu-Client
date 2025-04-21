@@ -97,6 +97,7 @@ login: async (values) => {
   logout: () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    useLikedStore.setState({ likedItems: [] });
     set({
       user: null,
       accessToken: null,
@@ -223,73 +224,93 @@ export const useSidebarStore = create((set) => ({
   openSidebar: () => set(() => ({ side: true })),
 }));
 
-export const useLikedStore = create((set, get) => ({
-  likedItems: [], // Array of { centerId, id (likeId) }
-  loading: false,
+export const useLikedStore = create(
+  persist(
+    (set, get) => ({
+      likedItems: [],
+      loading: false,
 
-  fetchLiked: async () => {
-    set({ loading: true });
-    try {
-      const token = localStorage.getItem("accessToken");
-      const res = await axios.get(`${API_BASE}/liked/query`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const liked = res.data?.data || [];
-
-      // Save both centerId and the likeId (id) from the backend
-      const likedItems = liked.map((item) => ({
-        centerId: item.centerId,
-        id: item.id,
-      }));
-
-      set({ likedItems });
-    } catch (err) {
-      console.error("Failed to fetch liked centers", err);
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  toggleLike: async (centerId) => {
-    const { likedItems } = get();
-    const token = localStorage.getItem("accessToken");
-
-    const existing = likedItems.find((item) => item.centerId === centerId);
-
-    try {
-      if (existing) {
-        // Unlike using `likeId` (not centerId)
-        await axios.delete(`${API_BASE}/liked/${existing.id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        set({
-          likedItems: likedItems.filter((item) => item.centerId !== centerId),
-        });
-      } else {
-        // Like
-        const res = await axios.post(
-          `${API_BASE}/liked`,
-          { centerId },
-          {
+      fetchLiked: async () => {
+        set({ loading: true });
+        try {
+          const token = localStorage.getItem("accessToken");
+          const res = await axios.get(`${API_BASE}/liked/query`, {
             headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const newLike = res.data?.data;
-        if (newLike?.id) {
-          set({
-            likedItems: [...likedItems, { centerId, id: newLike.id }],
           });
-        }
-      }
-    } catch (err) {
-      console.error("Toggle like error", err);
-    }
-  },
 
-  isLiked: (centerId) =>
-    get().likedItems.some((item) => item.centerId === centerId),
-}));
+          const user = useAuthStore.getState().user;
+          const liked = (res.data?.data || []).filter(item => item.userId === user?.data?.id);
+
+          const likedItems = liked.map((item) => ({
+            centerId: item.centerId,
+            id: item.id,
+          }));
+
+          set({ likedItems });
+        } catch (err) {
+          console.error("❌ Failed to fetch liked centers:", err);
+        } finally {
+          set({ loading: false });
+        }
+      },
+
+      toggleLike: async (centerId) => {
+        const user = useAuthStore.getState().user;
+      
+        if (!user || !user?.data?.id) {
+          toast.warning("Please log in to like centers.");
+          return;
+        }
+      
+        const { likedItems } = get();
+        const token = await useAuthStore.getState().refreshTokenFunc(false);
+      
+        if (!token) return;
+      
+        const existing = likedItems.find((item) => item.centerId === centerId);
+      
+        try {
+          if (existing) {
+            // Unlike
+            await axios.delete(`${API_BASE}/liked/${existing.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            set({
+              likedItems: likedItems.filter((item) => item.centerId !== centerId),
+            });
+          } else {
+            // Like
+            const res = await axios.post(
+              `${API_BASE}/liked`,
+              { centerId },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+      
+            const newLike = res.data?.data;
+            if (newLike?.id) {
+              set({
+                likedItems: [...likedItems, { centerId, id: newLike.id }],
+              });
+            }
+          }
+        } catch (err) {
+          const msg = err?.response?.data?.message;
+          if (msg === "You allready clicked like.") {
+            console.warn("💡 Already liked, skipping...");
+          } else {
+            console.error("❌ toggleLike error:", msg || err);
+          }
+        }
+      },
+
+      isLiked: (centerId) => get().likedItems.some((item) => item.centerId === centerId),
+    }),
+    {
+      name: "liked-storage",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
 
 export const useCommentStore = create((set, get) => ({
   comments: [],
@@ -498,4 +519,46 @@ export const useModalStore = create((set) => ({
   isModalOpen: false,
   openModal: () => set({ isModalOpen: true }),
   closeModal: () => set({ isModalOpen: false }),
+}));
+
+
+
+export const useMyCentersStore = create((set) => ({
+  myCenters: [],
+  loading: false,
+  error: null,
+
+  fetchMyCenters: async () => {
+    set({ loading: true, error: null });
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.get("https://findcourse.net.uz/api/users/mycenters", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const centers = res.data?.data || [];
+
+      const processed = centers.map((center) => {
+        const comments = center.comments || [];
+        const avgRating =
+          comments.length > 0
+            ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
+            : 0;
+
+        return {
+          ...center,
+          rating: avgRating,
+          imageUrl: center.image ? `https://findcourse.net.uz/api/image/${center.image}` : null,
+        };
+      });
+
+      set({ myCenters: processed });
+    } catch (error) {
+      console.error("❌ Failed to fetch my centers:", error);
+      set({ error: "Failed to load your centers" });
+    } finally {
+      set({ loading: false });
+    }
+  },
 }));
