@@ -581,16 +581,16 @@ const ScrollingLogos = () => {
 
 const About = () => {
   return (
-    <div className="overflow-x-hidden mt-18">
+    <div className="overflow-x-hidden mt-">
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: -50 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ duration: 0.8 }}
-        className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-4 md:p-6 min-h-[60vh] text-white bg-cover bg-center"
+        className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-4 md:p-6 min-h-[60vh] text-[#34115a] bg-cover bg-center"
         style={{ backgroundImage: `url(${aboutus})` }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div className="absolute inset-0 bg-white bg-opacity-65"></div>
 
         <motion.div
           initial={{ opacity: 0, x: -50 }} 
@@ -598,8 +598,8 @@ const About = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="relative z-10 max-w-3xl px-4 md:px-8 text-start mt-16 md:mt-0"
         >
-          <p className="text-lg md:text-xl mt-4 md:mt-0">Helping You Find the Best Education Centers!</p>
-          <h1 className="text-3xl md:text-7xl font-bold">About Us</h1>
+          <p className="text-lg md:text-l mt-4 md:mt-0">Helping You Find the Best Education Centers!</p>
+          <h1 className="text-3xl md:text-6xl font-bold">About Us</h1>
         </motion.div>
 
         <motion.div
@@ -611,7 +611,7 @@ const About = () => {
           <div className="flex gap-2">
             <Link to="/" className="no-underline hover:underline text-white">Home</Link>
             <p>|</p>
-            <Link to="/" className="text-[#bbbbbb] no-underline hover:underline">
+            <Link to="/" className="text-[#2d0e4e] no-underline hover:underline">
               About Us
             </Link>
           </div>

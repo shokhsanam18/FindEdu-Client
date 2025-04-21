@@ -12,11 +12,12 @@ import {
   FaUpload,
 } from "react-icons/fa";
 import { MdComputer, MdBusiness } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../Store";
 import { AuthContext } from "../context/auth";
 import { toast } from "sonner";
 import "react-toastify/dist/ReactToastify.css";
+import { motion } from "framer-motion";
 import axios from "axios";
 
 const API_BASE_URL = "https://findcourse.net.uz/api/resources";
@@ -60,7 +61,6 @@ export const Resources = () => {
     try {
       const token = localStorage.getItem("accessToken");
       const { itemsPerPage } = pagination;
-
       let url = `${API_BASE_URL}?page=${page}&limit=${itemsPerPage}`;
 
       if (activeFilter === "myResources") {
@@ -137,9 +137,26 @@ export const Resources = () => {
     if (imageInputMode === "upload") {
       const file = e.target.files[0];
       if (file) {
+        if (!file.type.match("image.*")) {
+          setErrors({
+            ...errors,
+            image: "Please select an image file (JPEG, PNG, etc.)",
+          });
+          return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          setErrors({
+            ...errors,
+            image: "Image file size must be less than 5MB",
+          });
+          return;
+        }
+
         const previewUrl = URL.createObjectURL(file);
         setImagePreview(previewUrl);
         setNewResource({ ...newResource, image: file });
+        setErrors({ ...errors, image: "" });
       }
     } else {
       const { value } = e.target;
@@ -215,6 +232,11 @@ export const Resources = () => {
     return isValid;
   };
 
+  const API_BASE_URL = "https://findcourse.net.uz/api/resources";
+  const CATEGORIES_URL = "https://findcourse.net.uz/api/categories";
+
+  // ... [previous code remains the same until handleSubmit]
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -223,7 +245,12 @@ export const Resources = () => {
       return;
     }
 
-    if (!validateForm()) {
+    // Enhanced validation
+    if (!newResource.categoryId) {
+      setErrors((prev) => ({
+        ...prev,
+        categoryId: "Please select a category",
+      }));
       return;
     }
 
@@ -233,18 +260,40 @@ export const Resources = () => {
       const token = localStorage.getItem("accessToken");
       const formData = new FormData();
 
-      // Append all fields
-      formData.append("categoryId", newResource.categoryId);
+      // 1. Get the full category details to verify
+      const categoryResponse = await axios.get(
+        `${CATEGORIES_URL}/${newResource.categoryId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!categoryResponse.data?.id) {
+        throw new Error("Selected category not found");
+      }
+
+      // 2. Prepare the resource data
+      formData.append("categoryId", categoryResponse.data.id); // Using the verified ID
       formData.append("name", newResource.name);
       formData.append("description", newResource.description || "");
       formData.append("media", newResource.media);
 
-      // Handle image based on input mode
-      if (imageInputMode === "upload" && newResource.image instanceof File) {
-        formData.append("image", newResource.image);
+      // 3. Handle image upload
+      if (imageInputMode === "upload") {
+        if (newResource.image instanceof File) {
+          formData.append("image", newResource.image);
+        } else {
+          throw new Error("Please select an image file to upload");
+        }
       } else if (imageInputMode === "url" && newResource.image) {
         formData.append("image", newResource.image);
       }
+
+      // Debug output
+      console.log("Submitting resource with category:", {
+        categoryId: categoryResponse.data.id,
+        categoryName: categoryResponse.data.name,
+      });
 
       const response = await axios.post(API_BASE_URL, formData, {
         headers: {
@@ -263,35 +312,25 @@ export const Resources = () => {
         image: null,
       });
       setImagePreview("");
-      setErrors({
-        media: "",
-        image: "",
-        name: "",
-        categoryId: "",
-      });
       fetchResources();
     } catch (error) {
-      console.error("Error details:", {
-        message: error.message,
-        response: error.response?.data,
-        config: error.config,
+      console.error("Submission error:", {
+        error: error.response?.data || error.message,
+        requestData: {
+          categoryId: newResource.categoryId,
+          name: newResource.name,
+          media: newResource.media,
+        },
       });
 
-      if (error.response?.data?.errors) {
-        const serverErrors = error.response.data.errors;
-        let errorMessages = [];
-
-        Object.keys(serverErrors).forEach((key) => {
-          errorMessages.push(`${key}: ${serverErrors[key].join(", ")}`);
-        });
-
-        toast.error(`Validation errors: ${errorMessages.join("; ")}`);
-      } else {
-        toast.error(
-          error.response?.data?.message ||
-            "Failed to add resource. Please check your inputs."
-        );
+      let errorMessage = "Failed to add resource";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
+
+      toast.error(errorMessage);
     } finally {
       setIsUploading(false);
     }
@@ -421,433 +460,496 @@ export const Resources = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-21">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+    <div className="">
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-[#2d0e4e] bg-cover bg-center mt-20"
+        style={{ backgroundImage: "url('/aboutus.png')" }}
+      >
+        <div className="absolute inset-0 bg-white bg-opacity-70"></div>
+
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="relative z-10 max-w-2xl px-3 text-center md:px-6 md:text-start mt-2 md:mt-8"
+        >
+          <p className="text-xl md:text-xl mt-6 md:mt-0">
+            Discover Teaching Resources
+          </p>
+          <p className="text-lg md:text-l mt-4 md:mt-2">
+            Access high-quality materials to enhance your educational programs.
+          </p>
+          <h1 className="text-4xl md:text-5xl font-bold mt-2 md:mt-4">
             Educational Resources
           </h1>
-          <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-            High-quality materials for learning center administrators and
-            educators
-          </p>
-        </div>
+        </motion.div>
 
-        <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="relative flex-grow">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaSearch className="h-5 w-5 text-gray-400" />
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-xl mt-4 md:mt-0"
+        >
+          <div className="flex gap-2">
+            <Link to="/" className="no-underline hover:underline text-white">
+              Home
+            </Link>
+            <p>|</p>
+            <Link
+              to="/resources"
+              className="text-[#2d0e4e] no-underline hover:underline"
+            >
+              Resources
+            </Link>
+          </div>
+        </motion.div>
+      </motion.div>
+      <div className="min-h-screen  py-8 px-4 sm:px-6 lg:px-8 mt-5">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+              Educational Resources
+            </h1>
+            <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+              High-quality materials for learning center administrators and
+              educators
+            </p>
+          </div>
+
+          <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="relative flex-grow">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaSearch className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="Search resources..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-              <input
-                type="text"
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                placeholder="Search resources..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="flex items-center space-x-2 overflow-x-auto pb-2 md:pb-0">
-              <button
-                onClick={() => setActiveFilter("all")}
-                className={`px-4 py-2 rounded-full text-sm font-medium ${
-                  activeFilter === "all"
-                    ? "bg-blue-100 text-blue-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                All Resources
-              </button>
-              {isLoggedIn && (
+              <div className="flex items-center space-x-2 overflow-x-auto pb-2 md:pb-0">
                 <button
-                  onClick={() => setActiveFilter("myResources")}
+                  onClick={() => setActiveFilter("all")}
                   className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    activeFilter === "myResources"
+                    activeFilter === "all"
                       ? "bg-blue-100 text-blue-800"
                       : "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  My Resources
+                  All Resources
                 </button>
-              )}
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveFilter(category.id.toString())}
-                  className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${
-                    activeFilter === category.id.toString()
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {category.name === "IT" ? (
-                    <MdComputer className="mr-2" />
-                  ) : (
-                    <MdBusiness className="mr-2" />
-                  )}
-                  {category.name}
-                </button>
-              ))}
+                {isLoggedIn && (
+                  <button
+                    onClick={() => setActiveFilter("myResources")}
+                    className={`px-4 py-2 rounded-full text-sm font-medium ${
+                      activeFilter === "myResources"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    My Resources
+                  </button>
+                )}
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setActiveFilter(category.id.toString())}
+                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${
+                      activeFilter === category.id.toString()
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {category.name === "IT" ? (
+                      <MdComputer className="mr-2" />
+                    ) : (
+                      <MdBusiness className="mr-2" />
+                    )}
+                    {category.name}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
 
-        <button
-          onClick={handleAddResourceClick}
-          className="px-4 py-2 bg-[#451774] text-white text-sm rounded-lg hover:bg-[#3a115a] transition duration-300 mx-auto block mb-8"
-        >
-          Add Resource
-        </button>
+          <button
+            onClick={handleAddResourceClick}
+            className="px-4 py-2 bg-[#451774] text-white text-sm rounded-lg hover:bg-[#3a115a] transition duration-300 mx-auto block mb-8"
+          >
+            Add Resource
+          </button>
 
-        {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-400 bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg w-96">
-              <h2 className="text-xl font-semibold mb-4">Add New Resource</h2>
-              <form onSubmit={handleSubmit}>
-                <div className="mb-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category *
-                  </label>
-                  <select
-                    name="categoryId"
-                    value={newResource.categoryId}
-                    onChange={handleInputChange}
-                    className={`block w-full p-2 border ${
-                      errors.categoryId ? "border-red-500" : "border-gray-300"
-                    } rounded`}
-                    required
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.categoryId && (
-                    <div className="flex items-center mt-1">
-                      <FaExclamationTriangle className="text-red-500 mr-1" />
-                      <span className="text-sm text-red-500">
-                        {errors.categoryId}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mb-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Resource Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Resource Name"
-                    value={newResource.name}
-                    onChange={handleInputChange}
-                    className={`block w-full p-2 border ${
-                      errors.name ? "border-red-500" : "border-gray-300"
-                    } rounded`}
-                    required
-                  />
-                  {errors.name && (
-                    <div className="flex items-center mt-1">
-                      <FaExclamationTriangle className="text-red-500 mr-1" />
-                      <span className="text-sm text-red-500">
-                        {errors.name}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mb-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    name="description"
-                    placeholder="Description"
-                    value={newResource.description}
-                    onChange={handleInputChange}
-                    className="block w-full p-2 border border-gray-300 rounded"
-                  />
-                </div>
-
-                <div className="mb-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Media URL *
-                  </label>
-                  <input
-                    type="url"
-                    name="media"
-                    placeholder="Media URL (max 200 characters)"
-                    value={newResource.media}
-                    onChange={(e) => {
-                      if (e.target.value.length <= 200) {
-                        handleInputChange(e);
-                      }
-                    }}
-                    className={`block w-full p-2 border ${
-                      errors.media ? "border-red-500" : "border-gray-300"
-                    } rounded`}
-                    required
-                  />
-                  <div className="flex items-center mt-1">
-                    {errors.media && (
-                      <>
+          {isModalOpen && (
+            <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-400 bg-opacity-50">
+              <div className="bg-white p-6 rounded-lg w-96">
+                <h2 className="text-xl font-semibold mb-4">Add New Resource</h2>
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Category *
+                    </label>
+                    <select
+                      name="categoryId"
+                      value={newResource.categoryId}
+                      onChange={(e) => {
+                        setNewResource({
+                          ...newResource,
+                          categoryId: e.target.value,
+                        });
+                        setErrors({ ...errors, categoryId: "" });
+                      }}
+                      className={`block w-full p-2 border ${
+                        errors.categoryId ? "border-red-500" : "border-gray-300"
+                      } rounded`}
+                      required
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.categoryId && (
+                      <div className="flex items-center mt-1">
                         <FaExclamationTriangle className="text-red-500 mr-1" />
                         <span className="text-sm text-red-500">
-                          {errors.media}
+                          {errors.categoryId}
                         </span>
-                      </>
+                      </div>
                     )}
-                    <span className="text-xs text-gray-500 ml-auto">
-                      {newResource.media.length}/200
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Image
-                  </label>
-                  <div className="flex mb-2">
-                    <button
-                      type="button"
-                      onClick={() => setImageInputMode("upload")}
-                      className={`flex items-center px-3 py-1 rounded-l-md ${
-                        imageInputMode === "upload"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      <FaUpload className="mr-1" /> Upload
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setImageInputMode("url")}
-                      className={`flex items-center px-3 py-1 rounded-r-md ${
-                        imageInputMode === "url"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      <FaLink className="mr-1" /> URL
-                    </button>
                   </div>
 
-                  {imageInputMode === "upload" ? (
-                    <>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageInput}
-                        className="block w-full text-sm text-gray-500 mb-2
+                  <div className="mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Resource Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Resource Name"
+                      value={newResource.name}
+                      onChange={handleInputChange}
+                      className={`block w-full p-2 border ${
+                        errors.name ? "border-red-500" : "border-gray-300"
+                      } rounded`}
+                      required
+                    />
+                    {errors.name && (
+                      <div className="flex items-center mt-1">
+                        <FaExclamationTriangle className="text-red-500 mr-1" />
+                        <span className="text-sm text-red-500">
+                          {errors.name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      name="description"
+                      placeholder="Description"
+                      value={newResource.description}
+                      onChange={handleInputChange}
+                      className="block w-full p-2 border border-gray-300 rounded"
+                    />
+                  </div>
+
+                  <div className="mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Media URL *
+                    </label>
+                    <input
+                      type="url"
+                      name="media"
+                      placeholder="Media URL (max 200 characters)"
+                      value={newResource.media}
+                      onChange={(e) => {
+                        if (e.target.value.length <= 200) {
+                          handleInputChange(e);
+                        }
+                      }}
+                      className={`block w-full p-2 border ${
+                        errors.media ? "border-red-500" : "border-gray-300"
+                      } rounded`}
+                      required
+                    />
+                    <div className="flex items-center mt-1">
+                      {errors.media && (
+                        <>
+                          <FaExclamationTriangle className="text-red-500 mr-1" />
+                          <span className="text-sm text-red-500">
+                            {errors.media}
+                          </span>
+                        </>
+                      )}
+                      <span className="text-xs text-gray-500 ml-auto">
+                        {newResource.media.length}/200
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Image
+                    </label>
+                    <div className="flex mb-2">
+                      <button
+                        type="button"
+                        onClick={() => setImageInputMode("upload")}
+                        className={`flex items-center px-3 py-1 rounded-l-md ${
+                          imageInputMode === "upload"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        <FaUpload className="mr-1" /> Upload
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setImageInputMode("url")}
+                        className={`flex items-center px-3 py-1 rounded-r-md ${
+                          imageInputMode === "url"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        <FaLink className="mr-1" /> URL
+                      </button>
+                    </div>
+
+                    {imageInputMode === "upload" ? (
+                      <>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageInput}
+                          className="block w-full text-sm text-gray-500 mb-2
                           file:mr-4 file:py-2 file:px-4
                           file:rounded-md file:border-0
                           file:text-sm file:font-semibold
                           file:bg-blue-50 file:text-blue-700
                           hover:file:bg-blue-100"
-                      />
-                      {imagePreview && (
-                        <div className="mt-2">
-                          <img
-                            src={imagePreview}
-                            alt="Preview"
-                            className="h-32 object-cover rounded"
-                          />
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <input
-                      type="url"
-                      name="image"
-                      placeholder="Image URL"
-                      value={
-                        typeof newResource.image === "string"
-                          ? newResource.image
-                          : ""
-                      }
-                      onChange={handleImageInput}
-                      className="block w-full p-2 border border-gray-300 rounded"
-                    />
-                  )}
-                </div>
-
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-                    disabled={isUploading}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center"
-                    disabled={isUploading}
-                  >
-                    {isUploading ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Uploading...
+                        />
+                        {errors.image && (
+                          <div className="flex items-center mt-1">
+                            <FaExclamationTriangle className="text-red-500 mr-1" />
+                            <span className="text-sm text-red-500">
+                              {errors.image}
+                            </span>
+                          </div>
+                        )}
+                        {imagePreview && (
+                          <div className="mt-2">
+                            <img
+                              src={imagePreview}
+                              alt="Preview"
+                              className="h-32 object-cover rounded"
+                            />
+                          </div>
+                        )}
                       </>
                     ) : (
-                      "Add Resource"
+                      <input
+                        type="url"
+                        name="image"
+                        placeholder="Image URL"
+                        value={
+                          typeof newResource.image === "string"
+                            ? newResource.image
+                            : ""
+                        }
+                        onChange={handleImageInput}
+                        className="block w-full p-2 border border-gray-300 rounded"
+                      />
                     )}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+                  </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredResources.length > 0 ? (
-            filteredResources.map((resource) => (
-              <div
-                key={resource.id}
-                className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow duration-300"
-              >
-                {resource.image && (
-                  <div className="h-48 overflow-hidden">
-                    <img
-                      src={resource.image}
-                      alt={resource.name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(false)}
+                      className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                      disabled={isUploading}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center"
+                      disabled={isUploading}
+                    >
+                      {isUploading ? (
+                        <>
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          Uploading...
+                        </>
+                      ) : (
+                        "Add Resource"
+                      )}
+                    </button>
                   </div>
-                )}
-                <div className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="text-2xl">
-                        {getTypeIcon(resource.type)}
+                </form>
+              </div>
+            </div>
+          )}
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredResources.length > 0 ? (
+              filteredResources.map((resource) => (
+                <div
+                  key={resource.id}
+                  className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow duration-300"
+                >
+                  {resource.image && (
+                    <div className="h-48 overflow-hidden">
+                      <img
+                        src={resource.image}
+                        alt={resource.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="text-2xl">
+                          {getTypeIcon(resource.type)}
+                        </div>
+                        <span className="ml-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {resource.type || "Resource"}
+                        </span>
                       </div>
-                      <span className="ml-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {resource.type || "Resource"}
-                      </span>
+                      <div className="flex items-center text-yellow-500">
+                        <FaStar className="mr-1" />
+                        <span className="text-sm font-medium text-gray-700">
+                          {resource.rating || "N/A"}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center text-yellow-500">
-                      <FaStar className="mr-1" />
-                      <span className="text-sm font-medium text-gray-700">
-                        {resource.rating || "N/A"}
-                      </span>
+                    <div className="mt-4">
+                      <h3 className="text-lg font-medium text-gray-900 line-clamp-2">
+                        {resource.name}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        by {resource.user?.firstName || "Unknown"}
+                      </p>
+                      <p className="mt-2 text-sm text-gray-600 line-clamp-3">
+                        {resource.description}
+                      </p>
                     </div>
-                  </div>
-                  <div className="mt-4">
-                    <h3 className="text-lg font-medium text-gray-900 line-clamp-2">
-                      {resource.name}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      by {resource.user?.firstName || "Unknown"}
-                    </p>
-                    <p className="mt-2 text-sm text-gray-600 line-clamp-3">
-                      {resource.description}
-                    </p>
-                  </div>
-                  <div className="mt-6 flex items-center justify-between">
-                    <div className="flex items-center text-sm text-gray-500">
-                      <span>
-                        {resource.downloads?.toLocaleString() || "0"} downloads
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {new Date(resource.createdAt).toLocaleDateString()}
+                    <div className="mt-6 flex items-center justify-between">
+                      <div className="flex items-center text-sm text-gray-500">
+                        <span>
+                          {resource.downloads?.toLocaleString() || "0"}{" "}
+                          downloads
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {new Date(resource.createdAt).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="bg-gray-50 px-6 py-4 flex justify-between">
-                  <a
-                    href={resource.media}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-[#451774] hover:text-[#451774]"
-                  >
-                    Preview
-                  </a>
-                  <div className="flex space-x-2">
-                    {isUserResource(resource) && (
-                      <button
-                        onClick={() => handleDelete(resource.id)}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700"
-                      >
-                        <FaTrash className="mr-1" /> Delete
-                      </button>
-                    )}
+                  <div className="bg-gray-50 px-6 py-4 flex justify-between">
                     <a
                       href={resource.media}
-                      download
-                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#451774] hover:bg-[#3a115a]"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-[#451774] hover:text-[#451774]"
                     >
-                      <FaDownload className="mr-1" /> Download
+                      Preview
                     </a>
+                    <div className="flex space-x-2">
+                      {isUserResource(resource) && (
+                        <button
+                          onClick={() => handleDelete(resource.id)}
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700"
+                        >
+                          <FaTrash className="mr-1" /> Delete
+                        </button>
+                      )}
+                      <a
+                        href={resource.media}
+                        download
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#451774] hover:bg-[#3a115a]"
+                      >
+                        <FaDownload className="mr-1" /> Download
+                      </a>
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="col-span-3 py-12 text-center">
+                <h3 className="text-lg font-medium text-gray-900">
+                  No resources found
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Try adjusting your search or filter criteria
+                </p>
               </div>
-            ))
-          ) : (
-            <div className="col-span-3 py-12 text-center">
-              <h3 className="text-lg font-medium text-gray-900">
-                No resources found
-              </h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Try adjusting your search or filter criteria
-              </p>
+            )}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-12 flex justify-center">
+              <nav
+                className="inline-flex rounded-md shadow-sm -space-x-px"
+                aria-label="Pagination"
+              >
+                <button
+                  onClick={() =>
+                    handlePageChange(Math.max(1, pagination.currentPage - 1))
+                  }
+                  disabled={pagination.currentPage === 1}
+                  className="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                {renderPaginationButtons()}
+                <button
+                  onClick={() =>
+                    handlePageChange(
+                      Math.min(totalPages, pagination.currentPage + 1)
+                    )
+                  }
+                  disabled={pagination.currentPage === totalPages}
+                  className="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </nav>
             </div>
           )}
         </div>
-
-        {totalPages > 1 && (
-          <div className="mt-12 flex justify-center">
-            <nav
-              className="inline-flex rounded-md shadow-sm -space-x-px"
-              aria-label="Pagination"
-            >
-              <button
-                onClick={() =>
-                  handlePageChange(Math.max(1, pagination.currentPage - 1))
-                }
-                disabled={pagination.currentPage === 1}
-                className="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Previous
-              </button>
-              {renderPaginationButtons()}
-              <button
-                onClick={() =>
-                  handlePageChange(
-                    Math.min(totalPages, pagination.currentPage + 1)
-                  )
-                }
-                disabled={pagination.currentPage === totalPages}
-                className="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Next
-              </button>
-            </nav>
-          </div>
-        )}
       </div>
     </div>
   );

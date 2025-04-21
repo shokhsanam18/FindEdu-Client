@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { toast } from "sonner";
+import axios from "axios";
+// import { toast } from "sonner";
 import {
   MapPin,
   Star,
@@ -22,7 +23,7 @@ import {
   ChevronDown,
   Briefcase,
   Bookmark,
-  Loader2,
+  PencilLine,
 } from "lucide-react";
 import { useLikedStore, useCommentStore, useAuthStore } from "../Store";
 
@@ -72,25 +73,35 @@ const CenterDetail = () => {
       try {
         setLoading(true);
 
-        // Fetch center data
+        // Fetch center
         const centerRes = await axios.get(`${API_BASE}/api/centers/${id}`);
         const centerData = centerRes.data?.data;
 
-        // Fetch majors for this center
+        // Fetch majors
         const majorsRes = await axios.get(`${API_BASE}/api/major/query`);
         const majorsData = majorsRes.data?.data || [];
 
-        // Mock branches data - replace with actual API call if available
-        const mockBranches = [
-          { id: 1, name: "Main Branch", address: centerData.address },
+        // Fetch branches (filials)
+        const filialRes = await axios.get(`${API_BASE}/api/filials`, {
+          params: { centerId: centerData.id },
+        });
+        const filials = filialRes.data?.data || [];
+
+        // Construct dynamic branch list
+        const dynamicBranches = [
           {
-            id: 2,
-            name: "Downtown Branch",
-            address: "456 Business Ave, Tashkent",
+            id: "main",
+            name: "Main Branch",
+            address: centerData.address,
           },
-          { id: 3, name: "North Branch", address: "789 Park Blvd, Tashkent" },
+          ...filials.map((filial) => ({
+            id: filial.id,
+            name: filial.region?.name || `Region ${filial.regionId}`,
+            address: filial.address,
+          })),
         ];
 
+        // Calculate avg rating
         const comments = centerData.comments || [];
         const avgRating =
           comments.length > 0
@@ -103,9 +114,9 @@ const CenterDetail = () => {
           imageUrl: centerData.image ? `${ImageApi}/${centerData.image}` : null,
         });
 
+        setBranches(dynamicBranches);
+        setSelectedBranch(dynamicBranches[0]);
         setMajors(majorsData);
-        setBranches(mockBranches);
-        setSelectedBranch(mockBranches[0]);
         setSelectedMajor(majorsData[0]);
 
         await fetchCommentsByCenter(id);
@@ -132,6 +143,16 @@ const CenterDetail = () => {
       fetchLiked();
     }
   }, [user]);
+
+  const handleBranchClick = (branch) => {
+    if (branch.id === "main") {
+      // If it's the main branch, stay on the same page
+      setSelectedBranch(branch);
+    } else {
+      // Navigate to the branch detail page
+      navigate(`/branches/${branch.id}`);
+    }
+  };
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
@@ -182,28 +203,6 @@ const CenterDetail = () => {
     setEditingCommentId(null);
     setEditCommentText("");
     setEditCommentStar(5);
-  };
-
-  const PostRegisteration = () => {
-    const existingData = JSON.parse(localStorage.getItem("RegisterData")) || [];
-
-    const newRegister = {
-      id: id,
-      branch: selectedBranch.name,
-      address: center.address,
-      majorId: selectedMajor.id,
-      majorName: center.name,
-      visitDate: visitDate,
-    };
-    const index = existingData.findIndex((item) => item.id === id);
-
-    if (index !== -1) {
-      existingData[index] = newRegister;
-    } else {
-      existingData.push(newRegister);
-    }
-
-    localStorage.setItem("RegisterData", JSON.stringify(existingData));
   };
 
   if (loading) {
@@ -286,12 +285,9 @@ const CenterDetail = () => {
                 className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-md"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={handleLikeClick}
-                disabled={likeLoading}
+                onClick={() => toggleLike(Number(id))}
               >
-                {likeLoading ? (
-                  <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
-                ) : liked ? (
+                {liked ? (
                   <Heart className="h-6 w-6 text-red-500 fill-red-500" />
                 ) : (
                   <Heart className="h-6 w-6 text-red-500" />
@@ -311,7 +307,7 @@ const CenterDetail = () => {
                         ? "bg-purple-100 border border-purple-300"
                         : "bg-gray-50 hover:bg-gray-100"
                     }`}
-                    onClick={() => setSelectedBranch(branch)}
+                    onClick={() => handleBranchClick(branch)}
                   >
                     <h4 className="font-medium">{branch.name}</h4>
                     <p className="text-sm text-gray-600">{branch.address}</p>
@@ -326,36 +322,54 @@ const CenterDetail = () => {
               </h2>
 
               <div className="gap-2 px-5 flex flex-row flex-wrap">
-                {majors.map((major) => (
-                  <motion.div
-                    key={major.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
-                      selectedMajor?.id === major.id
-                        ? "ring-2 ring-purple-500"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedMajor(major)}
-                  >
-                    <div className="p-2">
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0 p-2 bg-purple-100 rounded-lg text-purple-600">
-                          <Bookmark className="h-4 w-4" />
+                {center.majors.map(
+                  (major) =>
+                    major.name.length > 0 && (
+                      <motion.div
+                        key={major.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
+                          selectedMajor?.id === major.id
+                            ? "ring-2 ring-purple-500"
+                            : ""
+                        }`}
+                        onClick={() => setSelectedMajor(major)}
+                      >
+                        <div className="p-2">
+                          <div className="flex items-start">
+                            <div className="flex-shrink-0 p-2 bg-purple-100 rounded-lg text-purple-600">
+                              <Bookmark className="h-4 w-4" />
+                            </div>
+                            <div className="ml-2 flex-1 cursor-pointer">
+                              <h3 className="text-lg font-semibold text-gray-900 mr-1">
+                                {major.name}
+                              </h3>
+                              <p className="mt-1 text-gray-600">
+                                {major.description || ""}
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                        <div className="ml-2 flex-1 cursor-pointer">
-                          <h3 className="text-lg font-semibold text-gray-900 mr-1">
-                            {major.name}
-                          </h3>
-                          <p className="mt-1 text-gray-600">
-                            {major.description || ""}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+                      </motion.div>
+                    )
+                )}
+              </div>
+              <div className="mt-5 px-5">
+                <button
+                  onClick={() => {
+                    if (!user || !user?.data?.id) {
+                      toast.warning("Please login to register for a class.");
+                      return;
+                    }
+                    setShowReservationModal(true);
+                  }}
+                  className="px-[20px] py-3 text-lg justify-center bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
+                >
+                  <Clock className="h-5 w-5 mr-2" />
+                  Register for a Class
+                </button>
               </div>
             </div>
           </div>
@@ -399,12 +413,6 @@ const CenterDetail = () => {
                       )}
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Email</h3>
-                    <p className="mt-1 text-lg font-medium">
-                      {center.email || "Not provided"}
-                    </p>
-                  </div>
                   {center.website && (
                     <div className="md:col-span-2">
                       <h3 className="text-sm font-medium text-gray-500">
@@ -436,7 +444,7 @@ const CenterDetail = () => {
                     onClick={() => setShowReservationModal(true)}
                     className="px-4 py-3 text-lg bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
                   >
-                    <Clock className="h-5 w-5 mr-2" />
+                    <Clock className="h-5 w-5 mr-2 " />
                     Register for a Class
                   </button>
                 </div>
@@ -507,115 +515,106 @@ const CenterDetail = () => {
                         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
                       )
                       .map((comment) => (
-                        <div
-                          key={comment.id}
-                          className="bg-gray-50 p-4 rounded-lg"
-                        >
-                          {editingCommentId === comment.id ? (
-                            <div className="space-y-2">
-                              <textarea
-                                value={editCommentText}
-                                onChange={(e) =>
-                                  setEditCommentText(e.target.value)
-                                }
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                                rows={3}
-                              />
-                              <div className="flex items-center">
-                                <span className="mr-2">Rating:</span>
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <button
-                                    type="button"
-                                    key={star}
-                                    onClick={() => setEditCommentStar(star)}
-                                    className="focus:outline-none"
-                                  >
-                                    <Star
-                                      className={`h-5 w-5 ${
-                                        star <= editCommentStar
-                                          ? "text-yellow-500 fill-yellow-500"
-                                          : "text-gray-300"
-                                      }`}
-                                    />
-                                  </button>
-                                ))}
-                              </div>
-                              <div className="flex justify-end space-x-2">
-                                <button
-                                  onClick={cancelEditing}
-                                  className="px-3 py-1 text-gray-600 hover:text-gray-800"
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  onClick={handleUpdateComment}
-                                  className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
-                                >
-                                  Save
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <>
-                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                                <div className="flex items-center flex-wrap gap-2">
-                                  <User className="h-5 w-5 text-gray-400" />
-                                  <span className="font-medium text-sm sm:text-base break-words max-w-full">
-                                    {comment.user?.firstName &&
-                                    comment.user?.lastName
-                                      ? `${comment.user.firstName} ${comment.user.lastName}`
-                                      : "Anonymous"}
-                                  </span>
-                                  <div className="flex items-center">
-                                    {[...Array(5)].map((_, i) => (
-                                      <Star
-                                        key={i}
-                                        className={`h-4 w-4 ${
-                                          i < comment.star
-                                            ? "text-yellow-500 fill-yellow-500"
-                                            : "text-gray-300"
-                                        }`}
-                                      />
-                                    ))}
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
-                                  <Calendar className="h-4 w-4 flex-shrink-0" />
-                                  <span className="whitespace-nowrap">
-                                    {new Date(
-                                      comment.createdAt ||
-                                        comment.updatedAt ||
-                                        Date.now()
-                                    ).toLocaleDateString()}
-                                  </span>
-                                  {user?.data?.id === comment.user?.id && (
-                                    <div className="flex items-center gap-2 ml-1">
-                                      <button
-                                        onClick={() =>
-                                          startEditingComment(comment)
-                                        }
-                                        className="text-blue-500 hover:text-blue-700 whitespace-nowrap"
-                                      >
-                                        Edit
-                                      </button>
-                                      <button
-                                        onClick={() =>
-                                          handleDeleteComment(comment.id)
-                                        }
-                                        className="text-red-500 hover:text-red-700"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                              <p className="mt-2 text-gray-700 text-sm sm:text-base break-words">
-                                {comment.text || comment.content}
-                              </p>
-                            </>
-                          )}
-                        </div>
+<div
+  key={comment.id}
+  className="bg-gray-50 p-4 rounded-lg"
+>
+  {editingCommentId === comment.id ? (
+    <div className="space-y-2">
+      <textarea
+        value={editCommentText}
+        onChange={(e) => setEditCommentText(e.target.value)}
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+        rows={3}
+      />
+      <div className="flex items-center">
+        <span className="mr-2">Rating:</span>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            type="button"
+            key={star}
+            onClick={() => setEditCommentStar(star)}
+            className="focus:outline-none"
+          >
+            <Star
+              className={`h-5 w-5 ${
+                star <= editCommentStar
+                  ? "text-yellow-500 fill-yellow-500"
+                  : "text-gray-300"
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+      <div className="flex justify-end space-x-2">
+        <button
+          onClick={cancelEditing}
+          className="px-3 py-1 text-gray-600 hover:text-gray-800"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleUpdateComment}
+          className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  ) : (
+    <>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+        <div className="flex items-center flex-wrap gap-2">
+          <User className="h-5 w-5 text-gray-400" />
+          <span className="font-medium text-sm sm:text-base break-words max-w-full">
+            {comment.user?.firstName && comment.user?.lastName
+              ? `${comment.user.firstName} ${comment.user.lastName}`
+              : "Anonymous"}
+          </span>
+          <div className="flex items-center">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`h-4 w-4 ${
+                  i < comment.star
+                    ? "text-yellow-500 fill-yellow-500"
+                    : "text-gray-300"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+          <Calendar className="h-4 w-4 flex-shrink-0" />
+          <span className="whitespace-nowrap">
+            {new Date(
+              comment.createdAt || comment.updatedAt || Date.now()
+            ).toLocaleDateString()}
+          </span>
+          {user?.data?.id === comment.user?.id && (
+            <div className="flex items-center gap-2 ml-1">
+              <button
+                onClick={() => startEditingComment(comment)}
+                className="text-blue-500 hover:text-blue-700 whitespace-nowrap"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDeleteComment(comment.id)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+      <p className="mt-2 text-gray-700 text-sm sm:text-base break-words">
+        {comment.text || comment.content}
+      </p>
+    </>
+  )}
+</div>
                       ))
                   )}
                 </div>
@@ -714,7 +713,10 @@ const CenterDetail = () => {
                         <p className="text-sm font-medium text-purple-700">
                           Selected Major:
                         </p>
-                        <p className="font-medium">{center.majors[0].name}</p>
+                        <p className="font-medium">{selectedMajor?.name}</p>
+                        <p className="text-sm text-gray-600">
+                          {selectedMajor?.address}
+                        </p>
                       </div>
 
                       {/* Date and time picker */}
