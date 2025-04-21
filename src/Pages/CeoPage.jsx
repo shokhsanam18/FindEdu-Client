@@ -413,7 +413,6 @@
 
 
 
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -441,6 +440,7 @@ const filialSchema = z.object({
   phone: z.string().min(10, "Phone number is required"),
   regionId: z.string().min(1, "Region is required"),
   address: z.string().min(5, "Address is required"),
+  image: z.any().refine((file) => file !== null, "Image is required"),
 });
 
 export default function CeoPage() {
@@ -472,6 +472,7 @@ export default function CeoPage() {
   const [regions, setRegions] = useState([]);
   const [majors, setMajors] = useState([]);
   const [centerImageFile, setCenterImageFile] = useState(null);
+  const [filialImageFile, setFilialImageFile] = useState(null);
   const [selectedMajors, setSelectedMajors] = useState([]);
   const [createdCenterId, setCreatedCenterId] = useState(null);
   const [filials, setFilials] = useState([]);
@@ -512,7 +513,11 @@ export default function CeoPage() {
     setCenterValue("image", file, { shouldValidate: true });
   };
 
-
+  const handleFilialImageChange = (e) => {
+    const file = e.target.files[0];
+    setFilialImageFile(file);
+    setFilialValue("image", file, { shouldValidate: true });
+  };
 
   const onSubmitCenter = async (data) => {
     try {
@@ -562,9 +567,7 @@ export default function CeoPage() {
       toast.success("Learning Center added successfully!");
       resetCenterForm();
       setCenterImageFile(null);
-      resetCenterForm();
-      setSelectedMajors([]); // Add this line
-      setCenterImageFile(null);
+      setSelectedMajors([]);
       fetchFilials(response.data.data.id);
     } catch (error) {
       console.error("Submission error:", error);
@@ -582,14 +585,40 @@ export default function CeoPage() {
     }
 
     try {
+      if (!filialImageFile) {
+        toast.error("Please upload an image");
+        return;
+      }
+
       const formData = {
         name: data.name,
         phone: data.phone,
         regionId: data.regionId,
         centerId: createdCenterId,
         address: data.address,
-        image: "default.jpg", // Using default image since upload might fail
+        image: "",
       };
+
+      // Try to upload image but don't fail if it doesn't work
+      try {
+        const uploadData = new FormData();
+        uploadData.append("image", filialImageFile);
+
+        const response = await axios.post(
+          "https://findcourse.net.uz/api/upload",
+          uploadData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        formData.image = response.data.data;
+      } catch (uploadError) {
+        console.warn("Image upload failed, proceeding without image");
+        formData.image = "default.jpg";
+      }
 
       await axios.post("https://findcourse.net.uz/api/filials", formData, {
         headers: {
@@ -600,6 +629,7 @@ export default function CeoPage() {
 
       toast.success("Branch added successfully!");
       resetFilialForm();
+      setFilialImageFile(null);
       fetchFilials(createdCenterId);
     } catch (error) {
       console.error("Submission error:", error);
@@ -876,49 +906,49 @@ export default function CeoPage() {
                 </div>
 
                 <div>
-  <label className="block font-semibold text-gray-700">
-    Majors (Select at least one)
-  </label>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-    {majors.map((major) => (
-      <div key={major.id} className="flex items-center">
-        <input
-          type="checkbox"
-          id={`major-${major.id}`}
-          value={major.id}
-          checked={selectedMajors.includes(major.id)}
-          onChange={(e) => {
-            const value = e.target.value;
-            let newSelectedMajors;
-            
-            if (e.target.checked) {
-              newSelectedMajors = [...selectedMajors, value];
-            } else {
-              newSelectedMajors = selectedMajors.filter((id) => id !== value);
-            }
-            
-            setSelectedMajors(newSelectedMajors);
-            setCenterValue("majorsId", newSelectedMajors, { shouldValidate: true });
-          }}
-          className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-        />
-        <label htmlFor={`major-${major.id}`} className="ml-2 text-sm text-gray-700">
-          {major.name}
-        </label>
-      </div>
-    ))}
-  </div>
-  {centerErrors.majorsId && (
-    <p className="mt-1 text-sm text-red-600">
-      {centerErrors.majorsId.message}
-    </p>
-  )}
-  {selectedMajors.length > 0 && (
-    <p className="mt-1 text-sm text-gray-500">
-      Selected: {selectedMajors.length} major(s)
-    </p>
-  )}
-</div>
+                  <label className="block font-semibold text-gray-700">
+                    Majors (Select at least one)
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                    {majors.map((major) => (
+                      <div key={major.id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`major-${major.id}`}
+                          value={major.id}
+                          checked={selectedMajors.includes(major.id)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            let newSelectedMajors;
+                            
+                            if (e.target.checked) {
+                              newSelectedMajors = [...selectedMajors, value];
+                            } else {
+                              newSelectedMajors = selectedMajors.filter((id) => id !== value);
+                            }
+                            
+                            setSelectedMajors(newSelectedMajors);
+                            setCenterValue("majorsId", newSelectedMajors, { shouldValidate: true });
+                          }}
+                          className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor={`major-${major.id}`} className="ml-2 text-sm text-gray-700">
+                          {major.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  {centerErrors.majorsId && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {centerErrors.majorsId.message}
+                    </p>
+                  )}
+                  {selectedMajors.length > 0 && (
+                    <p className="mt-1 text-sm text-gray-500">
+                      Selected: {selectedMajors.length} major(s)
+                    </p>
+                  )}
+                </div>
 
                 <Button
                   type="submit"
@@ -1007,6 +1037,108 @@ export default function CeoPage() {
                   )}
                 </div>
 
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-2">
+                    Branch Image <span className="text-red-500">*</span>
+                  </label>
+
+                  {filialImageFile ? (
+                    <div className="flex items-center space-x-4">
+                      <div className="relative">
+                        <img
+                          src={URL.createObjectURL(filialImageFile)}
+                          alt="Preview"
+                          className="w-32 h-32 object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFilialImageFile(null);
+                            setFilialValue("image", null, { shouldValidate: true });
+                          }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                          aria-label="Remove image"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">
+                          {filialImageFile.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {(filialImageFile.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="block">
+                      <div
+                        className={`flex flex-col items-center justify-center w-full border-2 border-dashed rounded-lg p-5 text-center cursor-pointer transition-colors ${
+                          filialErrors.image
+                            ? "border-red-500 bg-red-50"
+                            : "border-gray-300 hover:border-purple-500 hover:bg-purple-50"
+                        }`}
+                      >
+                        <svg
+                          className="mx-auto h-8 w-12 text-gray-400 mb-3"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        <p className="text-sm font-medium text-gray-700 mb-1">
+                          Click to upload or drag and drop
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          PNG, JPG up to 5MB
+                        </p>
+                        <input
+                          type="file"
+                          onChange={handleFilialImageChange}
+                          className="hidden"
+                          accept="image/png, image/jpeg, image/jpg"
+                        />
+                      </div>
+                    </label>
+                  )}
+
+                  {filialErrors.image && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {filialErrors.image.message}
+                    </p>
+                  )}
+                </div>
+
                 <Button
                   type="submit"
                   className="w-full bg-purple-900 hover:bg-blue-900 text-white py-2 rounded-lg cursor-pointer"
@@ -1028,7 +1160,13 @@ export default function CeoPage() {
                             <p className="text-sm text-gray-600">{filial.address}</p>
                             <p className="text-sm text-gray-600">{filial.phone}</p>
                           </div>
-
+                          {filial.image && filial.image !== "default.jpg" && (
+                            <img 
+                              src={filial.image} 
+                              alt={filial.name} 
+                              className="w-16 h-16 object-cover rounded-lg"
+                            />
+                          )}
                         </div>
                       ))}
                     </div>
