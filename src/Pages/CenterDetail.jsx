@@ -22,6 +22,7 @@ import {
   ChevronDown,
   Briefcase,
   Bookmark,
+  PencilLine,
 } from "lucide-react";
 import { useLikedStore, useCommentStore, useAuthStore } from "../Store";
 
@@ -607,9 +608,9 @@ const CenterDetail = () => {
                                         onClick={() =>
                                           startEditingComment(comment)
                                         }
-                                        className="text-blue-500 hover:text-blue-700 whitespace-nowrap"
+                                        className="text-blue-500 hover:text-blue-700 whitespace-nowrap "
                                       >
-                                        Edit
+                                        <PencilLine className="h-4 w-4" />
                                       </button>
                                       <button
                                         onClick={() =>
