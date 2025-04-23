@@ -20,8 +20,8 @@ import CenterEditForm from "./Pages/CenterEditForm.jsx";
 import Favorites from "./Pages/Favorites.jsx";
 import FormTry from "./Register/Login/Register.jsx";
 import { Centers } from "./Pages/Centers.jsx";
-import BranchDetails from './Pages/Branches'; 
-import { Toaster } from "sonner"; 
+import BranchDetails from "./Pages/Branches";
+import { Toaster } from "sonner";
 import Profile from "./Pages/Profile";
 function App() {
   const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
@@ -33,7 +33,7 @@ function App() {
   return (
     <AuthProvider>
       <Toaster position="top-right" richColors expand={true} />
-      
+
       <div>
         <Routes>
           <Route path="/" element={<Layout />}>

@@ -44,6 +44,8 @@ const CenterDetail = () => {
   // Registration modal state
   const [showReservationModal, setShowReservationModal] = useState(false);
   const [visitDate, setVisitDate] = useState("");
+  const [visitDay, setVisitDay] = useState(""); // YYYY-MM-DD
+  const [visitHour, setVisitHour] = useState(""); // HH:MM
   const [isSubmittingReservation, setIsSubmittingReservation] = useState(false);
   const [reservationError, setReservationError] = useState(null);
   const [reservationSuccess, setReservationSuccess] = useState(false);
@@ -75,16 +77,19 @@ const CenterDetail = () => {
         // Fetch center
         const centerRes = await axios.get(`${API_BASE}/api/centers/${id}`);
         const centerData = centerRes.data?.data;
+        console.log(centerData)
 
         // Fetch majors
         const majorsRes = await axios.get(`${API_BASE}/api/major/query`);
         const majorsData = majorsRes.data?.data || [];
+        console.log(majorsData)
 
         // Fetch branches (filials)
         const filialRes = await axios.get(`${API_BASE}/api/filials`, {
           params: { centerId: centerData.id },
         });
         const filials = filialRes.data?.data || [];
+        console.log(filials)
 
         // Construct dynamic branch list
         const dynamicBranches = [
@@ -112,6 +117,8 @@ const CenterDetail = () => {
           rating: avgRating,
           imageUrl: centerData.image ? `${ImageApi}/${centerData.image}` : null,
         });
+
+        console.log(centerData)
 
         setBranches(dynamicBranches);
         setSelectedBranch(dynamicBranches[0]);
@@ -146,6 +153,10 @@ const CenterDetail = () => {
       // Navigate to the branch detail page
       navigate(`/branches/${branch.id}`);
     }
+  };
+  const isValidTwoHourInterval = (datetimeStr) => {
+    const date = new Date(datetimeStr);
+    return date.getMinutes() === 0 && date.getHours() % 2 === 0;
   };
 
   const handleCommentSubmit = async (e) => {
@@ -234,7 +245,7 @@ const CenterDetail = () => {
     );
   }
 
-  const PostRegisteration = () => {
+  const PostRegisteration = (finalVisitDate) => {
     const existingData = JSON.parse(localStorage.getItem("RegisterData")) || [];
 
     const newRegister = {
@@ -243,8 +254,9 @@ const CenterDetail = () => {
       address: center.address,
       majorId: selectedMajor.id,
       majorName: center.name,
-      visitDate: visitDate,
+      visitDate: finalVisitDate, // <-- now using correct value
     };
+
     const index = existingData.findIndex((item) => item.id === id);
 
     if (index !== -1) {
@@ -318,11 +330,10 @@ const CenterDetail = () => {
                 {branches.map((branch) => (
                   <div
                     key={branch.id}
-                    className={`p-3 rounded-lg cursor-pointer transition-colors  ${
-                      selectedBranch?.id === branch.id
+                    className={`p-3 rounded-lg cursor-pointer transition-colors  ${selectedBranch?.id === branch.id
                         ? "bg-purple-100 border border-purple-300"
                         : "bg-gray-50 hover:bg-gray-100"
-                    }`}
+                      }`}
                     onClick={() => handleBranchClick(branch)}
                   >
                     <h4 className="font-medium">{branch.name}</h4>
@@ -346,11 +357,10 @@ const CenterDetail = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
-                        className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
-                          selectedMajor?.id === major.id
+                        className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${selectedMajor?.id === major.id
                             ? "ring-2 ring-purple-500"
                             : ""
-                        }`}
+                          }`}
                         onClick={() => setSelectedMajor(major)}
                       >
                         <div className="p-2">
@@ -486,11 +496,10 @@ const CenterDetail = () => {
                           className="focus:outline-none "
                         >
                           <Star
-                            className={`h-5 w-5 ${
-                              star <= newComment.star
+                            className={`h-5 w-5 ${star <= newComment.star
                                 ? "text-yellow-500 fill-yellow-500"
                                 : "text-gray-300"
-                            }`}
+                              }`}
                           />
                         </button>
                       ))}
@@ -545,11 +554,10 @@ const CenterDetail = () => {
                                     className="focus:outline-none"
                                   >
                                     <Star
-                                      className={`h-5 w-5 ${
-                                        star <= editCommentStar
+                                      className={`h-5 w-5 ${star <= editCommentStar
                                           ? "text-yellow-500 fill-yellow-500"
                                           : "text-gray-300"
-                                      }`}
+                                        }`}
                                     />
                                   </button>
                                 ))}
@@ -576,7 +584,7 @@ const CenterDetail = () => {
                                   <User className="h-5 w-5 text-gray-400" />
                                   <span className="font-medium text-sm sm:text-base break-words max-w-full">
                                     {comment.user?.firstName &&
-                                    comment.user?.lastName
+                                      comment.user?.lastName
                                       ? `${comment.user.firstName} ${comment.user.lastName}`
                                       : "Anonymous"}
                                   </span>
@@ -584,11 +592,10 @@ const CenterDetail = () => {
                                     {[...Array(5)].map((_, i) => (
                                       <Star
                                         key={i}
-                                        className={`h-4 w-4 ${
-                                          i < comment.star
+                                        className={`h-4 w-4 ${i < comment.star
                                             ? "text-yellow-500 fill-yellow-500"
                                             : "text-gray-300"
-                                        }`}
+                                          }`}
                                       />
                                     ))}
                                   </div>
@@ -598,8 +605,8 @@ const CenterDetail = () => {
                                   <span className="whitespace-nowrap">
                                     {new Date(
                                       comment.createdAt ||
-                                        comment.updatedAt ||
-                                        Date.now()
+                                      comment.updatedAt ||
+                                      Date.now()
                                     ).toLocaleDateString()}
                                   </span>
                                   {user?.data?.id === comment.user?.id && (
@@ -694,12 +701,19 @@ const CenterDetail = () => {
                     </h3>
                     <p className="mt-2 text-sm text-gray-500">
                       Your class has been scheduled for{" "}
-                      {new Date(visitDate).toLocaleString()}.
+                      {new Date(`${visitDay}T${visitHour}`).toLocaleString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false, 
+                      })}
                     </p>
                     <div className="mt-4 space-y-2">
                       <p className="text-sm font-medium">Selected Branch:</p>
                       <p className="text-sm text-gray-600">
-                        {selectedBranch?.name}
+                        {selectedBranch?.name}, {selectedBranch?.address}
                       </p>
                       <p className="text-sm font-medium mt-2">
                         Selected Major:
@@ -712,53 +726,85 @@ const CenterDetail = () => {
                 ) : (
                   <form>
                     <div className="space-y-6">
-                      {/* Selected branch display */}
-                      <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
-                        <p className="text-sm font-medium text-purple-700">
-                          Selected Branch:
-                        </p>
-                        <p className="font-medium">{selectedBranch?.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {selectedBranch?.address}
-                        </p>
-                      </div>
-
-                      {/* Selected major display */}
-                      <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
-                        <p className="text-sm font-medium text-purple-700">
-                          Selected Major:
-                        </p>
-                        <p className="font-medium">{selectedMajor?.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {selectedMajor?.address}
-                        </p>
-                      </div>
-
-                      {/* Date and time picker */}
+                      {/* Branch Dropdown */}
                       <div>
-                        <label
-                          htmlFor="visitDate"
-                          className="block text-sm font-medium text-gray-700 mb-1"
+                        <label className="text-sm font-medium text-gray-700">Select Branch</label>
+                        <select
+                          value={selectedBranch?.id}
+                          onChange={(e) => {
+                            const selected = branches.find((b) => b.id.toString() === e.target.value);
+                            setSelectedBranch(selected);
+                          }}
+                          className="w-full mt-1 px-3 py-2 border rounded-lg"
                         >
-                          Select Date & Time
-                        </label>
-                        <div className="relative">
+                          {branches.map((branch) => (
+                            <option key={branch.id} value={branch.id}>
+                              {branch.name}, {branch.address}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Major Dropdown */}
+                      <div className="mt-4">
+                        <label className="text-sm font-medium text-gray-700">Select Major</label>
+                        <select
+                          value={selectedMajor?.id}
+                          onChange={(e) => {
+                            const selected = center.majors.find((m) => m.id.toString() === e.target.value);
+                            setSelectedMajor(selected);
+                          }}
+                          className="w-full mt-1 px-3 py-2 border rounded-lg"
+                        >
+                          {center.majors.map((major) => (
+                            <option key={major.id} value={major.id}>
+                              {major.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Date Picker */}
+                        <div>
+                          <label htmlFor="visitDay" className="block text-sm font-medium text-gray-700 mb-1">
+                            Select Date
+                          </label>
                           <input
-                            type="datetime-local"
-                            id="visitDate"
-                            value={visitDate}
-                            onChange={(e) => setVisitDate(e.target.value)}
-                            className="block w-full pl-4 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none"
+                            type="date"
+                            id="visitDay"
+                            value={visitDay}
+                            onChange={(e) => setVisitDay(e.target.value)}
+                            min={new Date().toISOString().split("T")[0]}
+                            className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                             required
-                            min={new Date().toISOString().slice(0, 16)}
                           />
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            {/* <Calendar className="h-5 w-5" /> */}
-                          </div>
                         </div>
-                        <p className="mt-2 text-xs text-gray-500">
-                          Please select a future date and time for your class.
-                        </p>
+
+                        {/* Time Picker */}
+                        <div>
+                          <label htmlFor="visitHour" className="block text-sm font-medium text-gray-700 mb-1">
+                            Select Time (Every 2 hrs)
+                          </label>
+                          <select
+                            id="visitHour"
+                            value={visitHour}
+                            onChange={(e) => setVisitHour(e.target.value)}
+                            className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                            required
+                          >
+                            <option value="">Select time</option>
+                            {[10, 12, 14, 16, 18].map((hour) => {
+                              const formatted = hour.toString().padStart(2, "0");
+                              return (
+                                <option key={formatted} value={`${formatted}:00`}>
+                                  {formatted}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
                       </div>
 
                       {reservationError && (
@@ -779,9 +825,24 @@ const CenterDetail = () => {
                           Cancel
                         </button>
                         <button
-                          onClick={() => PostRegisteration()}
+                          onClick={(e) => {
+                            e.preventDefault();
+
+                            if (!visitDay || !visitHour) {
+                              setReservationError("Please select both a date and a valid 2-hour interval.");
+                              return;
+                            }
+
+                            const combinedDateTime = `${visitDay}T${visitHour}`;
+                            setReservationError(null);
+
+                            // Pass directly to PostRegisteration
+                            PostRegisteration(combinedDateTime);
+
+                            setReservationSuccess(true);
+                          }}
                           type="submit"
-                          disabled={isSubmittingReservation || !visitDate}
+                          disabled={isSubmittingReservation || !visitDay || !visitHour}
                           className="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#441774] hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-70 transition-colors"
                         >
                           {isSubmittingReservation ? (
