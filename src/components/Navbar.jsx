@@ -265,7 +265,6 @@
 
 
 
-
 import React, { useEffect } from "react";
 import { Button as Buton } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
@@ -288,6 +287,7 @@ import {
   ChevronDownIcon,
   PlusCircleIcon,
   ChartBarIcon,
+  PencilIcon,
 } from "@heroicons/react/24/solid";
 import { useAuthStore, useSearchStore } from "../Store";
 import { useSidebarSt } from "@/Store";
@@ -348,7 +348,6 @@ export default function Navbar() {
       icon: PowerIcon,
     },
   ];
-
   return (
     <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-7 w-full z-40 bg-white shadow-md backdrop-blur-md">
       <div className="bg-white items-center justify-between flex">
@@ -446,71 +445,66 @@ export default function Navbar() {
         </div>
 
         {isLoggedIn ? (
-          <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
-            <MenuHandler className="p-0 flex items-center gap-1.5">
-              <Button
-                variant="text"
-                color="blue-gray"
-                className="flex items-center hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff] gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto"
-              >
-                <Avatar
-                  variant="circular"
-                  size="sm"
-                  alt="User profile"
-                  className="border border-purple-900 p-0.5"
-                  src={
-                    profileImageUrl ||
-                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJKOCxJ4PWSjccLHucBQ-AlNhpiVx2ASk10lFfiNrG-QBOwwYkSGolTVZuKMZd7VcaKNk&usqp=CAU"
-                  }
-                />
-                <motion.p className="text-[#290a3f]">
+          <div className="relative group">
+            <button className="p-0 flex items-center gap-1.5 hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff] gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto">
+              <Avatar
+                variant="circular"
+                size="sm"
+                alt="User profile"
+                className="border border-purple-900 p-0.5"
+                src={
+                  profileImageUrl ||
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJKOCxJ4PWSjccLHucBQ-AlNhpiVx2ASk10lFfiNrG-QBOwwYkSGolTVZuKMZd7VcaKNk&usqp=CAU"
+                }
+              />
+              <motion.p className="">
+                {user?.data?.firstName} {user?.data?.lastName}
+              </motion.p>
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`h-3 w-3 transition-transform group-hover:rotate-180`}
+              />
+            </button>
+            
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+              <div className="py-2 px-4">
+                <Typography variant="small" className="font-semibold text-[#290a3f]">
                   {user?.data?.firstName} {user?.data?.lastName}
-                </motion.p>
-                <ChevronDownIcon
-                  strokeWidth={2.5}
-                  className={`h-3 w-3 text-[#290a3f] transition-transform ${
-                    isMenuOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </Button>
-            </MenuHandler>
-            <MenuList className="p-1">
-  {profileMenuItems.map(({ label, icon, link }, key) => {
-    const isLastItem = key === profileMenuItems.length - 1;
-    // Skip rendering if it's the "My Centers" item
-    if (label === "My Centers") return null;
-    
-    return (
-      <Link to={`${isLastItem ? "#" : link}`} key={label}>
-        <MenuItem
-          onClick={isLastItem ? handleLogout : closeMenu}
-          className={`flex items-center gap-2 rounded ${
-            isLastItem
-              ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
-              : "hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff]"
-          }`}
-        >
-          {React.createElement(icon, {
-            className: `h-4 w-4 ${
-              isLastItem ? "text-red-500" : "text-[#290a3f]"
-            }`,
-            strokeWidth: 2,
-          })}
-          <Typography
-            as="span"
-            variant="small"
-            className={`font-normal ${
-              isLastItem ? "text-red-500" : "text-[#290a3f]"
-            }`}
-          >
-            {label}
-          </Typography>
-        </MenuItem>
-      </Link>
-    );
-  })}
-</MenuList>
-          </Menu>
+                </Typography>
+                <Typography variant="small" className="text-gray-600 text-xs">
+                  {user?.data?.email}
+                </Typography>
+                <Link to="/profile">
+                  <button
+                    className="flex items-center gap-1 mt-2 text-[#461773] hover:bg-[#efd8ff] w-full px-2 py-2 rounded text-sm"
+                  >
+                    <PencilIcon className="h-3 w-3" />
+                    Edit profile
+                  </button>
+                </Link>
+              </div>
+              
+              {profileMenuItems.map(({ label, icon, link }, key) => {
+                const isLastItem = key === profileMenuItems.length - 1;
+                if (!isLastItem) return null;
+                
+                return (
+                  <div key={label} className="border-t border-gray-100 px-2">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 w-full px-2 py-2 text-sm text-red-500 hover:bg-red-50 rounded"
+                    >
+                      {React.createElement(icon, {
+                        className: "h-4 w-4",
+                        strokeWidth: 2,
+                      })}
+                      {label}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         ) : (
           <div className="flex gap-3 md:gap-4">
             <Buton
@@ -537,5 +531,4 @@ export default function Navbar() {
         )}
       </div>
     </nav>
-  );
-}
+  );}
