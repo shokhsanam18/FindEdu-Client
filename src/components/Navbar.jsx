@@ -446,7 +446,7 @@ export default function Navbar() {
 
         {isLoggedIn ? (
           <div className="relative group">
-            <button className="p-0 flex items-center gap-1.5 hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff] gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto">
+            <button className="p-0 flex items-center hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff] gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto">
               <Avatar
                 variant="circular"
                 size="sm"
