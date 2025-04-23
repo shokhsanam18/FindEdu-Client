@@ -53,7 +53,15 @@ export const Appointment = () => {
               📍 <span className="font-semibold">Address:</span> {center.address}
             </p>
             <p className="text-gray-700 text-sm">
-              📅 <span className="font-semibold">Visit:</span> {center.visitDate}
+              📅 <span className="font-semibold">Visit:</span>{" "}
+              {new Date(center.visitDate).toLocaleString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })}
             </p>
           </div>
 

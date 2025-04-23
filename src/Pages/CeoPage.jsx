@@ -915,8 +915,8 @@ export default function CeoPage() {
                         <input
                           type="checkbox"
                           id={`major-${major.id}`}
-                          value={major.id}
-                          checked={selectedMajors.includes(major.id)}
+                          value={String(major.id)}
+                          checked={selectedMajors.includes(String(major.id))}
                           onChange={(e) => {
                             const value = e.target.value;
                             let newSelectedMajors;
