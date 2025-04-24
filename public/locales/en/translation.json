@@ -166,6 +166,104 @@
       "contact": "Contact",
       "comments": "Comments",
       "projects": "Projects"
-          }
-    
+          },
+       
+              "ceoPage": {
+                "hero": {
+                  "subtitle": "Add Your Education Center",
+                  "description": "Join us and help students discover the best learning opportunities.",
+                  "title": "CEO Page",
+                  "homeLink": "Home",
+                  "ceoLink": "CEO Page"
+                },
+                "centerForm": {
+                  "title": "Create Learning Center",
+                  "labels": {
+                    "name": "Center Name",
+                    "region": "Region",
+                    "address": "Address",
+                    "image": "Center Image",
+                    "phone": "Phone Number",
+                    "majors": "Majors (Select at least one)",
+                    "selectedMajors": "Selected: {count} major(s)"
+                  },
+                  "placeholders": {
+                    "name": "Enter center name",
+                    "address": "Enter address",
+                    "phone": "Enter phone number"
+                  },
+                  "imageUpload": {
+                    "clickToUpload": "Click to upload or drag and drop",
+                    "fileTypes": "PNG, JPG up to 5MB"
+                  },
+                  "submitButton": "Add Center",
+                  "creating": "Creating..."
+                },
+                "branchForm": {
+                  "title": "Add Branch",
+                  "labels": {
+                    "selectCenter": "Select Center",
+                    "name": "Branch Name",
+                    "manualName": "Let me enter branch name manually",
+                    "phone": "Phone Number",
+                    "region": "Region",
+                    "address": "Address",
+                    "image": "Branch Image"
+                  },
+                  "placeholders": {
+                    "name": "Enter branch name",
+                    "phone": "Enter phone number",
+                    "address": "Enter address"
+                  },
+                  "imageUpload": {
+                    "clickToUpload": "Click to upload or drag and drop",
+                    "fileTypes": "PNG, JPG up to 5MB"
+                  },
+                  "submitButton": "Add Branch",
+                  "adding": "Adding...",
+                  "branchesTitle": "Your Branches",
+                  "noBranches": "No branches added yet"
+                },
+                "errors": {
+                  "imageRequired": "Image is required",
+                  "selectCenterFirst": "Please create a center first",
+                  "uploadFailed": "Image upload failed. Please try again.",
+                  "centerFailed": "Failed to create center.",
+                  "branchFailed": "Failed to create branch. Please try again."
+                },
+                "success": {
+                  "centerCreated": "Center and main branch created successfully!",
+                  "branchAdded": "Branch added successfully!"
+                }
+              },
+"favorites": {
+      "hero": {
+        "subtitle": "Discover Most Loved Learning Spaces",
+        "title": "Favorite Centers",
+        "homeLink": "Home",
+        "favoritesLink": "Favorites"
+      },
+      "loading": "Loading...",
+      "empty": "You haven't liked any centers yet.",
+      "centerCard": {
+        "rating": "Rating",
+        "defaultPhone": "+1 (555) 123-4567",
+        "viewDetails": "View Details"
+      }},
+"branchDetail": {
+      "backButton": "Back to Center",
+      "imageAlt": "{name} branch",
+      "imageNotAvailable": "Image not available",
+      "noImage": "No image provided",
+      "addressLabel": "Address",
+      "addressNotSpecified": "Not specified",
+      "phoneLabel": "Phone",
+      "emailLabel": "Email",
+      "websiteLabel": "Website",
+      "workingHoursLabel": "Working Hours",
+      "loading": "Loading...",
+      "error": "Failed to load branch information",
+      "goBack": "Go back",
+      "notFound": "Branch not found"
+    }
 }

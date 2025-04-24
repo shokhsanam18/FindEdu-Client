@@ -159,5 +159,105 @@
 , "contact": "Контакты",
 "comments": "Отзывы",
 "projects": "Проекты"
+    },
+"ceoPage": {
+      "hero": {
+        "subtitle": "Добавьте свой учебный центр",
+        "description": "Присоединяйтесь к нам и помогите студентам найти лучшие возможности для обучения.",
+        "title": "Страница CEO",
+        "homeLink": "Главная",
+        "ceoLink": "Страница CEO"
+      },
+      "centerForm": {
+        "title": "Создать учебный центр",
+        "labels": {
+          "name": "Название центра",
+          "region": "Регион",
+          "address": "Адрес",
+          "image": "Изображение центра",
+          "phone": "Номер телефона",
+          "majors": "Направления (выберите хотя бы одно)",
+          "selectedMajors": "Выбрано: {count} направлений"
+        },
+        "placeholders": {
+          "name": "Введите название центра",
+          "address": "Введите адрес",
+          "phone": "Введите номер телефона"
+        },
+        "imageUpload": {
+          "clickToUpload": "Нажмите для загрузки или перетащите файл",
+          "fileTypes": "PNG, JPG до 5MB"
+        },
+        "submitButton": "Добавить центр",
+        "creating": "Создание..."
+      },
+      "branchForm": {
+        "title": "Добавить филиал",
+        "labels": {
+          "selectCenter": "Выберите центр",
+          "name": "Название филиала",
+          "manualName": "Ввести название вручную",
+          "phone": "Номер телефона",
+          "region": "Регион",
+          "address": "Адрес",
+          "image": "Изображение филиала"
+        },
+        "placeholders": {
+          "name": "Введите название филиала",
+          "phone": "Введите номер телефона",
+          "address": "Введите адрес"
+        },
+        "imageUpload": {
+          "clickToUpload": "Нажмите для загрузки или перетащите файл",
+          "fileTypes": "PNG, JPG до 5MB"
+        },
+        "submitButton": "Добавить филиал",
+        "adding": "Добавление...",
+        "branchesTitle": "Ваши филиалы",
+        "noBranches": "Пока нет филиалов"
+      },
+      "errors": {
+        "imageRequired": "Требуется изображение",
+        "selectCenterFirst": "Пожалуйста, сначала создайте центр",
+        "uploadFailed": "Не удалось загрузить изображение. Пожалуйста, попробуйте еще раз.",
+        "centerFailed": "Не удалось создать центр.",
+        "branchFailed": "Не удалось создать филиал. Пожалуйста, попробуйте еще раз."
+      },
+      "success": {
+        "centerCreated": "Центр и главный филиал успешно созданы!",
+        "branchAdded": "Филиал успешно добавлен!"
+      }
+    },
+"favorites": {
+      "hero": {
+        "subtitle": "Откройте для себя самые любимые учебные заведения",
+        "title": "Избранные центры",
+        "homeLink": "Главная",
+        "favoritesLink": "Избранное"
+      },
+      "loading": "Загрузка...",
+      "empty": "Вы еще не добавили центры в избранное.",
+      "centerCard": {
+        "rating": "Рейтинг",
+        "defaultPhone": "+7 (XXX) XXX-XXXX",
+        "viewDetails": "Подробнее"
+      }
+    },
+    "branchDetail": {
+      "backButton": "Назад в центр",
+      "imageAlt": "Филиал {name}",
+      "imageNotAvailable": "Изображение недоступно",
+      "noImage": "Изображение не предоставлено",
+      "addressLabel": "Адрес",
+      "addressNotSpecified": "Не указан",
+      "phoneLabel": "Телефон",
+      "emailLabel": "Электронная почта",
+      "websiteLabel": "Веб-сайт",
+      "workingHoursLabel": "Часы работы",
+      "loading": "Загрузка...",
+      "error": "Не удалось загрузить информацию о филиале",
+      "goBack": "Назад",
+      "notFound": "Филиал не найден"
     }
+  
 }

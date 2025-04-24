@@ -11,6 +11,7 @@ import ceo from "/public/ceo.png";
 import icon from "/public/icon.png";
 import { motion } from "framer-motion";
 import { useMyCentersStore } from "../Store";
+import { useTranslation } from 'react-i18next';
 
 const centerSchema = z.object({
   name: z.string().min(3, "Center name is required"),
@@ -41,7 +42,7 @@ export default function CeoPage() {
     resolver: zodResolver(centerSchema),
     mode: "onChange",
   });
-
+  const { t } = useTranslation();
   const {
     register: registerFilial,
     handleSubmit: handleSubmitFilial,
@@ -396,12 +397,12 @@ export default function CeoPage() {
         >
           <p className="text-l md:text-2xl  mt-6 md:mt-0">
             {" "}
-            Add Your Education Center
+            {t("ceoPage.hero.subtitle")}
           </p>
           <p className="text-l md:text-l  mt-20 md:mt-0">
-            Join us and help students discover the best learning opportunities.
+          {t("ceoPage.hero.description")}
           </p>
-          <h1 className="text-4xl md:text-7xl font-bold "> CEO Page</h1>
+          <h1 className="text-3xl md:text-6xl font-bold ">  {t("ceoPage.hero.title")}</h1>
         </motion.div>
 
         <motion.div
@@ -410,17 +411,17 @@ export default function CeoPage() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-xl  mt-4 md:mt-0"
         >
-          <div className="flex gap-2">
+          <div className="flex gap-2 text-lg">
             <Link to="/" className="no-underline hover:underline text-white">
               {" "}
-              Home
+              {t("ceoPage.hero.homeLink")}
             </Link>
             <p>|</p>
             <Link
               to="/ceo"
               className="text-[#2d0e4e] no-underline hover:underline"
             >
-              CEO Page{" "}
+              {t("ceoPage.hero.ceoLink")}{" "}
             </Link>
           </div>
         </motion.div>
@@ -452,12 +453,12 @@ export default function CeoPage() {
             {/* Center Form */}
             <div className="bg-white shadow-lg rounded-lg p-7 w-full mb-8">
               <h2 className="text-4xl font-bold text-center text-purple-900 mb-6">
-                Create Learning Center
+              {t("ceoPage.centerForm.title")}
               </h2>
               <form onSubmit={handleSubmitCenter(onSubmitCenter)} className="space-y-2">
                 <div>
                   <label className="block font-semibold text-gray-700">
-                    Center Name
+                  {t("ceoPage.centerForm.labels.name")}
                   </label>
                   <Input placeholder="Enter center name" {...registerCenter("name")} />
                   {centerErrors.name && (
@@ -467,7 +468,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                    Region
+                    {t("ceoPage.centerForm.labels.region")}
                   </label>
                   <select
                     {...registerCenter("regionId")}
@@ -489,9 +490,9 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                    Address
+                  {t("ceoPage.centerForm.labels.address")}
                   </label>
-                  <Input placeholder="Enter address" {...registerCenter("address")} />
+                  <Input placeholder={t("ceoPage.centerForm.placeholders.address")} {...registerCenter("address")} />
                   {centerErrors.address && (
                     <p className="text-red-500 text-sm">
                       {centerErrors.address.message}
@@ -501,7 +502,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700 mb-2">
-                    Center Image <span className="text-red-500">*</span>
+                  {t("ceoPage.centerForm.labels.image")} <span className="text-red-500">*</span>
                   </label>
 
                   {centerImageFile ? (
@@ -566,10 +567,10 @@ export default function CeoPage() {
                           />
                         </svg>
                         <p className="text-sm font-medium text-gray-700 mb-1">
-                          Click to upload or drag and drop
+                        {t("ceoPage.centerForm.imageUpload.clickToUpload")}
                         </p>
                         <p className="text-xs text-gray-500">
-                          PNG, JPG up to 5MB
+                        {t("ceoPage.centerForm.imageUpload.fileTypes")}
                         </p>
                         <input
                           type="file"
@@ -602,10 +603,10 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                    Phone Number
+                  {t("ceoPage.centerForm.labels.phone")}
                   </label>
                   <Input
-                    placeholder="Enter phone number"
+                    placeholder={t("ceoPage.centerForm.placeholders.phone")}
                     type="tel"
                     value={
                       watchCenter("phone")?.startsWith("+998")
@@ -628,7 +629,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                    Majors (Select at least one)
+                  {t("ceoPage.centerForm.labels.majors")}
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                     {majors.map((major) => (
@@ -676,7 +677,7 @@ export default function CeoPage() {
                   className="w-full bg-purple-900 hover:bg-blue-900 text-white py-2 rounded-lg cursor-pointer"
                   disabled={!isCenterValid || isCenterSubmitting}
                 >
-                  {isCenterSubmitting ? "Creating..." : "Add Center"}
+                  {isCenterSubmitting ? t("ceoPage.centerForm.creating") : t("ceoPage.centerForm.submitButton")}
                 </Button>
               </form>
             </div>
@@ -691,7 +692,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                    Select Center
+                  {t("ceoPage.branchForm.labels.selectCenter")}
                   </label>
                   <select
                     className="w-full p-2 border rounded bg-white mb-2"
@@ -709,10 +710,10 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                    Branch Name
+                  {t("ceoPage.branchForm.labels.name")}
                   </label>
                   <Input
-                    placeholder="Enter branch name"
+                    placeholder={t("ceoPage.branchForm.placeholders.name")}
                     {...registerFilial("name")}
                     readOnly={!isManualBranchName}
                   />
@@ -724,7 +725,7 @@ export default function CeoPage() {
                       onChange={(e) => setIsManualBranchName(e.target.checked)}
                     />
                     <label htmlFor="manualBranch" className="text-sm text-gray-600">
-                      Let me enter branch name manually
+                    {t("ceoPage.branchForm.labels.manualName")}
                     </label>
                   </div>
                   {filialErrors.name && (
@@ -734,10 +735,10 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                    Phone Number
+                  {t("ceoPage.branchForm.labels.phone")}
                   </label>
                   <Input
-                    placeholder="Enter phone number"
+                    placeholder={t("ceoPage.branchForm.placeholders.phone")}
                     type="tel"
                     value={
                       watchFilial("phone")?.startsWith("+998")
@@ -760,7 +761,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                    Region
+                  {t("ceoPage.branchForm.labels.region")}
                   </label>
                   <select
                     {...registerFilial("regionId")}
@@ -782,9 +783,9 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                    Address
+                  {t("ceoPage.branchForm.labels.address")}
                   </label>
-                  <Input placeholder="Enter address" {...registerFilial("address")} />
+                  <Input placeholder={t("ceoPage.branchForm.placeholders.address")} {...registerFilial("address")} />
                   {filialErrors.address && (
                     <p className="text-red-500 text-sm">
                       {filialErrors.address.message}
@@ -794,7 +795,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700 mb-2">
-                    Branch Image <span className="text-red-500">*</span>
+                  {t("ceoPage.branchForm.labels.image")} <span className="text-red-500">*</span>
                   </label>
 
                   {filialImageFile ? (
@@ -859,10 +860,10 @@ export default function CeoPage() {
                           />
                         </svg>
                         <p className="text-sm font-medium text-gray-700 mb-1">
-                          Click to upload or drag and drop
+                        {t("ceoPage.branchForm.imageUpload.clickToUpload")}
                         </p>
                         <p className="text-xs text-gray-500">
-                          PNG, JPG up to 5MB
+                        {t("ceoPage.branchForm.imageUpload.fileTypes")}
                         </p>
                         <input
                           type="file"
@@ -898,13 +899,13 @@ export default function CeoPage() {
                   className="w-full bg-purple-900 hover:bg-blue-900 text-white py-2 rounded-lg cursor-pointer"
                   disabled={!selectedCenterId || !isFilialValid || isFilialSubmitting}
                 >
-                  {isFilialSubmitting ? "Adding..." : "Add Branch"}
+                  {isFilialSubmitting ? t("ceoPage.branchForm.adding") : t("ceoPage.branchForm.submitButton")}
                 </Button>
               </form>
 
               {!!selectedCenterId && (
                 <div className="mt-6">
-                  <h3 className="text-2xl font-bold text-purple-900 mb-4">Your Branches</h3>
+                  <h3 className="text-2xl font-bold text-purple-900 mb-4"> {t("ceoPage.branchForm.branchesTitle")}</h3>
                   {filials.length > 0 ? (
                     <div className="space-y-4">
                       {filials.map((filial) => (
@@ -925,7 +926,7 @@ export default function CeoPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-center py-4">No branches added yet</p>
+                    <p className="text-gray-500 text-center py-4"> {t("ceoPage.branchForm.noBranches")}</p>
                   )}
                 </div>
               )}
