@@ -133,7 +133,10 @@ export const Resources = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewResource({ ...newResource, [name]: value });
+    setNewResource(prev => ({
+      ...prev,
+      [name]: name === "phone" ? value.replace(/\s+/g, '') : value.trimStart()
+    }));
   };
 
   const handleFileChange = (e) => {
@@ -432,7 +435,7 @@ export const Resources = () => {
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder={t("Resources.placeholder")}
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => setSearchTerm(e.target.value.trimStart())}
                 />
               </div>
             </div>

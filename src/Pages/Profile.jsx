@@ -65,9 +65,19 @@ export default function Profile() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    let cleaned = value;
+  
+    // Remove all spaces for phone
+    if (name === "phone") {
+      cleaned = value.replace(/\s+/g, '');
+    } else {
+      // Trim for everything else
+      cleaned = value.trimStart(); // Remove spaces from the beginning
+    }
+  
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: cleaned,
     }));
   };
 
@@ -75,10 +85,10 @@ export default function Profile() {
     e.preventDefault();
     try {
       await updateUser(user.data.id, {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-      });
+  firstName: formData.firstName.trim(),
+  lastName: formData.lastName.trim(),
+  phone: formData.phone.replace(/\s+/g, '')
+});
       setEditMode(false);
       fetchUserData();
     } catch (error) {
