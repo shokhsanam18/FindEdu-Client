@@ -4,6 +4,14 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { ArrowLeftIcon, MapPinIcon, TrashIcon, PencilIcon, PlusIcon } from "@heroicons/react/24/outline";
+import {
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Button,
+  Typography,
+} from "@material-tailwind/react";
 
 const API_BASE = "https://findcourse.net.uz/api";
 const ImageApi = `${API_BASE}/image`;
@@ -20,6 +28,8 @@ const CenterEditForm = () => {
     phone: "",
   });
   const [imageFile, setImageFile] = useState(null);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [branchToDelete, setBranchToDelete] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -442,11 +452,12 @@ const CenterEditForm = () => {
     }
   };
 
-  const handleDeleteBranch = async (branchId) => {
-    if (!window.confirm("Are you sure you want to delete this branch?")) {
-      return;
-    }
+  const handleDeleteBranch = (branchId) => {
+    setBranchToDelete(branchId);
+    setOpenDeleteDialog(true);
+  };
 
+  const confirmDeleteBranch = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
@@ -454,34 +465,27 @@ const CenterEditForm = () => {
         return;
       }
 
-      await axios.delete(`${API_BASE}/filials/${branchId}`, {
+      await axios.delete(`${API_BASE}/filials/${branchToDelete}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
       toast.success("Branch deleted successfully!");
+      setOpenDeleteDialog(false);
+      setBranchToDelete(null);
 
-      // Refresh branches list
-      const branchesRes = await axios.get(`${API_BASE}/filials`, {
+      // Refresh list
+      const res = await axios.get(`${API_BASE}/filials`, {
         params: { centerId: id },
-        headers: { Authorization: `Bearer ${accessToken}` }
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
-      setBranches(branchesRes.data?.data || []);
 
+      setBranches(res.data?.data || []);
     } catch (err) {
       console.error("Error deleting branch:", err);
-      let errorMessage = "Failed to delete branch.";
-
-      if (err.response) {
-        if (err.response.status === 401) {
-          errorMessage = "Unauthorized - Please login again.";
-        } else if (err.response.data?.message) {
-          errorMessage = err.response.data.message;
-        }
-      }
-
-      toast.error(errorMessage);
+      toast.error("Failed to delete branch.");
+      setOpenDeleteDialog(false);
     }
   };
 
@@ -859,6 +863,34 @@ const CenterEditForm = () => {
           </div>
         </motion.div>
       </div>
+
+      <Dialog open={openDeleteDialog} handler={() => setOpenDeleteDialog(false)}>
+        <DialogHeader>Delete Branch</DialogHeader>
+        <DialogBody>
+          <Typography variant="paragraph" color="blue-gray">
+            Are you sure you want to delete this branch? This action cannot be undone.
+          </Typography>
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            variant="text"
+            color="blue-gray"
+            onClick={() => setOpenDeleteDialog(false)}
+            className="mr-2"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="gradient"
+            color="red"
+            onClick={confirmDeleteBranch}
+            className="flex items-center gap-2 bg-red-700"
+          >
+            <TrashIcon className="h-5 w-5" />
+            Delete
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </div>
   );
 };
