@@ -629,7 +629,7 @@
 
 
 
-
+import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect, useContext } from "react";
 import { FaSearch, FaBook, FaVideo, FaFilePdf, FaStar, FaDownload, FaTrash } from "react-icons/fa";
 import { MdComputer, MdBusiness } from "react-icons/md";
@@ -1001,6 +1001,7 @@ export const Resources = () => {
 
     return buttons;
   };
+    const { t } = useTranslation();
 
   return (
     <div className="">
@@ -1020,12 +1021,12 @@ export const Resources = () => {
           className="relative z-10 max-w-2xl px-3 text-center md:px-6 md:text-start mt-2 md:mt-8"
         >
           <p className="text-xl md:text-xl mt-6 md:mt-0">
-            Discover Teaching Resources
+            {t("Resources.subtitle")}
           </p>
           <p className="text-lg md:text-l mt-4 md:mt-2">
-            Access high-quality materials to enhance your educational programs.
+            {t("Resources.description")}
           </p>
-          <h1 className="text-4xl md:text-5xl font-bold mt-2 md:mt-4">Educational Resources</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mt-2 md:mt-4">{t("Resources.title")}</h1>
         </motion.div>
 
         <motion.div
@@ -1036,14 +1037,14 @@ export const Resources = () => {
         >
           <div className="flex gap-2">
             <Link to="/" className="no-underline hover:underline text-white">
-              Home
+              {t("Resources.link1")}
             </Link>
             <p>|</p>
             <Link
               to="/resources"
               className="text-[#2d0e4e] no-underline hover:underline"
             >
-              Resources
+              {t("Resources.link2")}
             </Link>
           </div>
         </motion.div>
@@ -1061,7 +1062,7 @@ export const Resources = () => {
                 <input
                   type="text"
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="Search resources..."
+                  placeholder={t("Resources.placeholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -1070,7 +1071,7 @@ export const Resources = () => {
 
             {/* Categories Filter - Full card size images */}
             <div className="mt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Filter by Category</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">{t("Resources.filterByCategory")}</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {/* All Resources Button */}
                 <button
@@ -1080,7 +1081,7 @@ export const Resources = () => {
                   <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
                     <FaSearch className="text-gray-500 text-4xl" />
                   </div>
-                  <span className="text-sm font-medium p-2">All Resources</span>
+                  <span className="text-sm font-medium p-2">{t("Resources.allResources")}</span>
                 </button>
 
                 {/* My Resources Button (if logged in) */}
@@ -1092,7 +1093,7 @@ export const Resources = () => {
                     <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
                       <FaStar className="text-yellow-500 text-4xl" />
                     </div>
-                    <span className="text-sm font-medium p-2">My Resources</span>
+                    <span className="text-sm font-medium p-2">{t("Resources.myResources")}</span>
                   </button>
                 )}
 
@@ -1132,14 +1133,14 @@ export const Resources = () => {
             onClick={handleAddResourceClick}
             className="px-4 py-2 bg-[#451774] text-white text-sm rounded-lg hover:bg-[#3a115aba] transition duration-300 mx-auto block mb-8"
           >
-            Add Resource
+            {t("Resources.addResource")}
           </button>
 
           {/* Modal for Adding Resource */}
           {isModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-400 bg-opacity-50">
               <div className="bg-white p-6 rounded-lg w-96">
-                <h2 className="text-xl font-semibold mb-4">Add New Resource</h2>
+                <h2 className="text-xl font-semibold mb-4">{t("Resources.addNewResource")}</h2>
                 <form onSubmit={handleSubmit}>
                   {/* Category Selection */}
                   <select
@@ -1168,7 +1169,7 @@ export const Resources = () => {
                   <input
                     type="text"
                     name="name"
-                    placeholder="Resource Name"
+                    placeholder={t("Resources.resourceName")}
                     value={newResource.name}
                     onChange={handleInputChange}
                     className="block w-full mb-2 p-2 border border-gray-300 rounded"
@@ -1178,7 +1179,7 @@ export const Resources = () => {
                   {/* Description */}
                   <textarea
                     name="description"
-                    placeholder="Description"
+                    placeholder={t("Resources.Modaldescription")}
                     value={newResource.description}
                     onChange={handleInputChange}
                     className="block w-full mb-2 p-2 border border-gray-300 rounded"
@@ -1188,7 +1189,7 @@ export const Resources = () => {
                   <input
                     type="url"
                     name="media"
-                    placeholder="Media URL"
+                    placeholder={t("Resources.mediaUrl")}
                     value={newResource.media}
                     onChange={handleInputChange}
                     className="block w-full mb-2 p-2 border border-gray-300 rounded"
@@ -1197,11 +1198,11 @@ export const Resources = () => {
 
                   {/* Image Upload - URL or File */}
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Image (URL or File)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t("Resources.image")}</label>
                     <input
                       type="url"
                       name="image"
-                      placeholder="Image URL"
+                      placeholder={t("Resources.imageUrl")}
                       value={newResource.image}
                       onChange={(e) => {
                         handleInputChange(e);
@@ -1213,7 +1214,7 @@ export const Resources = () => {
                       className="block w-full mb-2 p-2 border border-gray-300 rounded"
                       disabled={!!newResource.imageFile}
                     />
-                    <p className="text-xs text-gray-500 mb-2">- OR -</p>
+                    <p className="text-xs text-gray-500 mb-2">- {t("Resources.or")} -</p>
                     <input
                       type="file"
                       accept="image/*"
@@ -1227,7 +1228,7 @@ export const Resources = () => {
                     />
                     {newResource.imageFile && (
                       <div className="mt-2 text-sm text-green-600">
-                        Selected file: {newResource.imageFile.name}
+                      {t("Resources.selectedFile")}: {newResource.imageFile.name}
                       </div>
                     )}
                   </div>
@@ -1240,7 +1241,7 @@ export const Resources = () => {
                       className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
                       disabled={isUploading}
                     >
-                      Cancel
+                      {t("Resources.cancel")}
                     </button>
                     <button
                       type="submit"
@@ -1256,7 +1257,7 @@ export const Resources = () => {
                           Uploading...
                         </>
                       ) : (
-                        "Add Resource"
+                        t("Resources.ModaladdResource")
                       )}
                     </button>
                   </div>
@@ -1313,7 +1314,7 @@ export const Resources = () => {
                       rel="noopener noreferrer"
                       className="text-sm font-medium text-[#451774] hover:text-[#451774]"
                     >
-                      Preview
+                      {t("Resources.preview")}
                     </a>
                     <div className="flex space-x-2">
                       {isUserResource(resource) && (
@@ -1321,7 +1322,7 @@ export const Resources = () => {
                           onClick={() => handleDelete(resource.id)}
                           className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700"
                         >
-                          <FaTrash className="mr-1" /> Delete
+                          <FaTrash className="mr-1" /> {t("Resources.delete")}
                         </button>
                       )}
                       <a
@@ -1329,7 +1330,7 @@ export const Resources = () => {
                         download
                         className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-[#451774] hover:bg-[#3a115a]"
                       >
-                        <FaDownload className="mr-1" /> Download
+                        <FaDownload className="mr-1" /> {t("Resources.download")}
                       </a>
                     </div>
                   </div>

@@ -79,7 +79,31 @@
     "okButton": "OK",
     "cancelButton": "Bekor qilish"
   },
-  
+  "Resources": {
+    "subtitle": "O‘quv resurslarini kashf et",
+    "description": "Ta'lim dasturlaringizni boyitish uchun yuqori sifatli materiallardan foydalaning",
+    "title": "O‘quv Resurslari",
+    "link1": "Bosh sahifa",
+    "link2": "Resurslar",
+    "placeholder": "Resurslarni qidirish...",
+    "filterByCategory": "Kategoriya bo‘yicha filtrlash",
+    "allResources": "Barcha resurslar",
+    "myResources": "Mening resurslarim",
+    "addResource": "Resurs qo‘shish",
+    "addNewResource": "Yangi resurs qo‘shish",
+    "resourceName": "Resurs nomi",
+    "Modaldescription": "Tavsif",
+    "mediaUrl": "Media havolasi",
+    "image": "Rasm (URL yoki fayl)",
+    "imageUrl": "Rasm havolasi",
+    "or": "YOKI",
+    "selectedFile": "Tanlangan fayl",
+    "cancel": "Bekor qilish",
+    "ModaladdResource": "Resurs qo'shish",
+    "delete": "O‘chirish",
+    "download": "Yuklab olish",
+    "preview": "Oldindan ko‘rish"
+  },
     "profile": {
       "title": "Mening profilim",
       "editButton": "Profilni tahrirlash",
