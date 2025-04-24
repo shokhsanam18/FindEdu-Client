@@ -1,100 +1,114 @@
 import React, { useEffect, useState } from "react";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
-import { useReceptionStore, useAuthStore } from "../Store";
+import { FiTrash2 } from "react-icons/fi";
+import {
+  useReceptionStore,
+  useAuthStore,
+  useCardStore
+} from "../Store";
+import {
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Button,
+} from "@material-tailwind/react";
 
 export const Appointment = () => {
-  const { fetchReceptions, receptions, deleteReception, updateReception } = useReceptionStore();
-  const { user } = useAuthStore();
-  const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({ visitDate: "" });
+  const { deleteReception } = useReceptionStore();
+  const { user, fetchUserData } = useAuthStore();
+  const { regions, fetchData } = useCardStore();
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
 
   useEffect(() => {
-    fetchReceptions();
+    fetchData(); // load majors, regions, and centers if needed
   }, []);
 
-  const handleEdit = (reception) => {
-    setEditingId(reception.id);
-    setFormData({ visitDate: reception.visitDate.slice(0, 16) }); // YYYY-MM-DDTHH:mm
+  const getRegionName = (regionId) => {
+    const region = regions.find((r) => r.id === regionId);
+    return region?.name || "Unknown region";
   };
 
-  const handleUpdate = async (id) => {
-    await updateReception(id, { visitDate: formData.visitDate });
-    setEditingId(null);
+  const handleDelete = (id) => {
+    setDeleteTargetId(id);
+    setOpenDeleteDialog(true);
   };
 
-  const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this appointment?")) {
-      await deleteReception(id);
-    }
+  const confirmDelete = async () => {
+    await deleteReception(deleteTargetId);
+    await fetchUserData();
+    setOpenDeleteDialog(false);
   };
 
-  const userAppointments = receptions.filter(
-    (rec) => rec.userId === user?.data?.id
-  );
+  const userAppointments = user?.data?.receptions || [];
 
   return (
-    <div className="w-full min-h-screen pt-[10%] pb-[5%] flex flex-wrap justify-center gap-6">
+    <div className="w-full pt-[10%] pb-[5%] flex flex-wrap justify-center gap-6">
       {userAppointments.map((rec) => (
         <div
           key={rec.id}
-          className="w-80 bg-white border border-purple-200 rounded-xl p-6 shadow hover:shadow-lg transition"
+          className="w-80 bg-purple-50 border border-purple-200 rounded-xl p-4 shadow hover:shadow-lg transition"
         >
-          {editingId === rec.id ? (
-            <div>
-              <label className="block text-sm mb-1">Visit Date</label>
-              <input
-                type="datetime-local"
-                className="w-full border px-2 py-1 rounded mb-3"
-                value={formData.visitDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, visitDate: e.target.value })
-                }
-              />
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setEditingId(null)}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => handleUpdate(rec.id)}
-                  className="text-purple-600 hover:text-purple-800"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <h3 className="text-xl font-bold text-purple-700 mb-2">
-                Major ID: {rec.majorId}
-              </h3>
-              <p className="text-gray-700 text-sm mb-1">
-                📍 Filial: {rec.filialId || "Main Branch"}
-              </p>
-              <p className="text-gray-700 text-sm">
-                📅 {new Date(rec.visitDate).toLocaleString()}
-              </p>
+          <img
+            src={`https://findcourse.net.uz/api/image/${rec.filial?.image}`}
+            alt="Center"
+            className="w-full h-40 object-cover rounded-lg mb-4"
+          />
+          <h3 className="text-xl font-bold text-purple-700 mb-1">
+            {rec.center?.name}
+          </h3>
+          <p className="text-sm text-gray-700 mb-1">
+            📍 <strong>Address:</strong> {rec.filial?.address},{" "}
+            {getRegionName(rec.filial?.regionId)}
+          </p>
+          <p className="text-sm text-gray-700 mb-1">
+            📅 <strong>Visit:</strong>{" "}
+            {new Date(rec.visitDate).toLocaleString()}
+          </p>
+          <p className="text-sm text-gray-700 mb-1">
+            🎓 <strong>Major:</strong> {rec.major?.name || "Unknown major"}
+          </p>
+          <p
+            className={`text-sm font-semibold ${
+              rec.status === "PENDING" ? "text-yellow-600" : "text-green-600"
+            }`}
+          >
+            🔖 {rec.status}
+          </p>
 
-              <div className="flex justify-end gap-4 mt-4">
-                <button
-                  onClick={() => handleEdit(rec)}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  <FiEdit className="inline-block" /> Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(rec.id)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <FiTrash2 className="inline-block" /> Delete
-                </button>
-              </div>
-            </>
-          )}
+          <div className="flex justify-end gap-4 mt-4">
+            <button
+              onClick={() => handleDelete(rec.id)}
+              className="text-red-600 hover:text-red-800"
+            >
+              <FiTrash2 className="inline-block" /> Delete
+            </button>
+          </div>
         </div>
       ))}
+
+      {/* Delete Dialog */}
+      <Dialog open={openDeleteDialog} handler={() => setOpenDeleteDialog(false)}>
+        <DialogHeader>Confirm Deletion</DialogHeader>
+        <DialogBody>
+          Are you sure you want to delete this appointment?
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            variant="text"
+            onClick={() => setOpenDeleteDialog(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            color="red"
+            onClick={confirmDelete}
+          >
+            Delete
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </div>
   );
 };

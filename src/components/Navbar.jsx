@@ -290,7 +290,7 @@ import { useAuthStore, useSearchStore } from "../Store";
 import { useSidebarSt } from "@/Store";
 import { AlignJustify } from "lucide-react";
 import { useTranslation } from 'react-i18next';
-
+import ReactCountryFlag from "react-country-flag";
 export default function Navbar() {
   const { t, i18n } = useTranslation();
   const toggleSidebar = useSidebarSt((state) => state.toggleSidebar);
@@ -359,9 +359,21 @@ export default function Navbar() {
   ];
 
   const languageMenuItems = [
-    { code: 'en', name: t('navbar.languages.en'), flag: '🇬🇧' },
-    { code: 'ru', name: t('navbar.languages.ru'), flag: '🇷🇺' },
-    { code: 'uz', name: t('navbar.languages.uz'), flag: '🇺🇿' },
+    { 
+      code: 'en', 
+      name: t('navbar.languages.en'), 
+      flag: <ReactCountryFlag countryCode="GB" svg style={{ width: '1.5em', height: '1.5em' }} /> 
+    },
+    { 
+      code: 'ru', 
+      name: t('navbar.languages.ru'), 
+      flag: <ReactCountryFlag countryCode="RU" svg style={{ width: '1.5em', height: '1.5em' }} /> 
+    },
+    { 
+      code: 'uz', 
+      name: t('navbar.languages.uz'), 
+      flag: <ReactCountryFlag countryCode="UZ" svg style={{ width: '1.5em', height: '1.5em' }} /> 
+    },
   ];
 
   return (

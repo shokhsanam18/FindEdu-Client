@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../Store";
+import { useTranslation } from "react-i18next";
 import {
   Typography,
   Input,
@@ -18,14 +19,13 @@ import {
   CheckIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
-import {
-ArrowLeft,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+
 export default function Profile() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const fetchUserData = useAuthStore((state) => state.fetchUserData);
   const updateUser = useAuthStore((state) => state.updateUser);
-  // const deleteUser = useAuthStore((state) => state.deleteUser);
   const fetchImage = useAuthStore((state) => state.fetchProfileImage);
   const profileImageUrl = useAuthStore((state) => state.profileImageUrl);
   const uploadImage = useAuthStore((state) => state.uploadImage);
@@ -80,7 +80,7 @@ export default function Profile() {
         phone: formData.phone,
       });
       setEditMode(false);
-      fetchUserData(); // Refresh user data
+      fetchUserData();
     } catch (error) {
       console.error("Error updating profile:", error);
     }
@@ -102,21 +102,13 @@ export default function Profile() {
         setIsUploading(true);
         const formData = new FormData();
         formData.append("image", file);
-        
-        // Upload the image
         const response = await uploadImage(formData);
         const imageFilename = response.data;
-        
-        // Update the user with the new image filename
         await updateUser(user.data.id, { image: imageFilename });
-        
-        // Update local state
         setFormData(prev => ({
           ...prev,
           image: imageFilename
         }));
-        
-        // Fetch the new image
         fetchImage(imageFilename);
       } catch (error) {
         console.error("Error uploading image:", error);
@@ -128,15 +120,12 @@ export default function Profile() {
 
   const getImageUrl = () => {
     if (formData.image) {
-      // If the image is a URL (from placeholder or just uploaded)
       if (formData.image.startsWith("http")) {
         return formData.image;
       }
-      // If we have a profileImageUrl from the store
       if (profileImageUrl) {
         return profileImageUrl;
       }
-      // Otherwise construct the URL from the filename
       return `/api/image/${formData.image}`;
     }
     return "https://via.placeholder.com/150";
@@ -144,19 +133,19 @@ export default function Profile() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl mt-20">
-            <div className="container mx-auto px-4 mt-5 mb-3 text-xl">
+      <div className="container mx-auto px-4 mt-5 mb-3 text-xl">
         <Link
           to="/"
           className="inline-flex items-center text-[#441774] hover:text-purple-800"
         >
           <ArrowLeft className="h-5 w-5 mr-2" />
-          Back to Home
+          {t("profile.backToHome")}
         </Link>
       </div>
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex justify-between items-center mb-6">
           <Typography variant="h3" color="blue-gray">
-            My Profile
+            {t("profile.title")}
           </Typography>
           {!editMode && (
             <Button
@@ -166,7 +155,7 @@ export default function Profile() {
               onClick={() => setEditMode(true)}
             >
               <PencilIcon className="h-4 w-4" />
-              Edit Profile
+              {t("profile.editButton")}
             </Button>
           )}
         </div>
@@ -193,7 +182,7 @@ export default function Profile() {
                   htmlFor="profileImage"
                   className={`text-sm ${isUploading ? 'text-gray-500' : 'text-blue-500 hover:text-blue-700'} cursor-pointer`}
                 >
-                  {isUploading ? 'Uploading...' : 'Change Photo'}
+                  {isUploading ? t("profile.uploading") : t("profile.changePhoto")}
                 </label>
               </div>
             )}
@@ -203,7 +192,7 @@ export default function Profile() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Typography variant="h6" color="blue-gray" className="mb-2">
-                  First Name
+                  {t("profile.firstName")}
                 </Typography>
                 {editMode ? (
                   <Input
@@ -219,7 +208,7 @@ export default function Profile() {
 
               <div>
                 <Typography variant="h6" color="blue-gray" className="mb-2">
-                  Last Name
+                  {t("profile.lastName")}
                 </Typography>
                 {editMode ? (
                   <Input
@@ -235,14 +224,14 @@ export default function Profile() {
 
               <div>
                 <Typography variant="h6" color="blue-gray" className="mb-2">
-                  Email
+                  {t("profile.email")}
                 </Typography>
                 <Typography>{formData.email}</Typography>
               </div>
 
               <div>
                 <Typography variant="h6" color="blue-gray" className="mb-2">
-                  Phone
+                  {t("profile.phone")}
                 </Typography>
                 {editMode ? (
                   <Input
@@ -250,16 +239,16 @@ export default function Profile() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    placeholder="Enter phone number"
+                    placeholder={t("profile.phone")}
                   />
                 ) : (
-                  <Typography>{formData.phone || "Not provided"}</Typography>
+                  <Typography>{formData.phone || t("profile.notProvided")}</Typography>
                 )}
               </div>
 
               <div className="md:col-span-2">
                 <Typography variant="h6" color="blue-gray" className="mb-2">
-                  Role
+                  {t("profile.role")}
                 </Typography>
                 <Typography className="capitalize">
                   {user?.role?.toLowerCase()}
@@ -275,14 +264,13 @@ export default function Profile() {
                   className="flex items-center gap-2"
                 >
                   <CheckIcon className="h-4 w-4" />
-                  Save Changes
+                  {t("profile.saveButton")}
                 </Button>
                 <Button
                   color="red"
                   variant="outlined"
                   onClick={() => {
                     setEditMode(false);
-                    // Reset form data to original user data
                     if (user?.data) {
                       setFormData({
                         firstName: user.data.firstName || "",
@@ -296,7 +284,7 @@ export default function Profile() {
                   className="flex items-center gap-2"
                 >
                   <XMarkIcon className="h-4 w-4" />
-                  Cancel
+                  {t("profile.cancelButton")}
                 </Button>
               </div>
             )}
@@ -312,19 +300,17 @@ export default function Profile() {
               onClick={() => setOpenDeleteDialog(true)}
             >
               <TrashIcon className="h-4 w-4" />
-              Delete Account
+              {t("profile.deleteAccount")}
             </Button>
           </div>
         )}
       </div>
 
-      {/* Delete Account Dialog */}
       <Dialog open={openDeleteDialog} handler={() => setOpenDeleteDialog(false)}>
-        <DialogHeader>Confirm Account Deletion</DialogHeader>
+        <DialogHeader>{t("profile.deleteDialog.title")}</DialogHeader>
         <DialogBody>
           <Typography variant="paragraph" color="blue-gray">
-            Are you sure you want to delete your account? This action cannot be
-            undone and all your data will be permanently removed.
+            {t("profile.deleteDialog.message")}
           </Typography>
         </DialogBody>
         <DialogFooter>
@@ -334,7 +320,7 @@ export default function Profile() {
             onClick={() => setOpenDeleteDialog(false)}
             className="mr-2"
           >
-            Cancel
+            {t("profile.deleteDialog.cancel")}
           </Button>
           <Button
             variant="gradient"
@@ -343,7 +329,7 @@ export default function Profile() {
             className="flex items-center gap-2 bg-red-700"
           >
             <TrashIcon className="h-4 w-4" />
-            Delete Account
+            {t("profile.deleteDialog.confirm")}
           </Button>
         </DialogFooter>
       </Dialog>

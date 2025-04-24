@@ -627,21 +627,6 @@ export const useReceptionStore = create((set, get) => ({
   loading: false,
   error: null,
 
-  fetchReceptions: async () => {
-    set({ loading: true, error: null });
-    try {
-      const token = localStorage.getItem("accessToken");
-      const res = await axios.get(`${API_BASE}/reseption`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set({ receptions: res.data?.data || [] });
-    } catch (error) {
-      console.error("❌ Failed to fetch receptions:", error);
-      set({ error: "Failed to load appointments" });
-    } finally {
-      set({ loading: false });
-    }
-  },
 
   createReception: async ({ centerId, filialId, majorId, visitDate }) => {
     try {
@@ -668,6 +653,32 @@ export const useReceptionStore = create((set, get) => ({
       };
     }
   },
+
+  fetchReceptions: async () => {
+    set({ loading: true, error: null });
+  
+    try {
+      const token = await useAuthStore.getState().refreshTokenFunc(false);
+      const user = useAuthStore.getState().user;
+  
+      if (!token || !user?.data?.id) {
+        console.warn("❌ Token or user not ready");
+        throw new Error("User not authenticated");
+      }
+  
+      const res = await axios.get(`${API_BASE}/reseption`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      set({ receptions: res.data?.data || [] });
+    } catch (error) {
+      console.error("❌ Failed to fetch receptions:", error);
+      set({ error: "Failed to load appointments" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
 
   updateReception: async (id, updates) => {
     try {
