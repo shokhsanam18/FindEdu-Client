@@ -21,9 +21,10 @@ import { Eye, EyeOff } from "lucide-react";
 const API_BASE = "https://findcourse.net.uz/api/users";
 
 const formSchema = z.object({
-  otp: z.string().min(4, { message: "OTP must be at least 4 digits" }),
+  otp: z.string().trim().min(4, { message: "OTP must be at least 4 digits" }),
   newPassword: z
     .string()
+    .trim()
     .min(6, { message: "Password must be at least 6 characters" }),
 });
 
