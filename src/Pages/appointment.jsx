@@ -1,88 +1,98 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { useReceptionStore, useAuthStore } from "../Store";
 
 export const Appointment = () => {
-  const [data, setData] = useState([]);
+  const { fetchReceptions, receptions, deleteReception, updateReception } = useReceptionStore();
+  const { user } = useAuthStore();
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({ visitDate: "" });
 
   useEffect(() => {
-    const storedData = localStorage.getItem("RegisterData");
-    if (storedData) {
-      setData(JSON.parse(storedData));
-    }
+    fetchReceptions();
   }, []);
 
-  // 🗑️ DELETE FUNCTION
-  const handleDelete = (index) => {
-    const updatedData = [...data];
-    updatedData.splice(index, 1); // remove 1 item at index
-    setData(updatedData);
-    localStorage.setItem("RegisterData", JSON.stringify(updatedData));
+  const handleEdit = (reception) => {
+    setEditingId(reception.id);
+    setFormData({ visitDate: reception.visitDate.slice(0, 16) }); // YYYY-MM-DDTHH:mm
   };
 
-  // ✏️ EDIT FUNCTION
-  const handleEdit = (index) => {
-    const editedMajor = prompt("Edit major name:", data[index].majorName);
-    const editedAddress = prompt("Edit address:", data[index].address);
-    const editedDate = prompt("Edit visit date:", data[index].visitDate);
+  const handleUpdate = async (id) => {
+    await updateReception(id, { visitDate: formData.visitDate });
+    setEditingId(null);
+  };
 
-    if (editedMajor && editedAddress && editedDate) {
-      const updatedData = [...data];
-      updatedData[index] = {
-        ...updatedData[index],
-        majorName: editedMajor,
-        address: editedAddress,
-        visitDate: editedDate,
-      };
-      setData(updatedData);
-      localStorage.setItem("RegisterData", JSON.stringify(updatedData));
+  const handleDelete = async (id) => {
+    if (confirm("Are you sure you want to delete this appointment?")) {
+      await deleteReception(id);
     }
   };
 
-  return (
-    <div className="w-full h-full pt-[20%] pb-[10%] flex items-center justify-center gap-5 flex-wrap">
-      {data.map((center, index) => (
-        <div
-          key={index}
-          className="w-80 p-6 bg-gradient-to-br from-white via-purple-50 to-purple-100 border border-purple-200 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
-        >
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold text-purple-700 mb-1 tracking-wide">
-              {center.majorName}
-            </h1>
-            <p className="text-gray-700 text-sm mb-1">
-              📍 <span className="font-semibold">Address:</span> {center.address}
-            </p>
-            <p className="text-gray-700 text-sm">
-              📅 <span className="font-semibold">Visit:</span>{" "}
-              {new Date(center.visitDate).toLocaleString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              })}
-            </p>
-          </div>
+  const userAppointments = receptions.filter(
+    (rec) => rec.userId === user?.data?.id
+  );
 
-          <div className="flex justify-end gap-3 mt-6">
-            <button
-              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition"
-              title="Edit"
-              onClick={() => handleEdit(index)}
-            >
-              <FiEdit className="text-lg" />
-              Edit
-            </button>
-            <button
-              className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 transition"
-              title="Delete"
-              onClick={() => handleDelete(index)}
-            >
-              <FiTrash2 className="text-lg" />
-              Delete
-            </button>
-          </div>
+  return (
+    <div className="w-full min-h-screen pt-[10%] pb-[5%] flex flex-wrap justify-center gap-6">
+      {userAppointments.map((rec) => (
+        <div
+          key={rec.id}
+          className="w-80 bg-white border border-purple-200 rounded-xl p-6 shadow hover:shadow-lg transition"
+        >
+          {editingId === rec.id ? (
+            <div>
+              <label className="block text-sm mb-1">Visit Date</label>
+              <input
+                type="datetime-local"
+                className="w-full border px-2 py-1 rounded mb-3"
+                value={formData.visitDate}
+                onChange={(e) =>
+                  setFormData({ ...formData, visitDate: e.target.value })
+                }
+              />
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setEditingId(null)}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleUpdate(rec.id)}
+                  className="text-purple-600 hover:text-purple-800"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <h3 className="text-xl font-bold text-purple-700 mb-2">
+                Major ID: {rec.majorId}
+              </h3>
+              <p className="text-gray-700 text-sm mb-1">
+                📍 Filial: {rec.filialId || "Main Branch"}
+              </p>
+              <p className="text-gray-700 text-sm">
+                📅 {new Date(rec.visitDate).toLocaleString()}
+              </p>
+
+              <div className="flex justify-end gap-4 mt-4">
+                <button
+                  onClick={() => handleEdit(rec)}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  <FiEdit className="inline-block" /> Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(rec.id)}
+                  className="text-red-600 hover:text-red-800"
+                >
+                  <FiTrash2 className="inline-block" /> Delete
+                </button>
+              </div>
+            </>
+          )}
         </div>
       ))}
     </div>

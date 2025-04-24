@@ -530,35 +530,122 @@ export const useMyCentersStore = create((set) => ({
 
   fetchMyCenters: async () => {
     set({ loading: true, error: null });
-
+  
     try {
       const token = localStorage.getItem("accessToken");
       const res = await axios.get("https://findcourse.net.uz/api/users/mycenters", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       const centers = res.data?.data || [];
-
-      const processed = centers.map((center) => {
-        const comments = center.comments || [];
-        const avgRating =
-          comments.length > 0
-            ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
-            : 0;
-
-        return {
-          ...center,
-          rating: avgRating,
-          imageUrl: center.image ? `https://findcourse.net.uz/api/image/${center.image}` : null,
-        };
-      });
-
+  
+      const processed = centers
+        .filter(center => !center.isDeleted && center.status !== "deleted")
+        .map(center => {
+          const comments = center.comments || [];
+          const avgRating =
+            comments.length > 0
+              ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
+              : 0;
+  
+          return {
+            ...center,
+            rating: avgRating,
+            imageUrl: center.image ? `${API_BASE}/image/${center.image}` : null,
+          };
+        });
+  
       set({ myCenters: processed });
     } catch (error) {
-      console.error("❌ Failed to fetch my centers:", error);
-      set({ error: "Failed to load your centers" });
+      // Handle 404 as "no centers yet", everything else as an error
+      if (error.response?.status === 404) {
+        set({ myCenters: [] });
+        console.warn("ℹ️ No centers found (404), treating as empty.");
+      } else {
+        console.error("❌ Failed to fetch my centers:", error);
+        set({ error: "Failed to load your centers" });
+      }
     } finally {
       set({ loading: false });
+    }
+  }
+
+  
+}));
+
+
+export const useReceptionStore = create((set, get) => ({
+  receptions: [],
+  loading: false,
+  error: null,
+
+  fetchReceptions: async () => {
+    set({ loading: true, error: null });
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.get(`${API_BASE}/reseption`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      set({ receptions: res.data?.data || [] });
+    } catch (error) {
+      console.error("❌ Failed to fetch receptions:", error);
+      set({ error: "Failed to load appointments" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  createReception: async ({ centerId, filialId, majorId, visitDate }) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const payload = {
+        centerId,
+        filialId: filialId && !isNaN(Number(filialId)) ? Number(filialId) : null,
+        majorId,
+        visitDate,
+      };
+      console.log("Payload to backend:", payload);
+      const res = await axios.post(`${API_BASE}/reseption`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      // ✅ Only return result — no toast
+      get().fetchReceptions();
+      return { success: true, data: res.data };
+    } catch (error) {
+      console.error("❌ Failed to create reception:", error);
+      return {
+        success: false,
+        error: error?.response?.data?.message || "Failed to create registration",
+      };
+    }
+  },
+
+  updateReception: async (id, updates) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      await axios.patch(`${API_BASE}/reseption/${id}`, updates, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Appointment updated!");
+      get().fetchReceptions();
+    } catch (error) {
+      console.error("❌ Failed to update reception:", error);
+      toast.error("Failed to update appointment");
+    }
+  },
+
+  deleteReception: async (id) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      await axios.delete(`${API_BASE}/reseption/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Appointment deleted");
+      get().fetchReceptions();
+    } catch (error) {
+      console.error("❌ Failed to delete reception:", error);
+      toast.error("Failed to delete appointment");
     }
   },
 }));

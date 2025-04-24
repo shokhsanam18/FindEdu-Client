@@ -24,7 +24,7 @@ import {
   Bookmark,
   PencilLine,
 } from "lucide-react";
-import { useLikedStore, useCommentStore, useAuthStore } from "../Store";
+import { useLikedStore, useCommentStore, useAuthStore, useReceptionStore } from "../Store";
 
 const API_BASE = "https://findcourse.net.uz";
 const ImageApi = `${API_BASE}/api/image`;
@@ -37,16 +37,15 @@ const CenterDetail = () => {
   const [error, setError] = useState(null);
   const { user } = useAuthStore();
   const [branches, setBranches] = useState([]);
-  const [majors, setMajors] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedMajor, setSelectedMajor] = useState(null);
 
   // Registration modal state
   const [showReservationModal, setShowReservationModal] = useState(false);
-  const [visitDate, setVisitDate] = useState("");
   const [visitDay, setVisitDay] = useState(""); // YYYY-MM-DD
   const [visitHour, setVisitHour] = useState(""); // HH:MM
   const [isSubmittingReservation, setIsSubmittingReservation] = useState(false);
+  const { createReception } = useReceptionStore();
   const [reservationError, setReservationError] = useState(null);
   const [reservationSuccess, setReservationSuccess] = useState(false);
 
@@ -92,17 +91,24 @@ const CenterDetail = () => {
         console.log(filials)
 
         // Construct dynamic branch list
-        const dynamicBranches = [
-          {
-            id: "main",
-            name: "Main Branch",
-            address: centerData.address,
-          },
-          ...filials.map((filial) => ({
+        let dynamicBranches = filials.map((filial) => {
+          const regionName = filial.region?.name || `Region ${filial.regionId}`;
+          const isMainBranch = filial.name?.toLowerCase().includes("main branch");
+
+          return {
             id: filial.id,
-            name: filial.region?.name || `Region ${filial.regionId}`,
+            name: isMainBranch
+              ? `${centerData.name} - ${regionName} Main branch`
+              : `${centerData.name} - ${regionName} branch`,
             address: filial.address,
-          })),
+            region: filial.region,
+          };
+        });
+
+        // Move main branch to the top based on name or any indicator
+        dynamicBranches = [
+          ...dynamicBranches.filter((b) => b.name?.toLowerCase().includes("main")),
+          ...dynamicBranches.filter((b) => !b.name?.toLowerCase().includes("main")),
         ];
 
         // Calculate avg rating
@@ -112,18 +118,18 @@ const CenterDetail = () => {
             ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
             : 0;
 
-        setCenter({
-          ...centerData,
-          rating: avgRating,
-          imageUrl: centerData.image ? `${ImageApi}/${centerData.image}` : null,
-        });
+            setCenter({
+              ...centerData,
+              rating: avgRating,
+              imageUrl: centerData.image ? `${ImageApi}/${centerData.image}` : null,
+              majors: centerData.majors || [], // ← Add this
+            });
 
         console.log(centerData)
 
         setBranches(dynamicBranches);
         setSelectedBranch(dynamicBranches[0]);
-        setMajors(majorsData);
-        setSelectedMajor(majorsData[0]);
+        setSelectedMajor(centerData.majors?.[0] || null);
 
         await fetchCommentsByCenter(id);
       } catch (err) {
@@ -137,6 +143,24 @@ const CenterDetail = () => {
 
     fetchData();
   }, [id, navigate]);
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape") {
+        setShowReservationModal(false);
+        setReservationError(null);
+        setReservationSuccess(false);
+      }
+    };
+
+    if (showReservationModal) {
+      window.addEventListener("keydown", handleEscape);
+    }
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [showReservationModal]);
 
   useEffect(() => {
     const user = useAuthStore.getState().user;
@@ -158,6 +182,8 @@ const CenterDetail = () => {
     const date = new Date(datetimeStr);
     return date.getMinutes() === 0 && date.getHours() % 2 === 0;
   };
+
+
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
@@ -245,28 +271,22 @@ const CenterDetail = () => {
     );
   }
 
-  const PostRegisteration = (finalVisitDate) => {
-    const existingData = JSON.parse(localStorage.getItem("RegisterData")) || [];
+  const PostRegisteration = async (finalVisitDate) => {
+    const result = await createReception({
+      centerId: center.id,
+      filialId: selectedBranch?.id,
+      majorId: selectedMajor?.id,
+      visitDate: combinedDateTime,
+    });
 
-    const newRegister = {
-      id: id,
-      branch: selectedBranch.name,
-      address: center.address,
-      majorId: selectedMajor.id,
-      majorName: center.name,
-      visitDate: finalVisitDate, // <-- now using correct value
-    };
-
-    const index = existingData.findIndex((item) => item.id === id);
-
-    if (index !== -1) {
-      existingData[index] = newRegister;
+    if (result.success) {
+      setReservationSuccess(true);
     } else {
-      existingData.push(newRegister);
+      setReservationError("Failed to register. Please try again.");
     }
-
-    localStorage.setItem("RegisterData", JSON.stringify(existingData));
   };
+
+
 
   return (
     <div className="min-h-screen bg-gray-100 mt-22 md:mt-20">
@@ -331,8 +351,8 @@ const CenterDetail = () => {
                   <div
                     key={branch.id}
                     className={`p-3 rounded-lg cursor-pointer transition-colors  ${selectedBranch?.id === branch.id
-                        ? "bg-purple-100 border border-purple-300"
-                        : "bg-gray-50 hover:bg-gray-100"
+                      ? "bg-purple-100 border border-purple-300"
+                      : "bg-gray-50 hover:bg-gray-100"
                       }`}
                     onClick={() => handleBranchClick(branch)}
                   >
@@ -358,8 +378,8 @@ const CenterDetail = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3 }}
                         className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${selectedMajor?.id === major.id
-                            ? "ring-2 ring-purple-500"
-                            : ""
+                          ? "ring-2 ring-purple-500"
+                          : ""
                           }`}
                         onClick={() => setSelectedMajor(major)}
                       >
@@ -497,8 +517,8 @@ const CenterDetail = () => {
                         >
                           <Star
                             className={`h-5 w-5 ${star <= newComment.star
-                                ? "text-yellow-500 fill-yellow-500"
-                                : "text-gray-300"
+                              ? "text-yellow-500 fill-yellow-500"
+                              : "text-gray-300"
                               }`}
                           />
                         </button>
@@ -555,8 +575,8 @@ const CenterDetail = () => {
                                   >
                                     <Star
                                       className={`h-5 w-5 ${star <= editCommentStar
-                                          ? "text-yellow-500 fill-yellow-500"
-                                          : "text-gray-300"
+                                        ? "text-yellow-500 fill-yellow-500"
+                                        : "text-gray-300"
                                         }`}
                                     />
                                   </button>
@@ -593,8 +613,8 @@ const CenterDetail = () => {
                                       <Star
                                         key={i}
                                         className={`h-4 w-4 ${i < comment.star
-                                            ? "text-yellow-500 fill-yellow-500"
-                                            : "text-gray-300"
+                                          ? "text-yellow-500 fill-yellow-500"
+                                          : "text-gray-300"
                                           }`}
                                       />
                                     ))}
@@ -648,13 +668,21 @@ const CenterDetail = () => {
 
       {/* Registration Modal */}
       {showReservationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          onClick={() => {
+            setShowReservationModal(false);
+            setReservationError(null);
+            setReservationSuccess(false);
+          }}
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2 }}
             className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden"
+            onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking inside
           >
             <div className="relative">
               {/* Modal header */}
@@ -707,7 +735,7 @@ const CenterDetail = () => {
                         day: "numeric",
                         hour: "2-digit",
                         minute: "2-digit",
-                        hour12: false, 
+                        hour12: false,
                       })}
                     </p>
                     <div className="mt-4 space-y-2">
@@ -739,7 +767,7 @@ const CenterDetail = () => {
                         >
                           {branches.map((branch) => (
                             <option key={branch.id} value={branch.id}>
-                              {branch.name}, {branch.address}
+                              {branch.address}, {branch.region?.name}
                             </option>
                           ))}
                         </select>
@@ -785,7 +813,7 @@ const CenterDetail = () => {
                         {/* Time Picker */}
                         <div>
                           <label htmlFor="visitHour" className="block text-sm font-medium text-gray-700 mb-1">
-                            Select Time (Every 2 hrs)
+                            Select Time
                           </label>
                           <select
                             id="visitHour"
@@ -794,7 +822,7 @@ const CenterDetail = () => {
                             className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                             required
                           >
-                            <option value="">Select time</option>
+                            <option value="" disabled={visitHour !== ""}>Select time</option>
                             {[10, 12, 14, 16, 18].map((hour) => {
                               const formatted = hour.toString().padStart(2, "0");
                               return (
@@ -825,7 +853,7 @@ const CenterDetail = () => {
                           Cancel
                         </button>
                         <button
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.preventDefault();
 
                             if (!visitDay || !visitHour) {
@@ -833,13 +861,23 @@ const CenterDetail = () => {
                               return;
                             }
 
-                            const combinedDateTime = `${visitDay}T${visitHour}`;
                             setReservationError(null);
+                            setIsSubmittingReservation(true);
 
-                            // Pass directly to PostRegisteration
-                            PostRegisteration(combinedDateTime);
+                            const result = await createReception({
+                              centerId: center.id,
+                              filialId: selectedBranch?.id,
+                              majorId: selectedMajor?.id,
+                              visitDate: `${visitDay}T${visitHour}`,
+                            });
 
-                            setReservationSuccess(true);
+                            setIsSubmittingReservation(false);
+
+                            if (result.success) {
+                              setReservationSuccess(true);
+                            } else {
+                              setReservationError("Failed to register. Please try again.");
+                            }
                           }}
                           type="submit"
                           disabled={isSubmittingReservation || !visitDay || !visitHour}
