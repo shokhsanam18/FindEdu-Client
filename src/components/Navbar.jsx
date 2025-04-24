@@ -262,9 +262,6 @@
 //   );
 // }
 
-
-
-
 import React, { useEffect } from "react";
 import { Button as Buton } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
@@ -292,8 +289,10 @@ import {
 import { useAuthStore, useSearchStore } from "../Store";
 import { useSidebarSt } from "@/Store";
 import { AlignJustify } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 export default function Navbar() {
+  const { t, i18n } = useTranslation();
   const toggleSidebar = useSidebarSt((state) => state.toggleSidebar);
   const user = useAuthStore((state) => state.user);
   const isLoggedIn = useAuthStore((state) => !!state.user?.data?.isActive);
@@ -305,6 +304,16 @@ export default function Navbar() {
   const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng)
+      .then(() => {
+        localStorage.setItem('i18nextLng', lng);
+      })
+      .catch((err) => {
+        console.error('Error changing language:', err);
+      });
+  };
 
   useEffect(() => {
     useAuthStore.getState().fetchUserData();
@@ -329,7 +338,7 @@ export default function Navbar() {
     ...(user?.role === "CEO"
       ? [
           {
-            label: "My Centers",
+            label: t('navbar.my_centers'),
             icon: BuildingOffice2Icon,
             link: "/MyCenters",
           },
@@ -337,17 +346,24 @@ export default function Navbar() {
       : user?.role === "USER"
       ? [
           {
-            label: "My Appointments",
+            label: t('navbar.my_appointments'),
             icon: CalendarIcon,
             link: "/Appointment",
           },
         ]
       : []),
     {
-      label: "Sign Out",
+      label: t('navbar.sign_out'),
       icon: PowerIcon,
     },
   ];
+
+  const languageMenuItems = [
+    { code: 'en', name: t('navbar.languages.en'), flag: '🇬🇧' },
+    { code: 'ru', name: t('navbar.languages.ru'), flag: '🇷🇺' },
+    { code: 'uz', name: t('navbar.languages.uz'), flag: '🇺🇿' },
+  ];
+
   return (
     <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-7 w-full z-40 bg-white shadow-md backdrop-blur-md">
       <div className="bg-white items-center justify-between flex">
@@ -366,13 +382,13 @@ export default function Navbar() {
           </button>
         </div>
 
-        <div className="hidden lg:flex items-center gap-6 xl:gap-8 px-6 py-3">
+        <div className="hidden lg:flex items-center gap-4 xl:gap-6 px-6 py-3">
           <Link
             to="/"
             className="text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
             onClick={() => window.scrollTo(0, 0)}
           >
-            Home
+            {t('navbar.home')}
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
           </Link>
 
@@ -381,7 +397,7 @@ export default function Navbar() {
             className="text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
             onClick={() => window.scrollTo(0, 0)}
           >
-            About Us
+            {t('navbar.about')}
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
           </Link>
 
@@ -390,7 +406,7 @@ export default function Navbar() {
             className="text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
             onClick={() => window.scrollTo(0, 0)}
           >
-            Resources
+            {t('navbar.resources')}
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
           </Link>
 
@@ -400,9 +416,10 @@ export default function Navbar() {
             onClick={() => window.scrollTo(0, 0)}
           >
             <HeartIcon className="h-5 w-5 transition-colors duration-300 group-hover:fill-[#461773] group-hover:stroke-[#461773]" />
-            Favorites
+            {t('navbar.favorites')}
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
           </Link>
+          
           {user?.role === "USER" && (
             <Link
               to="/Appointment"
@@ -410,7 +427,7 @@ export default function Navbar() {
               onClick={() => window.scrollTo(0, 0)}
             >
               <CalendarIcon className="h-5 w-5" />
-              Appointments
+              {t('navbar.appointments')}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
             </Link>
           )}
@@ -419,7 +436,7 @@ export default function Navbar() {
             <div className="relative group">
               <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300">
                 <ChartBarIcon className="h-5 w-5" />
-                CEO Dashboard
+                {t('navbar.ceo_dashboard')}
                 <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
               </button>
               <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
@@ -429,7 +446,7 @@ export default function Navbar() {
                   onClick={() => window.scrollTo(0, 0)}
                 >
                   <PlusCircleIcon className="h-4 w-4" />
-                  Create Center
+                  {t('navbar.create_center')}
                 </Link>
                 <Link
                   to="/MyCenters"
@@ -437,13 +454,35 @@ export default function Navbar() {
                   onClick={() => window.scrollTo(0, 0)}
                 >
                   <BuildingOffice2Icon className="h-4 w-4" />
-                  My Centers
+                  {t('navbar.my_centers')}
                 </Link>
               </div>
             </div>
           )}
         </div>
-
+<div className="flex flex-row gap-2">
+            {/* Language Selector */}
+            <div className="relative group mt-2">
+            <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 text-xl">
+              {i18n.language === 'en' && '🇬🇧'}
+              {i18n.language === 'ru' && '🇷🇺'}
+              {i18n.language === 'uz' && '🇺🇿'}
+              {t(`navbar.languages.${i18n.language}`)}
+              <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+            </button>
+            <div className="absolute left-0  w-12  bg-white rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+              {languageMenuItems.map(({ code, name, flag }) => (
+                <button
+                  key={code}
+                  onClick={() => changeLanguage(code)}
+                  className={`flex items-center gap-2 w-full px-4 py-2 text-sm text-left justify-center  text-center${i18n.language === code ? 'bg-[#efd8ff] text-[#461773]' : 'text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]'}`}
+                >
+                  <span className="text-xl ">{flag}</span>
+                  {name}
+                </button>
+              ))}
+            </div>
+          </div>
         {isLoggedIn ? (
           <div className="relative group">
             <button className="p-0 flex items-center hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff] gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto">
@@ -479,7 +518,7 @@ export default function Navbar() {
                     className="flex items-center gap-1 mt-2 text-[#461773] hover:bg-[#efd8ff] w-full px-2 py-2 rounded text-sm"
                   >
                     <PencilIcon className="h-3 w-3" />
-                    Edit profile
+                    {t('navbar.edit_profile')}
                   </button>
                 </Link>
               </div>
@@ -513,7 +552,7 @@ export default function Navbar() {
               asChild
             >
               <Link to="/Login">
-                <span className="relative z-10">Login</span>
+                <span className="relative z-10">{t('navbar.login')}</span>
                 <span className="absolute inset-0 bg-[#461773] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full z-0"></span>
               </Link>
             </Buton>
@@ -523,12 +562,15 @@ export default function Navbar() {
               className="relative overflow-hidden bg-[#461773] hover:bg-[#3a1260] text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full shadow-lg hover:shadow-[0_4px_15px_rgba(70,23,115,0.3)] transition-all duration-300"
             >
               <Link to="/Register">
-                <span className="relative z-10">Register</span>
+                <span className="relative z-10">{t('navbar.register')}</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-[#5a1d99] to-[#461773] opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full"></span>
               </Link>
             </Buton>
           </div>
         )}
+
+        </div>
       </div>
     </nav>
-  );}
+  );
+}

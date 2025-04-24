@@ -23,6 +23,7 @@ import { Centers } from "./Pages/Centers.jsx";
 import BranchDetails from "./Pages/Branches";
 import { Toaster } from "sonner";
 import Profile from "./Pages/Profile";
+import './i18Next/i18n'; 
 function App() {
   const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
 // dd

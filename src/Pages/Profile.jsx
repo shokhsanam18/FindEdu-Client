@@ -1,6 +1,6 @@
 // src/pages/Profile.jsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../Store";
 import {
   Typography,
@@ -18,7 +18,9 @@ import {
   CheckIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
-
+import {
+ArrowLeft,
+} from "lucide-react";
 export default function Profile() {
   const user = useAuthStore((state) => state.user);
   const fetchUserData = useAuthStore((state) => state.fetchUserData);
@@ -142,6 +144,15 @@ export default function Profile() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl mt-20">
+            <div className="container mx-auto px-4 mt-5 mb-3 text-xl">
+        <Link
+          to="/"
+          className="inline-flex items-center text-[#441774] hover:text-purple-800"
+        >
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          Back to Home
+        </Link>
+      </div>
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex justify-between items-center mb-6">
           <Typography variant="h3" color="blue-gray">

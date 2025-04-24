@@ -1130,7 +1130,7 @@ export const Resources = () => {
           {/* Add Resource Button */}
           <button
             onClick={handleAddResourceClick}
-            className="px-4 py-2 bg-[#451774] text-white text-sm rounded-lg hover:bg-[#3a115a] transition duration-300 mx-auto block mb-8"
+            className="px-4 py-2 bg-[#451774] text-white text-sm rounded-lg hover:bg-[#3a115aba] transition duration-300 mx-auto block mb-8"
           >
             Add Resource
           </button>
@@ -1288,8 +1288,8 @@ export const Resources = () => {
                         </span>
                       </div>
                       <div className="flex items-center text-yellow-500">
-                        <FaStar className="mr-1" />
-                        <span className="text-sm font-medium text-gray-700">{resource.rating || "N/A"}</span>
+                        {/* <FaStar className="mr-1" />
+                        <span className="text-sm font-medium text-gray-700">{resource.rating || "N/A"}</span> */}
                       </div>
                     </div>
                     <div className="mt-4">
@@ -1299,7 +1299,7 @@ export const Resources = () => {
                     </div>
                     <div className="mt-6 flex items-center justify-between">
                       <div className="flex items-center text-sm text-gray-500">
-                        <span>{resource.downloads?.toLocaleString() || "0"} downloads</span>
+                        {/* <span>{resource.downloads?.toLocaleString() || "0"} downloads</span> */}
                       </div>
                       <div className="text-sm text-gray-500">
                         {new Date(resource.createdAt).toLocaleDateString()}
