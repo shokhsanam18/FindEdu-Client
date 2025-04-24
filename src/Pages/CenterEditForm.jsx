@@ -38,24 +38,21 @@ const CenterEditForm = () => {
   });
   const [branchPreviewUrl, setBranchPreviewUrl] = useState(null);
   const [branchImageFile, setBranchImageFile] = useState(null);
+  const [mainBranch, setMainBranch] = useState(null);
 
   // Fetch center and branches
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const accessToken = localStorage.getItem("accessToken");
+        const token = localStorage.getItem("accessToken");
 
-        // Fetch center data
         const centerRes = await axios.get(`${API_BASE}/centers/${id}`, {
-          headers: { Authorization: `Bearer ${accessToken}` }
+          headers: { Authorization: `Bearer ${token}` }
         });
         const centerData = centerRes.data?.data;
 
-        const comments = centerData.comments || [];
-        const avgRating = comments.length > 0
-          ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
-          : 0;
+        const avgRating = (centerData.comments || []).reduce((sum, c) => sum + c.star, 0) / (centerData.comments?.length || 1);
 
         setCenter({
           ...centerData,
@@ -73,16 +70,16 @@ const CenterEditForm = () => {
           setPreviewUrl(`${ImageApi}/${centerData.image}`);
         }
 
-        // Fetch branches for this center
-        const branchesRes = await axios.get(`${API_BASE}/filials`, {
-          params: { centerId: id },
-          headers: { Authorization: `Bearer ${accessToken}` }
-        });
-        setBranches(branchesRes.data?.data || []);
+        const filials = centerData.filials || [];
+        const main = filials.find(f => f.name?.toLowerCase().includes("main"));
+        const others = filials.filter(f => !f.name?.toLowerCase().includes("main"));
+
+        setMainBranch(main || null);
+        setBranches(others);
 
       } catch (err) {
-        setError("Failed to load data");
         console.error(err);
+        setError("Failed to load data");
       } finally {
         setLoading(false);
       }
@@ -93,14 +90,14 @@ const CenterEditForm = () => {
 
 
   useEffect(() => {
-  if (showBranchForm && !isManualBranchName && branchFormData.regionId && center?.name) {
-    const regionName = regions.find(r => r.id === Number(branchFormData.regionId))?.name || "";
-    setBranchFormData((prev) => ({
-      ...prev,
-      name: regionName ? `${center.name} - ${regionName}` : center.name,
-    }));
-  }
-}, [branchFormData.regionId, center?.name, isManualBranchName, showBranchForm]);
+    if (showBranchForm && !isManualBranchName && branchFormData.regionId && center?.name) {
+      const regionName = regions.find(r => r.id === Number(branchFormData.regionId))?.name || "";
+      setBranchFormData((prev) => ({
+        ...prev,
+        name: regionName ? `${center.name} - ${regionName}` : center.name,
+      }));
+    }
+  }, [branchFormData.regionId, center?.name, isManualBranchName, showBranchForm]);
 
   // Center image handler
   const handleImageChange = (e) => {
@@ -168,7 +165,7 @@ const CenterEditForm = () => {
       if (newCenterData.address.trim() !== center.address.trim()) {
         payload.address = newCenterData.address.trim();
       }
-      
+
       if (newCenterData.phone.trim() !== center.phone.trim()) {
         payload.phone = newCenterData.phone.trim();
       }
@@ -182,6 +179,40 @@ const CenterEditForm = () => {
           },
         });
         toast.success("Center updated successfully!");
+
+
+        // Sync main branch
+        if (mainBranch?.id) {
+          const branchPayload = {};
+
+          const existingName = mainBranch.name;
+          const expectedName = `${newCenterData.name} - ${center?.region?.name} Main branch`;
+
+          if (expectedName !== existingName) {
+            branchPayload.name = expectedName;
+          }
+
+          if (newCenterData.phone !== mainBranch.phone) {
+            branchPayload.phone = newCenterData.phone;
+          }
+
+          if (newCenterData.address !== mainBranch.address) {
+            branchPayload.address = newCenterData.address;
+          }
+
+          if (uploadedImageFilename) {
+            branchPayload.image = uploadedImageFilename;
+          }
+
+          if (Object.keys(branchPayload).length > 0) {
+            await axios.patch(`${API_BASE}/filials/${mainBranch.id}`, branchPayload, {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+              },
+            });
+          }
+        }
       } else {
         toast.info("No changes detected.");
       }
@@ -247,13 +278,13 @@ const CenterEditForm = () => {
   const handleNewBranchClick = () => {
     const defaultRegionId = regions.length > 0 ? regions[0].id : "";
     const defaultRegionName = regions.find(r => r.id === defaultRegionId)?.name || "";
-  
+
     const autoName = !isManualBranchName && center?.name
-  ? defaultRegionName
-    ? `${center.name} - ${defaultRegionName} branch`
-    : `${center.name} branch`
-  : "";
-  
+      ? defaultRegionName
+        ? `${center.name} - ${defaultRegionName} branch`
+        : `${center.name} branch`
+      : "";
+
     setShowBranchForm(true);
     setEditingBranchId(null);
     setBranchFormData({
@@ -270,14 +301,14 @@ const CenterEditForm = () => {
     setShowBranchForm(true);
     setEditingBranchId(branch.id);
     setOriginalBranch(branch); // 👈 store the original branch
-  
+
     setBranchFormData({
       name: branch.name || "",
       phone: branch.phone || "",
       address: branch.address || "",
       image: branch.image || null
     });
-  
+
     setBranchPreviewUrl(branch.image ? `${ImageApi}/${branch.image}` : null);
     setBranchImageFile(null);
   };
@@ -313,49 +344,67 @@ const CenterEditForm = () => {
       // Prepare branch data
       const branchData = {};
 
-if (!editingBranchId || branchFormData.name.trim() !== originalBranch?.name?.trim()) {
-  branchData.name = branchFormData.name.trim();
-}
+      if (!editingBranchId || branchFormData.name.trim() !== originalBranch?.name?.trim()) {
+        branchData.name = branchFormData.name.trim();
+      }
 
-if (!editingBranchId || branchFormData.phone.trim() !== originalBranch?.phone?.trim()) {
-  branchData.phone = branchFormData.phone.trim();
-}
+      if (!editingBranchId || branchFormData.phone.trim() !== originalBranch?.phone?.trim()) {
+        branchData.phone = branchFormData.phone.trim();
+      }
 
-if (!editingBranchId || branchFormData.address.trim() !== originalBranch?.address?.trim()) {
-  branchData.address = branchFormData.address.trim();
-}
+      if (!editingBranchId || branchFormData.address.trim() !== originalBranch?.address?.trim()) {
+        branchData.address = branchFormData.address.trim();
+      }
 
-if (uploadedImageFilename) {
-  branchData.image = uploadedImageFilename;
-}
+      if (uploadedImageFilename) {
+        branchData.image = uploadedImageFilename;
+      }
 
-// If no changes, notify and return
-if (editingBranchId && Object.keys(branchData).length === 0) {
-  toast.info("No changes detected.");
-  setIsSubmitting(false);
-  return;
-} else {
-  if (editingBranchId) {
-    await axios.patch(`${API_BASE}/filials/${editingBranchId}`, branchData, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    toast.success("Branch updated successfully!");
-  } else {
-    await axios.post(`${API_BASE}/filials`, {
-      ...branchData,
-      centerId: id
-    }, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    toast.success("Branch created successfully!");
-  }
-        
+      // If no changes, notify and return
+      if (editingBranchId && Object.keys(branchData).length === 0) {
+        toast.info("No changes detected.");
+        setIsSubmitting(false);
+        return;
+      } else {
+        if (editingBranchId) {
+          await axios.patch(`${API_BASE}/filials/${editingBranchId}`, branchData, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          toast.success("Branch updated successfully!");
+
+
+          // If editing main branch, also update center
+          if (editingBranchId === mainBranch?.id) {
+            const centerPayload = {
+              name: branchFormData.name.split(" - ")[0], // Just the center name
+              phone: branchFormData.phone,
+              address: branchFormData.address,
+            };
+            if (uploadedImageFilename) centerPayload.image = uploadedImageFilename;
+
+            await axios.patch(`${API_BASE}/centers/${id}`, centerPayload, {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+              },
+            });
+          }
+        } else {
+          await axios.post(`${API_BASE}/filials`, {
+            ...branchData,
+            centerId: id
+          }, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          toast.success("Branch created successfully!");
+        }
+
       }
 
       // Refresh branches list
@@ -564,8 +613,8 @@ if (editingBranchId && Object.keys(branchData).length === 0) {
                     onClick={handleCenterSubmit}
                     disabled={isSubmitting}
                     className={`w-full py-3 px-4 rounded-lg text-white font-medium transition ${isSubmitting
-                        ? "bg-[#441774] cursor-not-allowed"
-                        : "bg-[#441774] hover:bg-purple-800"
+                      ? "bg-[#441774] cursor-not-allowed"
+                      : "bg-[#441774] hover:bg-purple-800"
                       }`}
                   >
                     {isSubmitting ? (
@@ -669,7 +718,7 @@ if (editingBranchId && Object.keys(branchData).length === 0) {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                       />
                     </div>
-                    
+
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                       <input
@@ -721,8 +770,8 @@ if (editingBranchId && Object.keys(branchData).length === 0) {
                       onClick={handleBranchSubmit}
                       disabled={isSubmitting}
                       className={`px-4 py-2 rounded-lg text-white font-medium transition ${isSubmitting
-                          ? "bg-[#441774] cursor-not-allowed"
-                          : "bg-[#441774] hover:bg-purple-800"
+                        ? "bg-[#441774] cursor-not-allowed"
+                        : "bg-[#441774] hover:bg-purple-800"
                         }`}
                     >
                       {isSubmitting ? (
