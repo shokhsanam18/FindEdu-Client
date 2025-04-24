@@ -217,7 +217,11 @@ const CenterDetail = () => {
 
     setIsCommenting(true);
     try {
-      await postComment({ ...newComment, centerId: Number(id) });
+      await postComment({
+        text: newComment.text.trimEnd(),
+        star: newComment.star,
+        centerId: Number(id),
+      });
       setNewComment({ text: "", star: 5 });
 
       // 👇 Refresh comments after posting
@@ -234,7 +238,7 @@ const CenterDetail = () => {
     try {
       await updateComment({
         id: editingCommentId,
-        text: editCommentText,
+        text: editCommentText.trimEnd(),
         star: editCommentStar,
       });
 
@@ -409,11 +413,10 @@ const CenterDetail = () => {
                     <p className="mt-1 text-lg font-medium flex items-center">
                       <Phone className="h-5 w-5 mr-2" />
                       {center.phone ? (
-                        <a
-                          href={`tel:${center.phone.replace(/[^\d+]/g, "")}`}
+                        <a href={`tel:${center.phone.replace(/\s+/g, '')}`}
                           className="hover:text-purple-500"
                         >
-                          {center.phone}
+                          {center.phone.replace(/\s+/g, '')}
                         </a>
                       ) : (
                         "Not provided"
@@ -846,11 +849,10 @@ const CenterDetail = () => {
                       <p className="mt-1 text-lg font-medium flex items-center">
                         <Phone className="h-5 w-5 mr-2" />
                         {center.phone ? (
-                          <a
-                            href={`tel:${center.phone.replace(/[^\d+]/g, "")}`}
+                          <a href={`tel:${center.phone.replace(/\s+/g, '')}`}
                             className="hover:text-purple-500"
                           >
-                            {center.phone}
+                            {center.phone.replace(/\s+/g, '')}
                           </a>
                         ) : (
                           "Not provided"

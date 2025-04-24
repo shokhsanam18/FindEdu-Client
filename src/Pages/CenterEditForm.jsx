@@ -170,15 +170,14 @@ const CenterEditForm = () => {
 
       // Build payload with only changed fields
       const payload = {};
-      if (newCenterData.name.trim() !== center.name.trim()) {
-        payload.name = newCenterData.name.trim();
+      if (newCenterData.name.trimEnd() !== center.name.trim()) {
+        payload.name = newCenterData.name.trimEnd();
       }
-      if (newCenterData.address.trim() !== center.address.trim()) {
-        payload.address = newCenterData.address.trim();
+      if (newCenterData.phone.replace(/\s+/g, '') !== center.phone.replace(/\s+/g, '')) {
+        payload.phone = newCenterData.phone.replace(/\s+/g, '');
       }
-
-      if (newCenterData.phone.trim() !== center.phone.trim()) {
-        payload.phone = newCenterData.phone.trim();
+      if (newCenterData.address.trimEnd() !== center.address.trim()) {
+        payload.address = newCenterData.address.trimEnd();
       }
       if (uploadedImageFilename) payload.image = uploadedImageFilename;
 
@@ -355,18 +354,15 @@ const CenterEditForm = () => {
       // Prepare branch data
       const branchData = {};
 
-      if (!editingBranchId || branchFormData.name.trim() !== originalBranch?.name?.trim()) {
-        branchData.name = branchFormData.name.trim();
+      if (!editingBranchId || branchFormData.name.trimEnd() !== originalBranch?.name?.trim()) {
+        branchData.name = branchFormData.name.trimEnd();
       }
-
-      if (!editingBranchId || branchFormData.phone.trim() !== originalBranch?.phone?.trim()) {
-        branchData.phone = branchFormData.phone.trim();
+      if (!editingBranchId || branchFormData.phone.replace(/\s+/g, '') !== originalBranch?.phone?.replace(/\s+/g, '')) {
+        branchData.phone = branchFormData.phone.replace(/\s+/g, '');
       }
-
-      if (!editingBranchId || branchFormData.address.trim() !== originalBranch?.address?.trim()) {
-        branchData.address = branchFormData.address.trim();
+      if (!editingBranchId || branchFormData.address.trimEnd() !== originalBranch?.address?.trim()) {
+        branchData.address = branchFormData.address.trimEnd();
       }
-
       if (uploadedImageFilename) {
         branchData.image = uploadedImageFilename;
       }

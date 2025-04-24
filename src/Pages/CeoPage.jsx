@@ -14,19 +14,43 @@ import { useMyCentersStore } from "../Store";
 import { useTranslation } from 'react-i18next';
 
 const centerSchema = z.object({
-  name: z.string().min(3, "Center name is required"),
+  name: z.string()
+    .min(3, "Center name is required")
+    .transform((val) => val.trimEnd()),
+
   regionId: z.string().min(1, "Region is required"),
-  address: z.string().min(5, "Address is required"),
+
+  address: z.string()
+    .min(5, "Address is required")
+    .transform((val) => val.trimEnd()),
+
   image: z.any().refine((file) => file !== null, "Image is required"),
+
   majorsId: z.array(z.string()).nonempty("At least one major is required"),
-  phone: z.string().min(10, "Phone number is required"),
+
+  phone: z.string()
+    .transform((val) => val.replace(/\s+/g, ''))
+    .refine((val) => /^\+998\d{9}$/.test(val), {
+      message: "Phone number must be in +998XXXXXXXXX format",
+    }),
+
 });
 
 const filialSchema = z.object({
-  name: z.string().optional(),
-  phone: z.string().min(10, "Phone number is required"),
+  name: z.string()
+    .optional()
+    .transform((val) => val?.trimEnd()),
+
+  phone: z.string()
+    .regex(/^\+998\d{9}$/, "Phone number must be in +998XXXXXXXXX format")
+    .transform((val) => val.replace(/\s+/g, '')),
+
   regionId: z.string().min(1, "Region is required"),
-  address: z.string().min(5, "Address is required"),
+
+  address: z.string()
+    .min(5, "Address is required")
+    .transform((val) => val.trimEnd()),
+
   image: z.any().refine((file) => file !== null, "Image is required"),
 });
 
@@ -205,10 +229,10 @@ export default function CeoPage() {
     try {
       // Step 2: Create Center
       const centerData = {
-        name: data.name,
+        name: data.name.trimEnd(),
         regionId: data.regionId,
-        address: data.address,
-        phone: data.phone,
+        address: data.address.trimEnd(),
+        phone: data.phone.replace(/\s+/g, ''), // removes all spaces
         majorsId: data.majorsId,
         image: imageUrl,
       };
@@ -227,7 +251,7 @@ export default function CeoPage() {
       centerId = centerRes.data.data.id;
       await updateSelectedCenter(centerId);
 
-      
+
 
     } catch (centerErr) {
       console.error("❌ Center creation failed:", centerErr);
@@ -297,12 +321,12 @@ export default function CeoPage() {
       }
 
       const formData = {
-        name: '',
-        phone: data.phone,
+        name: data.name?.trimEnd() || "",
+        phone: data.phone.replace(/\s+/g, ''),
         regionId: Number(data.regionId),
         centerId: Number(selectedCenterId),
-        address: data.address,
-        image: "",
+        address: data.address.trimEnd(),
+        image: imageUrl,
       };
       const regionName = regions.find(r => r.id === Number(data.regionId))?.name || 'Unknown region';
       const centerName = myCenters.find(c => c.id === Number(selectedCenterId))?.name || 'Center';
@@ -356,21 +380,21 @@ export default function CeoPage() {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
-  
+
       const allFilials = response.data.data || [];
-  
+
       // Sort so that the main branch comes first
       const sorted = allFilials.sort((a, b) => {
         const isMainA = a.name?.toLowerCase().includes("main branch");
         const isMainB = b.name?.toLowerCase().includes("main branch");
-  
+
         if (isMainA && !isMainB) return -1;
         if (!isMainA && isMainB) return 1;
         return 0;
       });
-  
+
       setFilials(sorted);
-  
+
     } catch (error) {
       console.error("Failed to load branches:", error);
       toast.error("Failed to load branches");
@@ -400,7 +424,7 @@ export default function CeoPage() {
             {t("ceoPage.hero.subtitle")}
           </p>
           <p className="text-l md:text-l  mt-20 md:mt-0">
-          {t("ceoPage.hero.description")}
+            {t("ceoPage.hero.description")}
           </p>
           <h1 className="text-3xl md:text-6xl font-bold ">  {t("ceoPage.hero.title")}</h1>
         </motion.div>
@@ -453,12 +477,12 @@ export default function CeoPage() {
             {/* Center Form */}
             <div className="bg-white shadow-lg rounded-lg p-7 w-full mb-8">
               <h2 className="text-4xl font-bold text-center text-purple-900 mb-6">
-              {t("ceoPage.centerForm.title")}
+                {t("ceoPage.centerForm.title")}
               </h2>
               <form onSubmit={handleSubmitCenter(onSubmitCenter)} className="space-y-2">
                 <div>
                   <label className="block font-semibold text-gray-700">
-                  {t("ceoPage.centerForm.labels.name")}
+                    {t("ceoPage.centerForm.labels.name")}
                   </label>
                   <Input placeholder="Enter center name" {...registerCenter("name")} />
                   {centerErrors.name && (
@@ -490,7 +514,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                  {t("ceoPage.centerForm.labels.address")}
+                    {t("ceoPage.centerForm.labels.address")}
                   </label>
                   <Input placeholder={t("ceoPage.centerForm.placeholders.address")} {...registerCenter("address")} />
                   {centerErrors.address && (
@@ -502,7 +526,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700 mb-2">
-                  {t("ceoPage.centerForm.labels.image")} <span className="text-red-500">*</span>
+                    {t("ceoPage.centerForm.labels.image")} <span className="text-red-500">*</span>
                   </label>
 
                   {centerImageFile ? (
@@ -567,10 +591,10 @@ export default function CeoPage() {
                           />
                         </svg>
                         <p className="text-sm font-medium text-gray-700 mb-1">
-                        {t("ceoPage.centerForm.imageUpload.clickToUpload")}
+                          {t("ceoPage.centerForm.imageUpload.clickToUpload")}
                         </p>
                         <p className="text-xs text-gray-500">
-                        {t("ceoPage.centerForm.imageUpload.fileTypes")}
+                          {t("ceoPage.centerForm.imageUpload.fileTypes")}
                         </p>
                         <input
                           type="file"
@@ -603,7 +627,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                  {t("ceoPage.centerForm.labels.phone")}
+                    {t("ceoPage.centerForm.labels.phone")}
                   </label>
                   <Input
                     placeholder={t("ceoPage.centerForm.placeholders.phone")}
@@ -614,11 +638,8 @@ export default function CeoPage() {
                         : `+998${watchCenter("phone") || ""}`
                     }
                     onChange={(e) => {
-                      const numbers = e.target.value.replace(/\D/g, "");
-                      const fullNumber = numbers.startsWith("998")
-                        ? `+${numbers.slice(0, 12)}`
-                        : `+998${numbers.slice(0, 9)}`;
-                      setCenterValue("phone", fullNumber, { shouldValidate: true });
+                      const cleaned = e.target.value.replace(/\s+/g, '');
+                      setCenterValue("phone", cleaned, { shouldValidate: true });
                     }}
                     {...registerCenter("phone")}
                   />
@@ -629,7 +650,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                  {t("ceoPage.centerForm.labels.majors")}
+                    {t("ceoPage.centerForm.labels.majors")}
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                     {majors.map((major) => (
@@ -692,7 +713,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                  {t("ceoPage.branchForm.labels.selectCenter")}
+                    {t("ceoPage.branchForm.labels.selectCenter")}
                   </label>
                   <select
                     className="w-full p-2 border rounded bg-white mb-2"
@@ -710,7 +731,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                  {t("ceoPage.branchForm.labels.name")}
+                    {t("ceoPage.branchForm.labels.name")}
                   </label>
                   <Input
                     placeholder={t("ceoPage.branchForm.placeholders.name")}
@@ -725,7 +746,7 @@ export default function CeoPage() {
                       onChange={(e) => setIsManualBranchName(e.target.checked)}
                     />
                     <label htmlFor="manualBranch" className="text-sm text-gray-600">
-                    {t("ceoPage.branchForm.labels.manualName")}
+                      {t("ceoPage.branchForm.labels.manualName")}
                     </label>
                   </div>
                   {filialErrors.name && (
@@ -735,7 +756,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                  {t("ceoPage.branchForm.labels.phone")}
+                    {t("ceoPage.branchForm.labels.phone")}
                   </label>
                   <Input
                     placeholder={t("ceoPage.branchForm.placeholders.phone")}
@@ -761,7 +782,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                  {t("ceoPage.branchForm.labels.region")}
+                    {t("ceoPage.branchForm.labels.region")}
                   </label>
                   <select
                     {...registerFilial("regionId")}
@@ -783,7 +804,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700">
-                  {t("ceoPage.branchForm.labels.address")}
+                    {t("ceoPage.branchForm.labels.address")}
                   </label>
                   <Input placeholder={t("ceoPage.branchForm.placeholders.address")} {...registerFilial("address")} />
                   {filialErrors.address && (
@@ -795,7 +816,7 @@ export default function CeoPage() {
 
                 <div>
                   <label className="block font-semibold text-gray-700 mb-2">
-                  {t("ceoPage.branchForm.labels.image")} <span className="text-red-500">*</span>
+                    {t("ceoPage.branchForm.labels.image")} <span className="text-red-500">*</span>
                   </label>
 
                   {filialImageFile ? (
@@ -860,10 +881,10 @@ export default function CeoPage() {
                           />
                         </svg>
                         <p className="text-sm font-medium text-gray-700 mb-1">
-                        {t("ceoPage.branchForm.imageUpload.clickToUpload")}
+                          {t("ceoPage.branchForm.imageUpload.clickToUpload")}
                         </p>
                         <p className="text-xs text-gray-500">
-                        {t("ceoPage.branchForm.imageUpload.fileTypes")}
+                          {t("ceoPage.branchForm.imageUpload.fileTypes")}
                         </p>
                         <input
                           type="file"
