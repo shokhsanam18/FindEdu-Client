@@ -78,5 +78,59 @@
     "selectRegions": "Hududlarni tanlang",
     "okButton": "OK",
     "cancelButton": "Bekor qilish"
-  }
+  },
+  
+    "profile": {
+      "title": "Mening profilim",
+      "editButton": "Profilni tahrirlash",
+      "saveButton": "O'zgarishlarni saqlash",
+      "cancelButton": "Bekor qilish",
+      "changePhoto": "Rasmni o'zgartirish",
+      "uploading": "Yuklanmoqda...",
+      "firstName": "Ism",
+      "lastName": "Familiya",
+      "email": "Elektron pochta",
+      "phone": "Telefon",
+      "notProvided": "Kiritilmagan",
+      "role": "Rol",
+      "deleteAccount": "Akkauntni o'chirish",
+      "deleteDialog": {
+        "title": "Akkauntni o'chirishni tasdiqlash",
+        "message": "Akkauntingizni o'chirishni istaysizmi? Bu amalni bekor qilib bo'lmaydi va barcha ma'lumotlaringiz butunlay o'chiriladi.",
+        "cancel": "Bekor qilish",
+        "confirm": "Akkauntni o'chirish"
+      },
+      "backToHome": "Bosh sahifaga qaytish"
+    },
+    "centerDetail": {
+      "backToCenters": "Markazlarga qaytish",
+      "ourBranches": "Bizning filiallar",
+      "availableCourses": "Mavjud kurslar",
+      "registerForClass": "Darsga yozilish",
+      "about": "Markaz haqida",
+      "comments": "Sharhlar",
+      "shareThoughts": "Bu markaz haqida fikrlaringizni bildiring...",
+      "rating": "Reyting:",
+      "postComment": "Sharh qoldirish",
+      "posting": "Yuborilmoqda...",
+      "noComments": "Hali sharhlar mavjud emas. Birinchi bo'ling!",
+      "classRegistration": "Darsga yozilish",
+      "selectDateTime": "O'zingizga qulay sana va vaqtni tanlang",
+      "selectBranch": "Filialni tanlang",
+      "selectMajor": "Yo'nalishni tanlang",
+      "selectDate": "Sanani tanlang",
+      "selectTime": "Vaqtni tanlang",
+      "cancel": "Bekor qilish",
+      "confirmRegistration": "Ro'yxatdan o'tishni tasdiqlash",
+      "processing": "Qayta ishlanmoqda...",
+      "registrationConfirmed": "Ro'yxatdan o'tish tasdiqlandi!",
+      "yourClassScheduled": "Darsingiz quyidagi vaqtga rejalashtirildi:",
+      "selectedBranch": "Tanlangan filial:",
+      "selectedMajor": "Tanlangan yo'nalish:",
+      "deleteCommentConfirm": "Bu sharhni o'chirishni istaysizmi?",
+      "loginToRegister": "Darsga yozilish uchun iltimos, tizimga kiring.",
+      "selectBothDateTime": "Iltimos, sana va 2 soatlik intervalni tanlang.",
+      "registrationFailed": "Ro'yxatdan o'tish muvaffaqiyatsiz tugadi. Iltimos, qayta urinib ko'ring."
+    }
+  
 }
