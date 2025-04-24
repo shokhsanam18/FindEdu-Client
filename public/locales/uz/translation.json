@@ -16,31 +16,67 @@
     "languages": {
       "en": "",
       "ru": "",
-      "uz": ""},
-      "heroSubtitle": "Eng yaxshi ta'lim markazlarini topishda yordam beramiz!",
+      "uz": ""
+    },
+    "heroSubtitle": "Eng yaxshi ta'lim markazlarini topishda yordam beramiz!",
     "heroTitle": "Biz haqimizda",
     "homeLink": "Bosh sahifa",
     "aboutLink": "Biz haqimizda",
     "successTitle": "Talabalarni muvaffaqiyatga tayyorlash",
-    "successSubtitle": "Ishonchli va muvaffaqiyatli o'quvchilarni rivojlantirish",
-    "successDescription": "Bizning platformamiz talabalarga ularning qiziqishlari, byudjeti va mintaqasiga mos keladigan ta'lim markazlarini topishda yordam beradi, eng yaxshi o'rganish tajribasini ta'minlaydi.",
+    "successSubtitle": "Ishonchli va muvaffaqiyatli o'quvchilarni shakllantirish",
+    "successDescription": "Bizning platformamiz talabalarga qiziqishlari, byudjeti va hududiga mos keladigan ta'lim markazlarini topishda yordam beradi, eng yaxshi ta'lim tajribasini ta'minlaydi.",
     "viewMoreButton": "Ko'proq ko'rish",
-    "testimonial": "Ushbu platforma mening uchun mukammal o'rganish markazini topishni osonlashtirdi. Juda tavsiya qilinadi!",
-    "studentsImageAlt": "Birgalikda o'rganayotgan talabalar",
+    "testimonial": "Ushbu platforma mening uchun mukammal o'quv markazini topishni osonlashtirdi. Juda tavsiya etaman!",
+    "studentsImageAlt": "Birga o'qiyotgan talabalar",
     "impactTitle": "Bizning ta'sirimiz",
     "registeredUsers": "Ro'yxatdan o'tgan foydalanuvchilar",
     "educationCenters": "Ta'lim markazlari",
     "successStories": "Muvaffaqiyat hikoyalari",
     "missionTitle": "Bizning missiyamiz",
     "missionSubtitle": "Yorqin kelajak uchun o'quvchilarni kuchaytirish",
-    "missionDescription": "Biz talabalar va sifatli ta'lim o'rtasidagi tafovutni bartaraf etishga intilamiz, o'quvchilarni eng yaxshi ta'lim muassasalari bilan bog'laydigan qulay platformani taqdim etish orqali. Maqsadimiz - har bir talabaga muvaffaqiyatga olib keladigan shaxsiylashtirilgan o'rganish tajribasiga ega bo'lish imkoniyatini ta'minlash.",
+    "missionDescription": "Biz talabalar va sifatli ta'lim o'rtasidagi tafovutni bartaraf etishni maqsad qilganmiz, o'quvchilarni eng yaxshi ta'lim muassasalari bilan bog'laydigan qulay platformani taqdim etish orqali. Har bir talaba muvaffaqiyatga olib boradigan shaxsiylashtirilgan ta'lim tajribasiga ega bo'lishini ta'minlash bizning maqsadimizdir.",
     "missionImageAlt": "Bizning missiyamiz tasviri",
-    "registerButton": "Ro'yxatdan o'tish",
-    "visionTitle": "Bizning ko'zlagan manzilimiz",
-    "visionSubtitle": "Ta'limning kelajagini shakllantirish",
-    "visionDescription": "Bizning ko'zlagan manzilimiz - dunyoning yetakchi ta'limni topish platformasiga aylanish, har bir talaba o'zining akademik yo'lida muvaffaqiyat qozonish uchun to'g'ri o'rganish resurslari, muassasalari va yo'lboshchiligini topishini ta'minlash.",
-    "visionImageAlt": "Bizning ko'zlagan manzilimiz tasviri",
-    "logosTitle": "Ta'lim markazlari bo'yicha qo'llanma"
-    
+    "registerButton": "Roʻyxatdan oʻtish",
+    "visionTitle": "Bizning ko'rsatkichimiz",
+    "visionSubtitle": "Ta'lim kelajagini shakllantirish",
+    "visionDescription": "Bizning ko'rsatkichimiz dunyoning yetakchi ta'lim platformasiga aylanish bo'lib, har bir talaba o'zining akademik faoliyatida yaxshi natijalarga erishish uchun kerakli o'quv resurslari, muassasalar va yo'riqnomalarni topishini ta'minlashdir.",
+    "visionImageAlt": "Bizning ko'rsatkichimiz tasviri",
+    "logosTitle": "Ta'lim markazlaringiz uchun qo'llanma",
+    "errorPage": {
+      "oopsMessage": "Voy! Siz qidirgan sahifa mavjud emas.",
+      "pageMovedMessage": "U ko'chirilgan yoki o'chirilgan bo'lishi mumkin.",
+      "goHomeButton": "Bosh sahifaga qaytish",
+      "needHelpText": "Yordam kerakmi?",
+      "contactSupport": "Qo'llab-quvvatlash bilan bog'lanish"
+    }
+  },
+  "cards": {
+    "heroTitle": "Bir qidiruv - cheksiz imkoniyatlar",
+    "heroDescription": "Biz talabalarga dunyo bo'ylab eng yaxshi kurslar, markazlar va ta'lim imkoniyatlarini topishda yordam beramiz. Mutaxassislarning tavsiyalari va talabalarning haqiqiy sharhlari bilan ta'lim safaringizni osonlashtiramiz.",
+    "searchPlaceholder": "Kasb, fan yoki o'quv markazi nomini kiriting...",
+    "filterButton": "Kurslar va hududlar",
+    "noCentersMessage": "Filtrlarga mos markazlar topilmadi.",
+    "defaultPhone": "+998 (XX) XXX-XXXX",
+    "ceoTitle": "CEO Sahifasi",
+    "ceoSubtitle": "Ta'lim markazingizni tahrirlashingiz mumkin",
+    "myCentersLink": "Mening markazlarim"
+  },
+  "home": {
+    "heroTitle": "Bir qidiruv - cheksiz imkoniyatlar",
+    "heroDescription": "Biz talabalarga dunyo bo'ylab eng yaxshi kurslar, markazlar va ta'lim imkoniyatlarini topishda yordam beramiz. Mutaxassislarning tavsiyalari va talabalarning haqiqiy sharhlari bilan ta'lim safaringizni osonlashtiramiz.",
+    "searchPlaceholder": "Kasb, fan yoki o'quv markazi nomini kiriting...",
+    "filterButton": "Kurslar va hududlar",
+    "noCentersMessage": "Filtrlarga mos markazlar topilmadi.",
+    "defaultPhone": "+998 (XX) XXX-XXXX"
+  },
+  "ceo": {
+    "title": "CEO Sahifasi",
+    "subtitle": "Ta'lim markazingizni tahrirlashingiz mumkin"
+  },
+  "modal": {
+    "selectMajors": "Yo'nalishlarni tanlang",
+    "selectRegions": "Hududlarni tanlang",
+    "okButton": "OK",
+    "cancelButton": "Bekor qilish"
   }
 }

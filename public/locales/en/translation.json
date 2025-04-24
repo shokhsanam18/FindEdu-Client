@@ -41,6 +41,42 @@
     "visionSubtitle": "Shaping the Future of Education",
     "visionDescription": "Our vision is to become the world's leading educational matchmaking platform, ensuring every student finds the right learning resources, institutions, and guidance to excel in their academic journey.",
     "visionImageAlt": "Illustration of our vision",
-    "logosTitle": "Your Guide to Education Centers"
+    "logosTitle": "Your Guide to Education Centers",
+    "errorPage": {
+      "oopsMessage": "Oops! The page you're looking for doesn't exist.",
+      "pageMovedMessage": "It might have been moved or deleted.",
+      "goHomeButton": "Go Home",
+      "needHelpText": "Need help?",
+      "contactSupport": "Contact Support"
+    }
+  },
+  "cards": {
+    "heroTitle": "One Search, Infinite Potential",
+    "heroDescription": "We help students discover the best courses, centers, and learning opportunities worldwide. With expert insights and real student reviews, we make your education journey effortless.",
+    "searchPlaceholder": "Enter profession, subject, or educational center name...",
+    "filterButton": "Courses & Regions",
+    "noCentersMessage": "No centers match your filters.",
+    "defaultPhone": "+1 (555) 123-4567",
+    "ceoTitle": "CEO Page",
+    "ceoSubtitle": "You can edit your Education Center",
+    "myCentersLink": "My Centers"
+  },
+  "home": {
+    "heroTitle": "One Search, Infinite Potential",
+    "heroDescription": "We help students discover the best courses, centers, and learning opportunities worldwide. With expert insights and real student reviews, we make your education journey effortless.",
+    "searchPlaceholder": "Enter profession, subject, or educational center name...",
+    "filterButton": "Courses & Regions",
+    "noCentersMessage": "No centers match your filters.",
+    "defaultPhone": "+1 (555) 123-4567"
+  },
+  "ceo": {
+    "title": "CEO Page",
+    "subtitle": "You can edit your Education Center"
+  },
+  "modal": {
+    "selectMajors": "Select Majors",
+    "selectRegions": "Select Regions",
+    "okButton": "OK",
+    "cancelButton": "Cancel"
   }
 }
