@@ -28,15 +28,15 @@ export const Resources = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 const [resourceToDelete, setResourceToDelete] = useState(null);
+const [categories, setCategories] = useState([]);
   const [newResource, setNewResource] = useState({
-    categoryId: 1,
+    categoryId: categories[0]?.id || "", 
     name: "",
     description: "",
     media: "",
     image: "",
     imageFile: null,
   });
-  const [categories, setCategories] = useState([]);
   const [resources, setResources] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -140,6 +140,16 @@ const [resourceToDelete, setResourceToDelete] = useState(null);
     fetchResources();
     fetchCategories();
   }, [activeFilter, searchTerm]);
+
+  
+useEffect(() => {
+  if (categories.length > 0 && isModalOpen) {
+    setNewResource(prev => ({
+      ...prev,
+      categoryId: categories[0].id, // Set the first valid category ID
+    }));
+  }
+}, [categories, isModalOpen]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
