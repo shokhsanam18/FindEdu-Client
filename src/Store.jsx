@@ -9,55 +9,55 @@ export const useAuthStore = create((set, get) => ({
   accessToken: localStorage.getItem("accessToken") || null,
   refreshToken: localStorage.getItem("refreshToken") || null,
   profileImageUrl: null,
-// Add these to your useAuthStore in Store.js
-updateUser: async (userId, userData) => {
-  try {
-    const token = await get().refreshTokenFunc(false);
-    if (!token) {
-      toast.error("Please log in to update profile");
-      return;
-    }
-
-    const { data } = await axios.patch(
-      `${API_BASE}/users/${userId}`,
-      userData,
-      {
-        headers: { Authorization: `Bearer ${token}` },
+  // Add these to your useAuthStore in Store.js
+  updateUser: async (userId, userData) => {
+    try {
+      const token = await get().refreshTokenFunc(false);
+      if (!token) {
+        toast.error("Please log in to update profile");
+        return;
       }
-    );
 
-    toast.success("Profile updated successfully");
-    await get().fetchUserData(); // Refresh user data
-    return data;
-  } catch (error) {
-    console.error("Update user error:", error);
-    toast.error(error.response?.data?.message || "Failed to update profile");
-    throw error;
-  }
-},
+      const { data } = await axios.patch(
+        `${API_BASE}/users/${userId}`,
+        userData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-uploadImage: async (formData) => {
-  try {
-    const token = await get().refreshTokenFunc(false);
-    if (!token) {
-      toast.error("Please log in to upload image");
-      return;
+      toast.success("Profile updated successfully");
+      await get().fetchUserData(); // Refresh user data
+      return data;
+    } catch (error) {
+      console.error("Update user error:", error);
+      toast.error(error.response?.data?.message || "Failed to update profile");
+      throw error;
     }
+  },
 
-    const { data } = await axios.post(`${API_BASE}/upload`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
+  uploadImage: async (formData) => {
+    try {
+      const token = await get().refreshTokenFunc(false);
+      if (!token) {
+        toast.error("Please log in to upload image");
+        return;
+      }
 
-    return data;
-  } catch (error) {
-    console.error("Image upload error:", error);
-    toast.error(error.response?.data?.message || "Failed to upload image");
-    throw error;
-  }
-},
+      const { data } = await axios.post(`${API_BASE}/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return data;
+    } catch (error) {
+      console.error("Image upload error:", error);
+      toast.error(error.response?.data?.message || "Failed to upload image");
+      throw error;
+    }
+  },
   fetchUserData: async () => {
     try {
       const token = await get().refreshTokenFunc(false); // don't logout immediately on missing token
@@ -90,28 +90,28 @@ uploadImage: async (formData) => {
     }
   },
 
-login: async (values) => {
-  try {
-    const res = await axios.post(`${API_BASE}/users/login`, values);
-    const { accessToken, refreshToken } = res.data;
+  login: async (values) => {
+    try {
+      const res = await axios.post(`${API_BASE}/users/login`, values);
+      const { accessToken, refreshToken } = res.data;
 
-    if (accessToken && refreshToken) {
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      set({ accessToken, refreshToken });
+      if (accessToken && refreshToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        set({ accessToken, refreshToken });
 
-      const user = await get().fetchUserData();
-      return { success: true, role: user?.role };
+        const user = await get().fetchUserData();
+        return { success: true, role: user?.role };
+      }
+
+      return { success: false, message: "Invalid credentials" };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Login failed"
+      };
     }
-
-    return { success: false, message: "Invalid credentials" };
-  } catch (error) {
-    return { 
-      success: false, 
-      message: error.response?.data?.message || "Login failed" 
-    };
-  }
-},
+  },
 
   refreshTokenFunc: async (shouldLogout = true) => {
     const refreshToken = get().refreshToken;
@@ -304,19 +304,19 @@ export const useLikedStore = create(
 
       toggleLike: async (centerId) => {
         const user = useAuthStore.getState().user;
-      
+
         if (!user || !user?.data?.id) {
           toast.warning("Please log in to like centers.");
           return;
         }
-      
+
         const { likedItems } = get();
         const token = await useAuthStore.getState().refreshTokenFunc(false);
-      
+
         if (!token) return;
-      
+
         const existing = likedItems.find((item) => item.centerId === centerId);
-      
+
         try {
           if (existing) {
             // Unlike
@@ -333,7 +333,7 @@ export const useLikedStore = create(
               { centerId },
               { headers: { Authorization: `Bearer ${token}` } }
             );
-      
+
             const newLike = res.data?.data;
             if (newLike?.id) {
               set({
@@ -517,7 +517,7 @@ export const useCardStore = create((set, get) => ({
     if (!Array.isArray(selected)) selected = [];
     set({ selectedMajors: selected }, get().filterCenters);
   },
-  
+
   setSelectedRegions: (selected) => {
     if (!Array.isArray(selected)) selected = [];
     set({ selectedRegions: selected }, get().filterCenters);
@@ -578,15 +578,15 @@ export const useMyCentersStore = create((set) => ({
 
   fetchMyCenters: async () => {
     set({ loading: true, error: null });
-  
+
     try {
       const token = localStorage.getItem("accessToken");
       const res = await axios.get("https://findcourse.net.uz/api/users/mycenters", {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       const centers = res.data?.data || [];
-  
+
       const processed = centers
         .filter(center => !center.isDeleted && center.status !== "deleted")
         .map(center => {
@@ -595,14 +595,14 @@ export const useMyCentersStore = create((set) => ({
             comments.length > 0
               ? comments.reduce((sum, c) => sum + c.star, 0) / comments.length
               : 0;
-  
+
           return {
             ...center,
             rating: avgRating,
             imageUrl: center.image ? `${API_BASE}/image/${center.image}` : null,
           };
         });
-  
+
       set({ myCenters: processed });
     } catch (error) {
       // Handle 404 as "no centers yet", everything else as an error
@@ -618,7 +618,7 @@ export const useMyCentersStore = create((set) => ({
     }
   }
 
-  
+
 }));
 
 
@@ -641,7 +641,7 @@ export const useReceptionStore = create((set, get) => ({
       const res = await axios.post(`${API_BASE}/reseption`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       // ✅ Only return result — no toast
       get().fetchReceptions();
       return { success: true, data: res.data };
@@ -656,20 +656,20 @@ export const useReceptionStore = create((set, get) => ({
 
   fetchReceptions: async () => {
     set({ loading: true, error: null });
-  
+
     try {
       const token = await useAuthStore.getState().refreshTokenFunc(false);
       const user = useAuthStore.getState().user;
-  
+
       if (!token || !user?.data?.id) {
         console.warn("❌ Token or user not ready");
         throw new Error("User not authenticated");
       }
-  
+
       const res = await axios.get(`${API_BASE}/reseption`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
+
       set({ receptions: res.data?.data || [] });
     } catch (error) {
       console.error("❌ Failed to fetch receptions:", error);
@@ -707,4 +707,47 @@ export const useReceptionStore = create((set, get) => ({
       toast.error("Failed to delete appointment");
     }
   },
+}));
+
+
+export const useImpactStore = create((set) => ({
+  data: {
+    users: 0,
+    centers: 0,
+  },
+  loading: false,
+
+  fetchImpact: async () => {
+    set({ loading: true });
+
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      const [usersRes, centersRes] = await Promise.all([
+        axios.get(`${API_BASE}/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { take: 10000 }, // ✅ only take
+        }),
+        axios.get(`${API_BASE}/centers`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { take: 1000 }, // ✅ only take
+        }),
+      ]);
+
+      console.log("usersRes", usersRes.data);
+      console.log("centersRes", centersRes.data);
+
+      set({
+        data: {
+          users: Math.round((usersRes.data?.data?.length || 0) / 10 ) * 10,
+          centers: Math.round((centersRes.data?.data?.length || 0) / 10 ) *10,
+        },
+        loading: false,
+      });
+    } catch (err) {
+      console.error("Error fetching impact:", err);
+      set({ loading: false });
+    }
+  },
+
 }));
