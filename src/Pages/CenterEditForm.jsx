@@ -25,7 +25,7 @@ const CenterEditForm = () => {
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isManualBranchName, setIsManualBranchName] = useState(false);
-
+  const [originalBranch, setOriginalBranch] = useState(null);
   // Branches state
   const [branches, setBranches] = useState([]);
   const [showBranchForm, setShowBranchForm] = useState(false);
@@ -162,9 +162,16 @@ const CenterEditForm = () => {
 
       // Build payload with only changed fields
       const payload = {};
-      if (newCenterData.name !== center.name) payload.name = newCenterData.name;
-      if (newCenterData.address !== center.address) payload.address = newCenterData.address;
-      if (newCenterData.phone !== center.phone) payload.phone = newCenterData.phone;
+      if (newCenterData.name.trim() !== center.name.trim()) {
+        payload.name = newCenterData.name.trim();
+      }
+      if (newCenterData.address.trim() !== center.address.trim()) {
+        payload.address = newCenterData.address.trim();
+      }
+      
+      if (newCenterData.phone.trim() !== center.phone.trim()) {
+        payload.phone = newCenterData.phone.trim();
+      }
       if (uploadedImageFilename) payload.image = uploadedImageFilename;
 
       if (Object.keys(payload).length > 0) {
@@ -262,12 +269,15 @@ const CenterEditForm = () => {
   const handleEditBranchClick = (branch) => {
     setShowBranchForm(true);
     setEditingBranchId(branch.id);
+    setOriginalBranch(branch); // 👈 store the original branch
+  
     setBranchFormData({
       name: branch.name || "",
       phone: branch.phone || "",
       address: branch.address || "",
       image: branch.image || null
     });
+  
     setBranchPreviewUrl(branch.image ? `${ImageApi}/${branch.image}` : null);
     setBranchImageFile(null);
   };
@@ -301,37 +311,51 @@ const CenterEditForm = () => {
       }
 
       // Prepare branch data
-      const branchData = {
-        name: branchFormData.name,
-        phone: branchFormData.phone,
-        address: branchFormData.address
-      };
+      const branchData = {};
 
-      if (uploadedImageFilename) {
-        branchData.image = uploadedImageFilename;
-      }
+if (!editingBranchId || branchFormData.name.trim() !== originalBranch?.name?.trim()) {
+  branchData.name = branchFormData.name.trim();
+}
 
-      if (editingBranchId) {
-        // Update existing branch
-        await axios.patch(`${API_BASE}/filials/${editingBranchId}`, branchData, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        toast.success("Branch updated successfully!");
-      } else {
-        // Create new branch - include centerId
-        await axios.post(`${API_BASE}/filials`, {
-          ...branchData,
-          centerId: id
-        }, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        toast.success("Branch created successfully!");
+if (!editingBranchId || branchFormData.phone.trim() !== originalBranch?.phone?.trim()) {
+  branchData.phone = branchFormData.phone.trim();
+}
+
+if (!editingBranchId || branchFormData.address.trim() !== originalBranch?.address?.trim()) {
+  branchData.address = branchFormData.address.trim();
+}
+
+if (uploadedImageFilename) {
+  branchData.image = uploadedImageFilename;
+}
+
+// If no changes, notify and return
+if (editingBranchId && Object.keys(branchData).length === 0) {
+  toast.info("No changes detected.");
+  setIsSubmitting(false);
+  return;
+} else {
+  if (editingBranchId) {
+    await axios.patch(`${API_BASE}/filials/${editingBranchId}`, branchData, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    toast.success("Branch updated successfully!");
+  } else {
+    await axios.post(`${API_BASE}/filials`, {
+      ...branchData,
+      centerId: id
+    }, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    toast.success("Branch created successfully!");
+  }
+        
       }
 
       // Refresh branches list
