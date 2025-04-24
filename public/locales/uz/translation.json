@@ -102,7 +102,10 @@
     "ModaladdResource": "Resurs qo'shish",
     "delete": "O‘chirish",
     "download": "Yuklab olish",
-    "preview": "Oldindan ko‘rish"
+    "preview": "Oldindan ko‘rish",
+    "confirmDeleteTitle": "Resursni o‘chirishni tasdiqlash",
+    "confirmDeleteMessage": "Siz ushbu resursni o‘chirishni istaysizmi? Bu amalni bekor qilib bo‘lmaydi.",
+    "confirm": "O‘chirish"
   },
     "profile": {
       "title": "Mening profilim",
