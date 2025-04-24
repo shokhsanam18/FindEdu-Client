@@ -35,7 +35,7 @@ const CenterDetail = () => {
   const [center, setCenter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useAuthStore();
+  const { user, fetchUserData } = useAuthStore();
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedMajor, setSelectedMajor] = useState(null);
@@ -280,6 +280,7 @@ const CenterDetail = () => {
     });
 
     if (result.success) {
+      await fetchUserData(); // 🔁 refresh user data so appointments update
       setReservationSuccess(true);
     } else {
       setReservationError("Failed to register. Please try again.");
@@ -874,6 +875,7 @@ const CenterDetail = () => {
                             setIsSubmittingReservation(false);
 
                             if (result.success) {
+                              await fetchUserData(); // 🔁 refresh user data so appointments update
                               setReservationSuccess(true);
                             } else {
                               setReservationError("Failed to register. Please try again.");
