@@ -119,144 +119,170 @@
     "backToHome": "Вернуться на главную"
   },
   "centerDetail": {
-    "backToCenters": "Вернуться к центрам",
-    "ourBranches": "Наши филиалы",
-    "availableCourses": "Доступные курсы",
-    "registerForClass": "Записаться на занятие",
-    "about": "О центре",
-    "comments": "Отзывы",
-    "shareThoughts": "Поделитесь своими впечатлениями об этом центре...",
-    "rating": "Рейтинг:",
-    "postComment": "Оставить отзыв",
-    "posting": "Отправка...",
-    "noComments": "Пока нет отзывов. Будьте первым!",
-    "classRegistration": "Запись на занятие",
-    "selectDateTime": "Выберите удобные дату и время",
-    "selectBranch": "Выберите филиал",
-    "selectMajor": "Выберите направление",
-    "selectDate": "Выберите дату",
-    "selectTime": "Выберите время",
-    "cancel": "Отмена",
-    "confirmRegistration": "Подтвердить запись",
-    "processing": "Обработка...",
-    "registrationConfirmed": "Запись подтверждена!",
-    "yourClassScheduled": "Ваше занятие запланировано на",
-    "selectedBranch": "Выбранный филиал:",
-    "selectedMajor": "Выбранное направление:",
-    "deleteCommentConfirm": "Вы уверены, что хотите удалить этот комментарий?",
-    "loginToRegister": "Пожалуйста, войдите, чтобы записаться на занятие.",
-    "selectBothDateTime": "Пожалуйста, выберите дату и временной интервал (2 часа).",
-    "registrationFailed": "Не удалось зарегистрироваться. Пожалуйста, попробуйте еще раз."
-  },
-  "footer": {
-    "math": "Математика",
-    "marketing": "Маркетинг",
-    "english": "Английский",
-    "it": "Информатика",
-    "design": "Дизайн",
-    "business": "Бизнес",
-    "centers": "Учебные центры",
-    "contact": "Контакты",
-    "comments": "Отзывы",
-    "projects": "Проекты"
-  },
-  "ceoPage": {
-    "hero": {
-      "subtitle": "Добавьте свой учебный центр",
-      "description": "Присоединяйтесь к нам и помогите студентам найти лучшие возможности для обучения.",
-      "title": "Страница CEO",
-      "homeLink": "Главная",
-      "ceoLink": "Страница CEO"
+      "backToCenters": "Вернуться к центрам",
+      "ourBranches": "Наши филиалы",
+      "availableCourses": "Доступные курсы",
+      "registerForClass": "Записаться на занятие",
+      "about": "О центре",
+      "comments": "Отзывы",
+      "shareThoughts": "Поделитесь своими впечатлениями об этом центре...",
+      "rating": "Рейтинг:",
+      "postComment": "Оставить отзыв",
+      "posting": "Отправка...",
+      "noComments": "Пока нет отзывов. Будьте первым!",
+      "classRegistration": "Запись на занятие",
+      "selectDateTime": "Выберите удобные дату и время",
+      "selectBranch": "Выберите филиал",
+      "selectMajor": "Выберите направление",
+      "selectDate": "Выберите дату",
+      "selectTime": "Выберите время",
+      "cancel": "Отмена",
+      "confirmRegistration": "Подтвердить запись",
+      "processing": "Обработка...",
+      "registrationConfirmed": "Запись подтверждена!",
+      "yourClassScheduled": "Ваше занятие запланировано на",
+      "selectedBranch": "Выбранный филиал:",
+      "selectedMajor": "Выбранное направление:",
+      "deleteCommentConfirm": "Вы уверены, что хотите удалить этот комментарий?",
+      "loginToRegister": "Пожалуйста, войдите, чтобы записаться на занятие.",
+      "selectBothDateTime": "Пожалуйста, выберите дату и временной интервал (2 часа).",
+      "registrationFailed": "Не удалось зарегистрироваться. Пожалуйста, попробуйте еще раз."
+    }, 
+    "footer": {
+"math": "Математика",
+"marketing": "Маркетинг",
+"english": "Английский",
+"it": "Информатика",
+"design": "Дизайн",
+"business": "Бизнес"
+, 
+
+"centers": "Учебные центры"
+, "contact": "Контакты",
+"comments": "Отзывы",
+"projects": "Проекты"
     },
-    "centerForm": {
-      "title": "Создать учебный центр",
-      "labels": {
-        "name": "Название центра",
-        "region": "Регион",
-        "address": "Адрес",
-        "image": "Изображение центра",
-        "phone": "Номер телефона",
-        "majors": "Направления (выберите хотя бы одно)",
-        "selectedMajors": "Выбрано: {count} направлений"
+"ceoPage": {
+      "hero": {
+        "subtitle": "Добавьте свой учебный центр",
+        "description": "Присоединяйтесь к нам и помогите студентам найти лучшие возможности для обучения.",
+        "title": "Страница CEO",
+        "homeLink": "Главная",
+        "ceoLink": "Страница CEO"
       },
-      "placeholders": {
-        "name": "Введите название центра",
-        "address": "Введите адрес",
-        "phone": "Введите номер телефона"
+      "centerForm": {
+        "title": "Создать учебный центр",
+        "labels": {
+          "name": "Название центра",
+          "region": "Регион",
+          "address": "Адрес",
+          "image": "Изображение центра",
+          "phone": "Номер телефона",
+          "majors": "Направления (выберите хотя бы одно)",
+          "selectedMajors": "Выбрано: {count} направлений"
+        },
+        "placeholders": {
+          "name": "Введите название центра",
+          "address": "Введите адрес",
+          "phone": "Введите номер телефона"
+        },
+        "imageUpload": {
+          "clickToUpload": "Нажмите для загрузки или перетащите файл",
+          "fileTypes": "PNG, JPG до 5MB"
+        },
+        "submitButton": "Добавить центр",
+        "creating": "Создание..."
       },
-      "imageUpload": {
-        "clickToUpload": "Нажмите для загрузки или перетащите файл",
-        "fileTypes": "PNG, JPG до 5MB"
+      "branchForm": {
+        "title": "Добавить филиал",
+        "labels": {
+          "selectCenter": "Выберите центр",
+          "name": "Название филиала",
+          "manualName": "Ввести название вручную",
+          "phone": "Номер телефона",
+          "region": "Регион",
+          "address": "Адрес",
+          "image": "Изображение филиала"
+        },
+        "placeholders": {
+          "name": "Введите название филиала",
+          "phone": "Введите номер телефона",
+          "address": "Введите адрес"
+        },
+        "imageUpload": {
+          "clickToUpload": "Нажмите для загрузки или перетащите файл",
+          "fileTypes": "PNG, JPG до 5MB"
+        },
+        "submitButton": "Добавить филиал",
+        "adding": "Добавление...",
+        "branchesTitle": "Ваши филиалы",
+        "noBranches": "Пока нет филиалов"
       },
-      "submitButton": "Добавить центр",
-      "creating": "Создание..."
+      "errors": {
+        "imageRequired": "Требуется изображение",
+        "selectCenterFirst": "Пожалуйста, сначала создайте центр",
+        "uploadFailed": "Не удалось загрузить изображение. Пожалуйста, попробуйте еще раз.",
+        "centerFailed": "Не удалось создать центр.",
+        "branchFailed": "Не удалось создать филиал. Пожалуйста, попробуйте еще раз."
+      },
+      "success": {
+        "centerCreated": "Центр и главный филиал успешно созданы!",
+        "branchAdded": "Филиал успешно добавлен!"
+      }
     },
-    "branchForm": {
-      "title": "Добавить филиал",
-      "labels": {
-        "selectCenter": "Выберите центр",
-        "name": "Название филиала",
-        "manualName": "Ввести название вручную",
-        "phone": "Номер телефона",
-        "region": "Регион",
-        "address": "Адрес",
-        "image": "Изображение филиала"
+"favorites": {
+      "hero": {
+        "subtitle": "Откройте для себя самые любимые учебные заведения",
+        "title": "Избранные центры",
+        "homeLink": "Главная",
+        "favoritesLink": "Избранное"
       },
-      "placeholders": {
-        "name": "Введите название филиала",
-        "phone": "Введите номер телефона",
-        "address": "Введите адрес"
-      },
-      "imageUpload": {
-        "clickToUpload": "Нажмите для загрузки или перетащите файл",
-        "fileTypes": "PNG, JPG до 5MB"
-      },
-      "submitButton": "Добавить филиал",
-      "adding": "Добавление...",
-      "branchesTitle": "Ваши филиалы",
-      "noBranches": "Пока нет филиалов"
+      "loading": "Загрузка...",
+      "empty": "Вы еще не добавили центры в избранное.",
+      "centerCard": {
+        "rating": "Рейтинг",
+        "defaultPhone": "+7 (XXX) XXX-XXXX",
+        "viewDetails": "Подробнее"
+      }
     },
-    "errors": {
-      "imageRequired": "Требуется изображение",
-      "selectCenterFirst": "Пожалуйста, сначала создайте центр",
-      "uploadFailed": "Не удалось загрузить изображение. Пожалуйста, попробуйте еще раз.",
-      "centerFailed": "Не удалось создать центр.",
-      "branchFailed": "Не удалось создать филиал. Пожалуйста, попробуйте еще раз."
+    "branchDetail": {
+      "backButton": "Назад в центр",
+      "imageAlt": "Филиал {name}",
+      "imageNotAvailable": "Изображение недоступно",
+      "noImage": "Изображение не предоставлено",
+      "addressLabel": "Адрес",
+      "addressNotSpecified": "Не указан",
+      "phoneLabel": "Телефон",
+      "emailLabel": "Электронная почта",
+      "websiteLabel": "Веб-сайт",
+      "workingHoursLabel": "Часы работы",
+      "loading": "Загрузка...",
+      "error": "Не удалось загрузить информацию о филиале",
+      "goBack": "Назад",
+      "notFound": "Филиал не найден"
     },
-    "success": {
-      "centerCreated": "Центр и главный филиал успешно созданы!",
-      "branchAdded": "Филиал успешно добавлен!"
-    }
-  },
-  "favorites": {
-    "hero": {
-      "subtitle": "Откройте для себя самые любимые учебные заведения",
-      "title": "Избранные центры",
-      "homeLink": "Главная",
-      "favoritesLink": "Избранное"
-    },
-    "loading": "Загрузка...",
-    "empty": "Вы еще не добавили центры в избранное.",
-    "centerCard": {
-      "rating": "Рейтинг",
-      "defaultPhone": "+7 (XXX) XXX-XXXX",
-      "viewDetails": "Подробнее"
-    }
-  },
-  "branchDetail": {
-    "backButton": "Назад в центр",
-    "imageAlt": "Филиал {name}",
-    "imageNotAvailable": "Изображение недоступно",
-    "noImage": "Изображение не предоставлено",
-    "addressLabel": "Адрес",
-    "addressNotSpecified": "Не указан",
-    "phoneLabel": "Телефон",
-    "emailLabel": "Электронная почта",
-    "websiteLabel": "Веб-сайт",
-    "workingHoursLabel": "Часы работы",
-    "loading": "Загрузка...",
-    "error": "Не удалось загрузить информацию о филиале",
-    "goBack": "Назад",
-    "notFound": "Филиал не найден"
-  }
+    "appointments": {
+  "noAppointments": "У вас пока нет записей",
+  "bookNow": "Запишитесь на приём сейчас",
+  "unknownRegion": "Неизвестный регион",
+  "unknownCenter": "Неизвестный центр",
+  "unknownAddress": "Адрес не указан",
+  "unknownDate": "Дата не указана",
+  "unknownMajor": "Не указано",
+  "centerImageAlt": "Образовательный центр",
+  "address": "Адрес",
+  "visitDate": "Дата визита",
+  "major": "Направление",
+  "confirmDelete": "Подтвердите удаление",
+  "deleteConfirmationMessage": "Вы уверены, что хотите удалить эту запись?",
+  "deleteAppointment": "Удалить запись"
+},
+"common": {
+  "loading": "Загрузка...",
+  "delete": "Удалить",
+  "deleting": "Удаление...",
+  "cancel": "Отмена"
+}
+
+  
 }

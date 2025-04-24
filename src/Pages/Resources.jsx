@@ -1,3 +1,5 @@
+
+
 import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect, useContext } from "react";
 import { FaSearch, FaBook, FaVideo, FaFilePdf, FaStar, FaDownload, FaTrash } from "react-icons/fa";
@@ -27,16 +29,16 @@ export const Resources = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [categories, setCategories] = useState([]);
 const [resourceToDelete, setResourceToDelete] = useState(null);
-const [categories, setCategories] = useState([]);
-  const [newResource, setNewResource] = useState({
-    categoryId: categories[0]?.id || "", 
-    name: "",
-    description: "",
-    media: "",
-    image: "",
-    imageFile: null,
-  });
+const [newResource, setNewResource] = useState({
+  categoryId: "", // Don't reference categories yet
+  name: "",
+  description: "",
+  media: "",
+  image: "",
+  imageFile: null,
+});
   const [resources, setResources] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -142,14 +144,14 @@ const [categories, setCategories] = useState([]);
   }, [activeFilter, searchTerm]);
 
   
-useEffect(() => {
-  if (categories.length > 0 && isModalOpen) {
-    setNewResource(prev => ({
-      ...prev,
-      categoryId: categories[0].id, // Set the first valid category ID
-    }));
-  }
-}, [categories, isModalOpen]);
+  useEffect(() => {
+    if (categories.length > 0 && isModalOpen) {
+      setNewResource(prev => ({
+        ...prev,
+        categoryId: categories[0].id,
+      }));
+    }
+  }, [categories, isModalOpen]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -794,3 +796,4 @@ useEffect(() => {
     </div>
   );
 };
+
