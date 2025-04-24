@@ -154,6 +154,18 @@
       "loginToRegister": "Please login to register for a class.",
       "selectBothDateTime": "Please select both a date and a valid 2-hour interval.",
       "registrationFailed": "Failed to register. Please try again."
-    }
+    },     "footer": {
+      "math": "Mathematics",
+      "marketing": "Marketing",
+      "english": "English",
+      "it": "IT",
+      "design": "Design",
+      "business": "Business"
+      , 
+      "centers": "Education Centers",
+      "contact": "Contact",
+      "comments": "Comments",
+      "projects": "Projects"
+          }
     
 }

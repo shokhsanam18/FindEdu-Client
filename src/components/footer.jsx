@@ -2,8 +2,10 @@ import React from "react";
 import { Facebook, Instagram, Send, Youtube } from "lucide-react";
 import icon from "/public/icon.png";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export const Footer = () => {
+  const { t } = useTranslation();
   return (
     <div className="bg-[#451774] text-white py-8 px-20 lg:px-36  ">
       <div className="text-2xl font-bold flex">
@@ -19,17 +21,17 @@ export const Footer = () => {
             <ul className="mt-4 space-y-4 ">
               <li>
                 <a href="#" className="hover:underline">
-                  Home
+                  {t("navbar.home")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Learning Centers
+                  {t("footer.centers")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  About Us
+                  {t("navbar.about")}
                 </a>
               </li>
             </ul>
@@ -39,17 +41,17 @@ export const Footer = () => {
             <ul className=" mt-4 space-y-4">
               <li>
                 <a href="#" className="hover:underline">
-                  Contact Us
+                  {t("footer.contact")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Leave a Comment
+                  {t("footer.comments")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Other Projects
+                  {t("footer.projects")}
                 </a>
               </li>
             </ul>
@@ -100,17 +102,17 @@ export const Footer = () => {
             <ul className="space-y-4 text-sm opacity-75">
               <li>
                 <a href="#" className="hover:underline">
-                  IT
+                  {t("footer.it")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Mathematics
+                  {t("footer.math")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Marketing
+                  {t("footer.marketing")}
                 </a>
               </li>
               <li>
@@ -124,7 +126,7 @@ export const Footer = () => {
             <ul className="space-y-4 text-sm opacity-75">
               <li>
                 <a href="#" className="hover:underline">
-                  English
+                  {t("footer.english")}
                 </a>
               </li>
               <li>
@@ -134,12 +136,12 @@ export const Footer = () => {
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Design
+                  {t("footer.design")}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:underline">
-                  Business
+                  {t("footer.business")}
                 </a>
               </li>
             </ul>
