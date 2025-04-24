@@ -77,7 +77,12 @@
     "selectMajors": "Select Majors",
     "selectRegions": "Select Regions",
     "okButton": "OK",
-    "cancelButton": "Cancel"
+    "cancelButton": "Cancel",
+    "confirmDelete": "Confirm Deletion",
+    "areYouSure": "Are you sure you want to delete this center? This action cannot be undone.",
+    "delete": "Delete",
+    "deletedSuccess": "Center deleted successfully",
+    "deleteError": "Failed to delete center"
   },
   "Resources": {
     "subtitle": "Discover Teaching Resources",
@@ -106,170 +111,171 @@
     "confirmDeleteTitle": "Confirm Resource Deletion",
     "confirmDeleteMessage": "Are you sure you want to delete this resource? This action cannot be undone.",
     "confirm": "Delete"
-  },  
-    "profile": {
-      "title": "My Profile",
-      "editButton": "Edit Profile",
-      "saveButton": "Save Changes",
-      "cancelButton": "Cancel",
-      "changePhoto": "Change Photo",
-      "uploading": "Uploading...",
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "email": "Email",
-      "phone": "Phone",
-      "notProvided": "Not provided",
-      "role": "Role",
-      "deleteAccount": "Delete Account",
-      "deleteDialog": {
-        "title": "Confirm Account Deletion",
-        "message": "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.",
-        "cancel": "Cancel",
-        "confirm": "Delete Account"
-      },
-      "backToHome": "Back to Home"},
-      "centerDetail": {
-      "backToCenters": "Back to Centers",
-      "ourBranches": "Our Branches",
-      "availableCourses": "Available Courses",
-      "registerForClass": "Register for a Class",
-      "about": "About",
-      "comments": "Comments",
-      "shareThoughts": "Share your thoughts about this center...",
-      "rating": "Rating:",
-      "postComment": "Post Comment",
-      "posting": "Posting...",
-      "noComments": "No comments yet. Be the first to share your thoughts!",
-      "classRegistration": "Class Registration",
-      "selectDateTime": "Select your preferred date and time",
-      "selectBranch": "Select Branch",
-      "selectMajor": "Select Major",
-      "selectDate": "Select Date",
-      "selectTime": "Select Time",
+  },
+  "profile": {
+    "title": "My Profile",
+    "editButton": "Edit Profile",
+    "saveButton": "Save Changes",
+    "cancelButton": "Cancel",
+    "changePhoto": "Change Photo",
+    "uploading": "Uploading...",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "notProvided": "Not provided",
+    "role": "Role",
+    "deleteAccount": "Delete Account",
+    "deleteDialog": {
+      "title": "Confirm Account Deletion",
+      "message": "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.",
       "cancel": "Cancel",
-      "confirmRegistration": "Confirm Registration",
-      "processing": "Processing...",
-      "registrationConfirmed": "Registration Confirmed!",
-      "yourClassScheduled": "Your class has been scheduled for",
-      "selectedBranch": "Selected Branch:",
-      "selectedMajor": "Selected Major:",
-      "deleteCommentConfirm": "Are you sure you want to delete this comment?",
-      "loginToRegister": "Please login to register for a class.",
-      "selectBothDateTime": "Please select both a date and a valid 2-hour interval.",
-      "registrationFailed": "Failed to register. Please try again."
-    },     "footer": {
-      "math": "Mathematics",
-      "marketing": "Marketing",
-      "english": "English",
-      "it": "IT",
-      "design": "Design",
-      "business": "Business"
-      , 
-      "centers": "Education Centers",
-      "contact": "Contact",
-      "comments": "Comments",
-      "projects": "Projects"
-          },
-       
-              "ceoPage": {
-                "hero": {
-                  "subtitle": "Add Your Education Center",
-                  "description": "Join us and help students discover the best learning opportunities.",
-                  "title": "CEO Page",
-                  "homeLink": "Home",
-                  "ceoLink": "CEO Page"
-                },
-                "centerForm": {
-                  "title": "Create Learning Center",
-                  "labels": {
-                    "name": "Center Name",
-                    "region": "Region",
-                    "address": "Address",
-                    "image": "Center Image",
-                    "phone": "Phone Number",
-                    "majors": "Majors (Select at least one)",
-                    "selectedMajors": "Selected: {count} major(s)"
-                  },
-                  "placeholders": {
-                    "name": "Enter center name",
-                    "address": "Enter address",
-                    "phone": "Enter phone number"
-                  },
-                  "imageUpload": {
-                    "clickToUpload": "Click to upload or drag and drop",
-                    "fileTypes": "PNG, JPG up to 5MB"
-                  },
-                  "submitButton": "Add Center",
-                  "creating": "Creating..."
-                },
-                "branchForm": {
-                  "title": "Add Branch",
-                  "labels": {
-                    "selectCenter": "Select Center",
-                    "name": "Branch Name",
-                    "manualName": "Let me enter branch name manually",
-                    "phone": "Phone Number",
-                    "region": "Region",
-                    "address": "Address",
-                    "image": "Branch Image"
-                  },
-                  "placeholders": {
-                    "name": "Enter branch name",
-                    "phone": "Enter phone number",
-                    "address": "Enter address"
-                  },
-                  "imageUpload": {
-                    "clickToUpload": "Click to upload or drag and drop",
-                    "fileTypes": "PNG, JPG up to 5MB"
-                  },
-                  "submitButton": "Add Branch",
-                  "adding": "Adding...",
-                  "branchesTitle": "Your Branches",
-                  "noBranches": "No branches added yet"
-                },
-                "errors": {
-                  "imageRequired": "Image is required",
-                  "selectCenterFirst": "Please create a center first",
-                  "uploadFailed": "Image upload failed. Please try again.",
-                  "centerFailed": "Failed to create center.",
-                  "branchFailed": "Failed to create branch. Please try again."
-                },
-                "success": {
-                  "centerCreated": "Center and main branch created successfully!",
-                  "branchAdded": "Branch added successfully!"
-                }
-              },
-"favorites": {
-      "hero": {
-        "subtitle": "Discover Most Loved Learning Spaces",
-        "title": "Favorite Centers",
-        "homeLink": "Home",
-        "favoritesLink": "Favorites"
-      },
-      "loading": "Loading...",
-      "empty": "You haven't liked any centers yet.",
-      "centerCard": {
-        "rating": "Rating",
-        "defaultPhone": "+1 (555) 123-4567",
-        "viewDetails": "View Details"
-      }},
-"branchDetail": {
-      "backButton": "Back to Center",
-      "imageAlt": "{name} branch",
-      "imageNotAvailable": "Image not available",
-      "noImage": "No image provided",
-      "addressLabel": "Address",
-      "addressNotSpecified": "Not specified",
-      "phoneLabel": "Phone",
-      "emailLabel": "Email",
-      "websiteLabel": "Website",
-      "workingHoursLabel": "Working Hours",
-      "loading": "Loading...",
-      "error": "Failed to load branch information",
-      "goBack": "Go back",
-      "notFound": "Branch not found"
+      "confirm": "Delete Account"
     },
-    "appointment": {
+    "backToHome": "Back to Home"
+  },
+  "centerDetail": {
+    "backToCenters": "Back to Centers",
+    "ourBranches": "Our Branches",
+    "availableCourses": "Available Courses",
+    "registerForClass": "Register for a Class",
+    "about": "About",
+    "comments": "Comments",
+    "shareThoughts": "Share your thoughts about this center...",
+    "rating": "Rating:",
+    "postComment": "Post Comment",
+    "posting": "Posting...",
+    "noComments": "No comments yet. Be the first to share your thoughts!",
+    "classRegistration": "Class Registration",
+    "selectDateTime": "Select your preferred date and time",
+    "selectBranch": "Select Branch",
+    "selectMajor": "Select Major",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "cancel": "Cancel",
+    "confirmRegistration": "Confirm Registration",
+    "processing": "Processing...",
+    "registrationConfirmed": "Registration Confirmed!",
+    "yourClassScheduled": "Your class has been scheduled for",
+    "selectedBranch": "Selected Branch:",
+    "selectedMajor": "Selected Major:",
+    "deleteCommentConfirm": "Are you sure you want to delete this comment?",
+    "loginToRegister": "Please login to register for a class.",
+    "selectBothDateTime": "Please select both a date and a valid 2-hour interval.",
+    "registrationFailed": "Failed to register. Please try again."
+  },
+  "footer": {
+    "math": "Mathematics",
+    "marketing": "Marketing",
+    "english": "English",
+    "it": "IT",
+    "design": "Design",
+    "business": "Business",
+    "centers": "Education Centers",
+    "contact": "Contact",
+    "comments": "Comments",
+    "projects": "Projects"
+  },
+  "ceoPage": {
+    "hero": {
+      "subtitle": "Add Your Education Center",
+      "description": "Join us and help students discover the best learning opportunities.",
+      "title": "CEO Page",
+      "homeLink": "Home",
+      "ceoLink": "CEO Page"
+    },
+    "centerForm": {
+      "title": "Create Learning Center",
+      "labels": {
+        "name": "Center Name",
+        "region": "Region",
+        "address": "Address",
+        "image": "Center Image",
+        "phone": "Phone Number",
+        "majors": "Majors (Select at least one)",
+        "selectedMajors": "Selected: {count} major(s)"
+      },
+      "placeholders": {
+        "name": "Enter center name",
+        "address": "Enter address",
+        "phone": "Enter phone number"
+      },
+      "imageUpload": {
+        "clickToUpload": "Click to upload or drag and drop",
+        "fileTypes": "PNG, JPG up to 5MB"
+      },
+      "submitButton": "Add Center",
+      "creating": "Creating..."
+    },
+    "branchForm": {
+      "title": "Add Branch",
+      "labels": {
+        "selectCenter": "Select Center",
+        "name": "Branch Name",
+        "manualName": "Let me enter branch name manually",
+        "phone": "Phone Number",
+        "region": "Region",
+        "address": "Address",
+        "image": "Branch Image"
+      },
+      "placeholders": {
+        "name": "Enter branch name",
+        "phone": "Enter phone number",
+        "address": "Enter address"
+      },
+      "imageUpload": {
+        "clickToUpload": "Click to upload or drag and drop",
+        "fileTypes": "PNG, JPG up to 5MB"
+      },
+      "submitButton": "Add Branch",
+      "adding": "Adding...",
+      "branchesTitle": "Your Branches",
+      "noBranches": "No branches added yet"
+    },
+    "errors": {
+      "imageRequired": "Image is required",
+      "selectCenterFirst": "Please create a center first",
+      "uploadFailed": "Image upload failed. Please try again.",
+      "centerFailed": "Failed to create center.",
+      "branchFailed": "Failed to create branch. Please try again."
+    },
+    "success": {
+      "centerCreated": "Center and main branch created successfully!",
+      "branchAdded": "Branch added successfully!"
+    }
+  },
+  "favorites": {
+    "hero": {
+      "subtitle": "Discover Most Loved Learning Spaces",
+      "title": "Favorite Centers",
+      "homeLink": "Home",
+      "favoritesLink": "Favorites"
+    },
+    "loading": "Loading...",
+    "empty": "You haven't liked any centers yet.",
+    "centerCard": {
+      "rating": "Rating",
+      "defaultPhone": "+1 (555) 123-4567",
+      "viewDetails": "View Details"
+    }
+  },
+  "branchDetail": {
+    "backButton": "Back to Center",
+    "imageAlt": "{name} branch",
+    "imageNotAvailable": "Image not available",
+    "noImage": "No image provided",
+    "addressLabel": "Address",
+    "addressNotSpecified": "Not specified",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email",
+    "websiteLabel": "Website",
+    "workingHoursLabel": "Working Hours",
+    "loading": "Loading...",
+    "error": "Failed to load branch information",
+    "goBack": "Go back",
+    "notFound": "Branch not found"
+  },
+  "appointment": {
     "hero": {
       "title": "Your Appointments",
       "subtitle": "Manage your education center visits",
@@ -299,5 +305,4 @@
     "deleting": "Deleting...",
     "cancel": "Cancel"
   }
-
 }
