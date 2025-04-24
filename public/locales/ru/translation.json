@@ -60,5 +60,30 @@
     "selectRegions": "Выберите регионы",
     "okButton": "ОК",
     "cancelButton": "Отмена"
+  },
+  "Resources": {
+    "subtitle": "Откройте для себя учебные ресурсы",
+    "description": "Получите доступ к качественным материалам для улучшения ваших образовательных программ.",
+    "title": "Учебные ресурсы",
+    "link1": "Главная",
+    "link2": "Ресурсы",
+    "placeholder": "Поиск ресурсов...",
+    "filterByCategory": "Фильтровать по категории",
+    "allResources": "Все ресурсы",
+    "myResources": "Мои ресурсы",
+    "addResource": "Добавить ресурс",
+    "addNewResource": "Добавить новый ресурс",
+    "resourceName": "Название ресурса",
+    "Modaldescription": "Описание",
+    "mediaUrl": "Медиа ссылка",
+    "image": "Изображение (URL или файл)",
+    "imageUrl": "Ссылка на изображение",
+    "or": "ИЛИ",
+    "selectedFile": "Выбранный файл",
+    "cancel": "Отмена",
+    "ModaladdResource": "Добавить ресурс",
+    "delete": "Удалить",
+    "download": "Скачать",
+    "preview": "Предпросмотр"
   }
 }

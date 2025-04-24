@@ -78,5 +78,30 @@
     "selectRegions": "Select Regions",
     "okButton": "OK",
     "cancelButton": "Cancel"
+  },
+  "Resources": {
+    "subtitle": "Discover Teaching Resources",
+    "description": "Access high-quality materials to enhance your educational programs.",
+    "title": "Educational Resources",
+    "link1": "Home",
+    "link2": "Resources",
+    "placeholder": "Search resources...",
+    "filterByCategory": "Filter by Category",
+    "allResources": "All Resources",
+    "myResources": "My Resources",
+    "addResource": "Add Resource",
+    "addNewResource": "Add New Resource",
+    "resourceName": "Resource Name",
+    "Modaldescription": "Description",
+    "mediaUrl": "Media URL",
+    "image": "Image (URL or File)",
+    "imageUrl": "Image URL",
+    "or": "OR",
+    "selectedFile": "Selected file",
+    "cancel": "Cancel",
+    "ModaladdResource": "Add Resource",
+    "delete": "Delete",
+    "download": "Download",
+    "preview": "Preview"
   }
 }
