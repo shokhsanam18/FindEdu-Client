@@ -3,11 +3,13 @@ import React, { useState, useEffect, useContext } from "react";
 import { FaSearch, FaBook, FaVideo, FaFilePdf, FaStar, FaDownload, FaTrash } from "react-icons/fa";
 import { MdComputer, MdBusiness } from "react-icons/md";
 import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../Store";
 import { AuthContext } from "../context/auth";
 import { toast } from "sonner";
 import "react-toastify/dist/ReactToastify.css";
 import { motion } from 'framer-motion';
+
 
 const API_BASE_URL = "https://findcourse.net.uz/api/resources";
 const CATEGORIES_URL = "https://findcourse.net.uz/api/categories";
@@ -222,13 +224,7 @@ export const Resources = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          categoryId: newResource.categoryId,
-          name: newResource.name,
-          description: newResource.description,
-          media: newResource.media,
-          image: imageUrl
-        }),
+        body: JSON.stringify(newResource),
       });
 
       if (!response.ok) {
@@ -245,7 +241,6 @@ export const Resources = () => {
         description: "",
         media: "",
         image: "",
-        imageFile: null,
       });
       fetchResources();
     } catch (error) {
@@ -381,6 +376,14 @@ export const Resources = () => {
         style={{ backgroundImage: "url('/aboutus.png')" }}
       >
         <div className="absolute inset-0 bg-white bg-opacity-70"></div>
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative flex flex-col md:flex-row justify-between items-center md:items-center p-6 min-h-[50vh] text-[#2d0e4e] bg-cover bg-center mt-20"
+        style={{ backgroundImage: "url('/aboutus.png')" }}
+      >
+        <div className="absolute inset-0 bg-white bg-opacity-70"></div>
 
         <motion.div
           initial={{ opacity: 0, x: -50 }}
@@ -418,83 +421,57 @@ export const Resources = () => {
         </motion.div>
       </motion.div>
 
-      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 mt-5">
-        <div className="max-w-7xl mx-auto">
-          {/* Search and Filter Section */}
-          <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="relative flex-grow">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaSearch className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder={t("Resources.placeholder")}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+    <div className="min-h-screen  py-8 px-4 sm:px-6 lg:px-8 mt-5">
+      <div className="max-w-7xl mx-auto">
+        {/* Page Header */}
+
+
+        {/* Search and Filter Section */}
+        <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="relative flex-grow">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="h-5 w-5 text-gray-400" />
               </div>
+              <input
+                type="text"
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Search resources..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-
-            {/* Categories Filter - Full card size images */}
-            <div className="mt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">{t("Resources.filterByCategory")}</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {/* All Resources Button */}
+            <div className="flex items-center space-x-2 overflow-x-auto pb-2 md:pb-0">
+              <button
+                onClick={() => setActiveFilter("all")}
+                className={`px-4 py-2 rounded-full text-sm font-medium ${activeFilter === "all" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
+              >
+                All Resources
+              </button>
+              {isLoggedIn && (
                 <button
-                  onClick={() => setActiveFilter("all")}
-                  className={`flex flex-col items-center p-0 rounded-lg overflow-hidden ${activeFilter === "all" ? "ring-2 ring-blue-500" : ""} hover:shadow-md transition-all`}
+                  onClick={() => setActiveFilter("myResources")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${activeFilter === "myResources" ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
                 >
-                  <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
-                    <FaSearch className="text-gray-500 text-4xl" />
-                  </div>
-                  <span className="text-sm font-medium p-2">{t("Resources.allResources")}</span>
+                  My Resources
                 </button>
-
-                {/* My Resources Button (if logged in) */}
-                {isLoggedIn && (
-                  <button
-                    onClick={() => setActiveFilter("myResources")}
-                    className={`flex flex-col items-center p-0 rounded-lg overflow-hidden ${activeFilter === "myResources" ? "ring-2 ring-blue-500" : ""} hover:shadow-md transition-all`}
-                  >
-                    <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
-                      <FaStar className="text-yellow-500 text-4xl" />
-                    </div>
-                    <span className="text-sm font-medium p-2">{t("Resources.myResources")}</span>
-                  </button>
-                )}
-
-                {/* Category Buttons */}
-                {categories.map(category => (
-                  <button
-                    key={category.id}
-                    onClick={() => setActiveFilter(category.id.toString())}
-                    className={`flex flex-col items-center p-0 rounded-lg overflow-hidden ${activeFilter === category.id.toString() ? "ring-2 ring-blue-500" : ""} hover:shadow-md transition-all`}
-                  >
-                    {category.image ? (
-                      <div className="w-full h-32 bg-gray-100">
-                        <img
-                          src={category.image}
-                          alt={category.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
-                        {category.name === "IT" ? (
-                          <MdComputer className="text-gray-500 text-4xl" />
-                        ) : (
-                          <MdBusiness className="text-gray-500 text-4xl" />
-                        )}
-                      </div>
-                    )}
-                    <span className="text-sm font-medium p-2">{category.name}</span>
-                  </button>
-                ))}
-              </div>
+              )}
+              
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveFilter(category.id.toString())}
+                  className={`px-4 py-2 rounded-full text-sm font-medium flex items-center ${
+                    activeFilter === category.id.toString() ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {category.name === "IT" ? <MdComputer className="mr-2" /> : <MdBusiness className="mr-2" />}
+                  {category.name}
+                </button>
+              ))}
             </div>
           </div>
+        </div>
 
           {/* Add Resource Button */}
           <button
@@ -712,6 +689,31 @@ export const Resources = () => {
             )}
           </div>
 
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-12 flex justify-center">
+              <nav className="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <button
+                  onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+                  disabled={pagination.currentPage === 1}
+                  className="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                {renderPaginationButtons()}
+                <button
+                  onClick={() => handlePageChange(Math.min(totalPages, pagination.currentPage + 1))}
+                  disabled={pagination.currentPage === totalPages}
+                  className="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </nav>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="mt-12 flex justify-center">
