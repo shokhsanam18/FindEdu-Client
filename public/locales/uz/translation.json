@@ -102,70 +102,172 @@
     "ModaladdResource": "Resurs qo'shish",
     "delete": "O‘chirish",
     "download": "Yuklab olish",
-    "preview": "Oldindan ko‘rish"
+    "preview": "Oldindan ko‘rish",
+    "confirmDeleteTitle": "Resursni o‘chirishni tasdiqlash",
+    "confirmDeleteMessage": "Siz ushbu resursni o‘chirishni istaysizmi? Bu amalni bekor qilib bo‘lmaydi.",
+    "confirm": "O‘chirish"
   },
-    "profile": {
-      "title": "Mening profilim",
-      "editButton": "Profilni tahrirlash",
-      "saveButton": "O'zgarishlarni saqlash",
-      "cancelButton": "Bekor qilish",
-      "changePhoto": "Rasmni o'zgartirish",
-      "uploading": "Yuklanmoqda...",
-      "firstName": "Ism",
-      "lastName": "Familiya",
-      "email": "Elektron pochta",
-      "phone": "Telefon",
-      "notProvided": "Kiritilmagan",
-      "role": "Rol",
-      "deleteAccount": "Akkauntni o'chirish",
-      "deleteDialog": {
-        "title": "Akkauntni o'chirishni tasdiqlash",
-        "message": "Akkauntingizni o'chirishni istaysizmi? Bu amalni bekor qilib bo'lmaydi va barcha ma'lumotlaringiz butunlay o'chiriladi.",
-        "cancel": "Bekor qilish",
-        "confirm": "Akkauntni o'chirish"
-      },
-      "backToHome": "Bosh sahifaga qaytish"
-    },
-    "centerDetail": {
-      "backToCenters": "Markazlarga qaytish",
-      "ourBranches": "Bizning filiallar",
-      "availableCourses": "Mavjud kurslar",
-      "registerForClass": "Darsga yozilish",
-      "about": "Markaz haqida",
-      "comments": "Sharhlar",
-      "shareThoughts": "Bu markaz haqida fikrlaringizni bildiring...",
-      "rating": "Reyting:",
-      "postComment": "Sharh qoldirish",
-      "posting": "Yuborilmoqda...",
-      "noComments": "Hali sharhlar mavjud emas. Birinchi bo'ling!",
-      "classRegistration": "Darsga yozilish",
-      "selectDateTime": "O'zingizga qulay sana va vaqtni tanlang",
-      "selectBranch": "Filialni tanlang",
-      "selectMajor": "Yo'nalishni tanlang",
-      "selectDate": "Sanani tanlang",
-      "selectTime": "Vaqtni tanlang",
+  "profile": {
+    "title": "Mening profilim",
+    "editButton": "Profilni tahrirlash",
+    "saveButton": "O'zgarishlarni saqlash",
+    "cancelButton": "Bekor qilish",
+    "changePhoto": "Rasmni o'zgartirish",
+    "uploading": "Yuklanmoqda...",
+    "firstName": "Ism",
+    "lastName": "Familiya",
+    "email": "Elektron pochta",
+    "phone": "Telefon",
+    "notProvided": "Kiritilmagan",
+    "role": "Rol",
+    "deleteAccount": "Akkauntni o'chirish",
+    "deleteDialog": {
+      "title": "Akkauntni o'chirishni tasdiqlash",
+      "message": "Akkauntingizni o'chirishni istaysizmi? Bu amalni bekor qilib bo'lmaydi va barcha ma'lumotlaringiz butunlay o'chiriladi.",
       "cancel": "Bekor qilish",
-      "confirmRegistration": "Ro'yxatdan o'tishni tasdiqlash",
-      "processing": "Qayta ishlanmoqda...",
-      "registrationConfirmed": "Ro'yxatdan o'tish tasdiqlandi!",
-      "yourClassScheduled": "Darsingiz quyidagi vaqtga rejalashtirildi:",
-      "selectedBranch": "Tanlangan filial:",
-      "selectedMajor": "Tanlangan yo'nalish:",
-      "deleteCommentConfirm": "Bu sharhni o'chirishni istaysizmi?",
-      "loginToRegister": "Darsga yozilish uchun iltimos, tizimga kiring.",
-      "selectBothDateTime": "Iltimos, sana va 2 soatlik intervalni tanlang.",
-      "registrationFailed": "Ro'yxatdan o'tish muvaffaqiyatsiz tugadi. Iltimos, qayta urinib ko'ring."
-    },     "footer": {
-      "math": "Matematika",
-      "marketing": "Marketing",
-      "english": "Ingliz tili",
-      "it": "IT",
-      "design": "Dizayn",
-      "business": " Biznes",
-      "centers": "O'quv Markazlar",
-      "contact": "Aloqa",
-      "comments": "Sharhlar",
-      "projects": "Loyihalar"
-          }
-  
+      "confirm": "Akkauntni o'chirish"
+    },
+    "backToHome": "Bosh sahifaga qaytish"
+  },
+  "centerDetail": {
+    "backToCenters": "Markazlarga qaytish",
+    "ourBranches": "Bizning filiallar",
+    "availableCourses": "Mavjud kurslar",
+    "registerForClass": "Darsga yozilish",
+    "about": "Markaz haqida",
+    "comments": "Sharhlar",
+    "shareThoughts": "Bu markaz haqida fikrlaringizni bildiring...",
+    "rating": "Reyting:",
+    "postComment": "Sharh qoldirish",
+    "posting": "Yuborilmoqda...",
+    "noComments": "Hali sharhlar mavjud emas. Birinchi bo'ling!",
+    "classRegistration": "Darsga yozilish",
+    "selectDateTime": "O'zingizga qulay sana va vaqtni tanlang",
+    "selectBranch": "Filialni tanlang",
+    "selectMajor": "Yo'nalishni tanlang",
+    "selectDate": "Sanani tanlang",
+    "selectTime": "Vaqtni tanlang",
+    "cancel": "Bekor qilish",
+    "confirmRegistration": "Ro'yxatdan o'tishni tasdiqlash",
+    "processing": "Qayta ishlanmoqda...",
+    "registrationConfirmed": "Ro'yxatdan o'tish tasdiqlandi!",
+    "yourClassScheduled": "Darsingiz quyidagi vaqtga rejalashtirildi:",
+    "selectedBranch": "Tanlangan filial:",
+    "selectedMajor": "Tanlangan yo'nalish:",
+    "deleteCommentConfirm": "Bu sharhni o'chirishni istaysizmi?",
+    "loginToRegister": "Darsga yozilish uchun iltimos, tizimga kiring.",
+    "selectBothDateTime": "Iltimos, sana va 2 soatlik intervalni tanlang.",
+    "registrationFailed": "Ro'yxatdan o'tish muvaffaqiyatsiz tugadi. Iltimos, qayta urinib ko'ring."
+  },
+  "footer": {
+    "math": "Matematika",
+    "marketing": "Marketing",
+    "english": "Ingliz tili",
+    "it": "IT",
+    "design": "Dizayn",
+    "business": " Biznes",
+    "centers": "O'quv Markazlar",
+    "contact": "Aloqa",
+    "comments": "Sharhlar",
+    "projects": "Loyihalar"
+  },
+  "ceoPage": {
+    "hero": {
+      "subtitle": "O'quv markazingizni qo'shing",
+      "description": "Bizga qo'shiling va talabalarga eng yaxshi o'quv imkoniyatlarini topishda yordam bering.",
+      "title": "CEO Sahifasi",
+      "homeLink": "Bosh sahifa",
+      "ceoLink": "CEO Sahifasi"
+    },
+    "centerForm": {
+      "title": "O'quv Markaz Yaratish",
+      "labels": {
+        "name": "Markaz nomi",
+        "region": "Hudud",
+        "address": "Manzil",
+        "image": "Markaz rasmi",
+        "phone": "Telefon raqami",
+        "majors": "Yo'nalishlar (kamida bittasini tanlang)",
+        "selectedMajors": "Tanlangan: {count} ta yo'nalish"
+      },
+      "placeholders": {
+        "name": "Markaz nomini kiriting",
+        "address": "Manzilni kiriting",
+        "phone": "Telefon raqamini kiriting"
+      },
+      "imageUpload": {
+        "clickToUpload": "Yuklash uchun bosing yoki faylni sudrab keling",
+        "fileTypes": "PNG, JPG 5MB gacha"
+      },
+      "submitButton": "Markaz qo'shish",
+      "creating": "Yaratilmoqda..."
+    },
+    "branchForm": {
+      "title": "Filial Qo'shish",
+      "labels": {
+        "selectCenter": "Markazni tanlang",
+        "name": "Filial nomi",
+        "manualName": "Filial nomini qo'lda kiritish",
+        "phone": "Telefon raqami",
+        "region": "Hudud",
+        "address": "Manzil",
+        "image": "Filial rasmi"
+      },
+      "placeholders": {
+        "name": "Filial nomini kiriting",
+        "phone": "Telefon raqamini kiriting",
+        "address": "Manzilni kiriting"
+      },
+      "imageUpload": {
+        "clickToUpload": "Yuklash uchun bosing yoki faylni sudrab keling",
+        "fileTypes": "PNG, JPG 5MB gacha"
+      },
+      "submitButton": "Filial qo'shish",
+      "adding": "Qo'shilmoqda...",
+      "branchesTitle": "Sizning filiallaringiz",
+      "noBranches": "Hali filiallar qo'shilmagan"
+    },
+    "errors": {
+      "imageRequired": "Rasm talab etiladi",
+      "selectCenterFirst": "Iltimos, avval markaz yarating",
+      "uploadFailed": "Rasm yuklanmadi. Iltimos, qayta urinib ko'ring.",
+      "centerFailed": "Markaz yaratish muvaffaqiyatsiz tugadi.",
+      "branchFailed": "Filial yaratish muvaffaqiyatsiz tugadi. Iltimos, qayta urinib ko'ring."
+    },
+    "success": {
+      "centerCreated": "Markaz va asosiy filial muvaffaqiyatli yaratildi!",
+      "branchAdded": "Filial muvaffaqiyatli qo'shildi!"
+    }
+  },
+  "favorites": {
+    "hero": {
+      "subtitle": "Sevimli o'quv markazlarini kashf eting",
+      "title": "Sevimli markazlar",
+      "homeLink": "Bosh sahifa",
+      "favoritesLink": "Sevimlilar"
+    },
+    "loading": "Yuklanmoqda...",
+    "empty": "Hali hech qanday markazni yoqtirmagansiz.",
+    "centerCard": {
+      "rating": "Reyting",
+      "defaultPhone": "+998 (XX) XXX-XXXX",
+      "viewDetails": "Batafsil"
+    }
+  },
+  "branchDetail": {
+    "backButton": "Markazga qaytish",
+    "imageAlt": "{name} filiali",
+    "imageNotAvailable": "Rasm mavjud emas",
+    "noImage": "Rasm kiritilmagan",
+    "addressLabel": "Manzil",
+    "addressNotSpecified": "Ko'rsatilmagan",
+    "phoneLabel": "Telefon",
+    "emailLabel": "Elektron pochta",
+    "websiteLabel": "Veb-sayt",
+    "workingHoursLabel": "Ish vaqtlari",
+    "loading": "Yuklanmoqda...",
+    "error": "Filial ma'lumotlarini yuklab bo'lmadi",
+    "goBack": "Orqaga",
+    "notFound": "Filial topilmadi"
+  }
 }

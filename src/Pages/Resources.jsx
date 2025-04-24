@@ -8,6 +8,14 @@ import { AuthContext } from "../context/auth";
 import { toast } from "sonner";
 import "react-toastify/dist/ReactToastify.css";
 import { motion } from 'framer-motion';
+import {
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Button,
+  Typography,
+} from "@material-tailwind/react";
 
 const API_BASE_URL = "https://findcourse.net.uz/api/resources";
 const CATEGORIES_URL = "https://findcourse.net.uz/api/categories";
@@ -18,6 +26,8 @@ export const Resources = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+const [resourceToDelete, setResourceToDelete] = useState(null);
   const [newResource, setNewResource] = useState({
     categoryId: 1,
     name: "",
@@ -259,27 +269,28 @@ export const Resources = () => {
     }
   };
 
-  const handleDelete = async (resourceId) => {
-    if (!confirm("Are you sure you want to delete this resource?")) return;
-
+  const handleDelete = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-      const response = await fetch(`${API_BASE_URL}/${resourceId}`, {
+      const response = await fetch(`${API_BASE_URL}/${resourceToDelete}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
         },
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to delete resource");
       }
-
-      setResources(resources.filter(r => r.id !== resourceId));
+  
+      setResources(resources.filter(r => r.id !== resourceToDelete));
       toast.success("Resource deleted successfully");
     } catch (error) {
       console.error("Error deleting resource:", error);
       toast.error(error.message);
+    } finally {
+      setOpenDeleteDialog(false);
+      setResourceToDelete(null);
     }
   };
 
@@ -690,7 +701,10 @@ export const Resources = () => {
                     <div className="flex space-x-2">
                       {isUserResource(resource) && (
                         <button
-                          onClick={() => handleDelete(resource.id)}
+                        onClick={() => {
+                          setResourceToDelete(resource.id);
+                          setOpenDeleteDialog(true);
+                        }}
                           className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700"
                         >
                           <FaTrash className="mr-1" /> {t("Resources.delete")}
@@ -739,6 +753,34 @@ export const Resources = () => {
           )}
         </div>
       </div>
+
+      <Dialog open={openDeleteDialog} handler={() => setOpenDeleteDialog(false)}>
+  <DialogHeader>{t("Resources.confirmDeleteTitle") || "Confirm Deletion"}</DialogHeader>
+  <DialogBody>
+    <Typography variant="paragraph" color="blue-gray">
+      {t("Resources.confirmDeleteMessage") || "Are you sure you want to delete this resource? This action cannot be undone."}
+    </Typography>
+  </DialogBody>
+  <DialogFooter>
+    <Button
+      variant="text"
+      color="blue-gray"
+      onClick={() => setOpenDeleteDialog(false)}
+      className="mr-2"
+    >
+      {t("Resources.cancel") || "Cancel"}
+    </Button>
+    <Button
+      variant="gradient"
+      color="red"
+      onClick={handleDelete}
+      className="flex items-center gap-2 bg-red-700"
+    >
+      <FaTrash className="h-4 w-4" />
+      {t("Resources.confirm") || "Delete"}
+    </Button>
+  </DialogFooter>
+</Dialog>
     </div>
   );
 };

@@ -12,6 +12,7 @@ import {
   Button,
   Typography,
 } from "@material-tailwind/react";
+import { useTranslation } from 'react-i18next';
 
 const API_BASE = "https://findcourse.net.uz/api";
 const ImageApi = `${API_BASE}/image`;
@@ -19,7 +20,7 @@ const ImageApi = `${API_BASE}/image`;
 const CenterEditForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   // Center state
   const [center, setCenter] = useState(null);
   const [newCenterData, setNewCenterData] = useState({

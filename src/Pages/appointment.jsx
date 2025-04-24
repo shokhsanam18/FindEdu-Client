@@ -12,12 +12,13 @@ import {
   DialogFooter,
   Button,
 } from "@material-tailwind/react";
+import { useTranslation } from 'react-i18next';
 
 export const Appointment = () => {
   const { deleteReception } = useReceptionStore();
   const { user, fetchUserData } = useAuthStore();
   const { regions, fetchData } = useCardStore();
-
+  const { t } = useTranslation();
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
 
