@@ -33,18 +33,13 @@ const CenterEditForm = () => {
   const [branchFormData, setBranchFormData] = useState({
     name: "",
     phone: "",
-    regionId: "",
     address: "",
     image: null
   });
   const [branchPreviewUrl, setBranchPreviewUrl] = useState(null);
   const [branchImageFile, setBranchImageFile] = useState(null);
 
-  // Regions state
-  const [regions, setRegions] = useState([]);
-  const [regionNames, setRegionNames] = useState({});
-
-  // Fetch center, branches, and regions
+  // Fetch center and branches
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -84,20 +79,6 @@ const CenterEditForm = () => {
           headers: { Authorization: `Bearer ${accessToken}` }
         });
         setBranches(branchesRes.data?.data || []);
-
-        // Fetch all regions
-        const regionsRes = await axios.get(`${API_BASE}/regions/search`, {
-          headers: { Authorization: `Bearer ${accessToken}` }
-        });
-        const regionsData = regionsRes.data?.data || [];
-        setRegions(regionsData);
-
-        // Create a mapping of region IDs to names
-        const namesMap = {};
-        regionsData.forEach(region => {
-          namesMap[region.id] = region.name;
-        });
-        setRegionNames(namesMap);
 
       } catch (err) {
         setError("Failed to load data");
@@ -271,7 +252,6 @@ const CenterEditForm = () => {
     setBranchFormData({
       name: autoName,
       phone: "",
-      regionId: defaultRegionId,
       address: "",
       image: null,
     });
@@ -285,7 +265,6 @@ const CenterEditForm = () => {
     setBranchFormData({
       name: branch.name || "",
       phone: branch.phone || "",
-      regionId: branch.regionId || (regions.length > 0 ? regions[0].id : ""),
       address: branch.address || "",
       image: branch.image || null
     });
@@ -325,7 +304,6 @@ const CenterEditForm = () => {
       const branchData = {
         name: branchFormData.name,
         phone: branchFormData.phone,
-        regionId: branchFormData.regionId,
         address: branchFormData.address
       };
 
@@ -462,7 +440,7 @@ const CenterEditForm = () => {
   return (
     <div className="min-h-screen bg-gray-100 pt-20 pb-10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
+        <div className="mb-6 mt-8">
           <Link
             to={`/centers/${id}`}
             className="inline-flex items-center text-[#441774] hover:text-purple-800 transition-colors"
@@ -667,23 +645,7 @@ const CenterEditForm = () => {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                       />
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Region</label>
-                      <select
-                        name="regionId"
-                        value={branchFormData.regionId}
-                        onChange={handleBranchChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                      >
-                        {regions.map(region => (
-                          <option key={region.id} value={region.id}>
-                            {region.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
+                    
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                       <input
@@ -786,7 +748,6 @@ const CenterEditForm = () => {
                         <h3 className="font-semibold text-lg text-gray-800">{branch.name}</h3>
                         <p className="text-gray-600">{branch.address}</p>
                         <p className="text-gray-600">{branch.phone}</p>
-                        <p className="text-gray-600">Region: {regionNames[branch.regionId] || branch.regionId}</p>
                       </div>
                       <div className="flex space-x-2">
                         <button

@@ -22,10 +22,11 @@ import FormTry from "./Register/Login/Register.jsx";
 import { Centers } from "./Pages/Centers.jsx";
 import BranchDetails from "./Pages/Branches";
 import { Toaster } from "sonner";
-
+import Profile from "./Pages/Profile";
+import './i18Next/i18n'; 
 function App() {
   const autoRefreshToken = useAuthStore((state) => state.autoRefreshToken);
-
+// dd
   useEffect(() => {
     autoRefreshToken();
   }, [autoRefreshToken]);
@@ -47,6 +48,8 @@ function App() {
             <Route path="/MyCenters" element={<Centers />} />
             <Route path="/ceo/edit/:id" element={<CenterEditForm />} />
             <Route path="/branches/:id" element={<BranchDetails />} />
+            <Route path="/profile" element={<Profile />} />
+
           </Route>
           <Route path="/Register" element={<FormTry />} />
           <Route path="/Login" element={<Login />} />

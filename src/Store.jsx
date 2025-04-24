@@ -9,7 +9,55 @@ export const useAuthStore = create((set, get) => ({
   accessToken: localStorage.getItem("accessToken") || null,
   refreshToken: localStorage.getItem("refreshToken") || null,
   profileImageUrl: null,
+// Add these to your useAuthStore in Store.js
+updateUser: async (userId, userData) => {
+  try {
+    const token = await get().refreshTokenFunc(false);
+    if (!token) {
+      toast.error("Please log in to update profile");
+      return;
+    }
 
+    const { data } = await axios.patch(
+      `${API_BASE}/users/${userId}`,
+      userData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    toast.success("Profile updated successfully");
+    await get().fetchUserData(); // Refresh user data
+    return data;
+  } catch (error) {
+    console.error("Update user error:", error);
+    toast.error(error.response?.data?.message || "Failed to update profile");
+    throw error;
+  }
+},
+
+uploadImage: async (formData) => {
+  try {
+    const token = await get().refreshTokenFunc(false);
+    if (!token) {
+      toast.error("Please log in to upload image");
+      return;
+    }
+
+    const { data } = await axios.post(`${API_BASE}/upload`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.error("Image upload error:", error);
+    toast.error(error.response?.data?.message || "Failed to upload image");
+    throw error;
+  }
+},
   fetchUserData: async () => {
     try {
       const token = await get().refreshTokenFunc(false); // don't logout immediately on missing token
