@@ -476,9 +476,39 @@ export default function Navbar() {
             {/* Language Selector */}
             <div className="relative group mt-2">
             <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 text-xl">
-              {i18n.language === 'en' && '🇬🇧'}
-              {i18n.language === 'ru' && '🇷🇺'}
-              {i18n.language === 'uz' && '🇺🇿'}
+            {i18n.language === 'en' && (
+  <ReactCountryFlag 
+    countryCode="GB" 
+    svg 
+    style={{ 
+      width: '1.5em', 
+      height: '1.5em',
+      marginRight: '8px'
+    }} 
+  />
+)}
+{i18n.language === 'ru' && (
+  <ReactCountryFlag 
+    countryCode="RU" 
+    svg 
+    style={{ 
+      width: '1.5em', 
+      height: '1.5em',
+      marginRight: '8px'
+    }} 
+  />
+)}
+{i18n.language === 'uz' && (
+  <ReactCountryFlag 
+    countryCode="UZ" 
+    svg 
+    style={{ 
+      width: '1.5em', 
+      height: '1.5em',
+      marginRight: '8px'
+    }} 
+  />
+)}
               {t(`navbar.languages.${i18n.language}`)}
               <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
             </button>
