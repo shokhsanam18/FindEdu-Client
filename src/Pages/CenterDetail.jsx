@@ -25,11 +25,13 @@ import {
   PencilLine,
 } from "lucide-react";
 import { useLikedStore, useCommentStore, useAuthStore, useReceptionStore } from "../Store";
+import { useTranslation } from "react-i18next";
 
 const API_BASE = "https://findcourse.net.uz";
 const ImageApi = `${API_BASE}/api/image`;
 
 const CenterDetail = () => {
+    const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [center, setCenter] = useState(null);
@@ -293,13 +295,13 @@ const CenterDetail = () => {
     <div className="min-h-screen bg-gray-100 mt-22 md:mt-20">
       {/* Back button */}
       <div className="container mx-auto px-4 mt-8 text-xl">
-        <Link
-          to="/"
-          className="inline-flex items-center text-[#441774] hover:text-purple-800"
-        >
-          <ArrowLeft className="h-5 w-5 mr-2" />
-          Back to Centers
-        </Link>
+      <Link
+  to="/"
+  className="inline-flex items-center text-[#441774] hover:text-purple-800"
+>
+  <ArrowLeft className="h-5 w-5 mr-2" />
+  {t("centerDetail.backToCenters")}
+</Link>
       </div>
 
       {/* Main content */}
@@ -346,8 +348,8 @@ const CenterDetail = () => {
 
             {/* Branches section */}
             <div className="p-4 bg-white border-t">
-              <h3 className="font-medium text-xl mb-3">Our Branches</h3>
-              <div className="space-y-3">
+            <h3 className="font-medium text-xl mb-3">{t("centerDetail.ourBranches")}</h3>
+            <div className="space-y-3">
                 {branches.map((branch) => (
                   <div
                     key={branch.id}
@@ -364,10 +366,10 @@ const CenterDetail = () => {
               </div>
             </div>
             <div className="mt-5 mb-10">
-              <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6 px-5">
-                <GraduationCap className="h-5 w-5 mr-2" />
-                Available Courses
-              </h2>
+            <h2 className="text-xl font-semibold text-gray-900 flex items-center mb-6 px-5">
+  <GraduationCap className="h-5 w-5 mr-2" />
+  {t("centerDetail.availableCourses")}
+</h2>
 
               <div className="gap-2 px-5 flex flex-row flex-wrap">
                 {center.majors.map(
@@ -404,19 +406,19 @@ const CenterDetail = () => {
                 )}
               </div>
               <div className="mt-5 px-5">
-                <button
-                  onClick={() => {
-                    if (!user || !user?.data?.id) {
-                      toast.warning("Please login to register for a class.");
-                      return;
-                    }
-                    setShowReservationModal(true);
-                  }}
-                  className="px-[20px] py-3 text-lg justify-center bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
-                >
-                  <Clock className="h-5 w-5 mr-2" />
-                  Register for a Class
-                </button>
+              <button
+  onClick={() => {
+    if (!user || !user?.data?.id) {
+      toast.warning(t("centerDetail.loginToRegister"));
+      return;
+    }
+    setShowReservationModal(true);
+  }}
+  className="px-[20px] py-3 text-lg justify-center bg-[#441774] text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center shadow-md"
+>
+  <Clock className="h-5 w-5 mr-2" />
+  {t("centerDetail.registerForClass")}
+</button>
               </div>
             </div>
           </div>
@@ -479,8 +481,8 @@ const CenterDetail = () => {
 
                 {/* Description */}
                 <div className="mt-8">
-                  <h2 className="text-xl font-semibold text-gray-900">About</h2>
-                  <p className="mt-4 text-gray-600 leading-relaxed">
+                <h2 className="text-xl font-semibold text-gray-900">{t("centerDetail.about")}</h2>
+                <p className="mt-4 text-gray-600 leading-relaxed">
                     {center.description ||
                       "No description available for this center."}
                   </p>
@@ -489,10 +491,10 @@ const CenterDetail = () => {
 
               {/* Comments section */}
               <div className="mt-10">
-                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                  <MessageSquare className="h-5 w-5 mr-2" />
-                  Comments ({comments.length})
-                </h2>
+              <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+  <MessageSquare className="h-5 w-5 mr-2" />
+  {t("centerDetail.comments")} ({comments.length})
+</h2>
 
                 {/* Comment form */}
                 <form onSubmit={handleCommentSubmit} className="mt-4">
@@ -502,14 +504,13 @@ const CenterDetail = () => {
                       onChange={(e) =>
                         setNewComment({ ...newComment, text: e.target.value })
                       }
-                      placeholder="Share your thoughts about this center..."
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder={t("centerDetail.shareThoughts")}                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       rows={3}
                       disabled={isCommenting}
                     />
                     <div className="flex items-center">
-                      <span className="mr-2">Rating:</span>
-                      {[1, 2, 3, 4, 5].map((star) => (
+                    <span className="mr-2">{t("centerDetail.rating")}</span>
+                                          {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           type="button"
                           key={star}
@@ -533,17 +534,16 @@ const CenterDetail = () => {
                       disabled={!newComment.text.trim() || isCommenting}
                       className="self-end px-4 py-2 bg-[#441774] text-white rounded-lg hover:bg-purple-700 disabled:bg-purple-400"
                     >
-                      {isCommenting ? "Posting..." : "Post Comment"}
-                    </button>
+  {isCommenting ? t("centerDetail.posting") : t("centerDetail.postComment")}
+  </button>
                   </div>
                 </form>
 
                 {/* Comments list */}
                 <div className="mt-6 space-y-4">
                   {comments.length === 0 ? (
-                    <p className="text-gray-500">
-                      No comments yet. Be the first to share your thoughts!
-                    </p>
+                    <p className="text-gray-500">{t("centerDetail.noComments")}</p>
+
                   ) : (
                     comments
                       .slice()
@@ -689,8 +689,8 @@ const CenterDetail = () => {
               {/* Modal header */}
               <div className="p-6 bg-[#441774] text-white">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-bold">Class Registration</h3>
-                  <button
+                <h3 className="text-xl font-bold">{t("centerDetail.classRegistration")}</h3>
+                <button
                     onClick={() => {
                       setShowReservationModal(false);
                       setReservationError(null);
@@ -702,8 +702,8 @@ const CenterDetail = () => {
                   </button>
                 </div>
                 <p className="mt-1 text-sm opacity-90">
-                  Select your preferred date and time
-                </p>
+  {t("centerDetail.selectDateTime")}
+</p>
               </div>
 
               {/* Modal body */}
@@ -740,13 +740,13 @@ const CenterDetail = () => {
                       })}
                     </p>
                     <div className="mt-4 space-y-2">
-                      <p className="text-sm font-medium">Selected Branch:</p>
+                    <p className="text-sm font-medium">{t("centerDetail.selectedBranch")}</p>
                       <p className="text-sm text-gray-600">
                         {selectedBranch?.name}, {selectedBranch?.address}
                       </p>
                       <p className="text-sm font-medium mt-2">
-                        Selected Major:
-                      </p>
+    {t("centerDetail.selectedMajor")}
+  </p>
                       <p className="text-sm text-gray-600">
                         {selectedMajor?.name}
                       </p>
@@ -757,8 +757,9 @@ const CenterDetail = () => {
                     <div className="space-y-6">
                       {/* Branch Dropdown */}
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Select Branch</label>
-                        <select
+                      <label className="text-sm font-medium text-gray-700">
+  {t("centerDetail.selectBranch")}
+</label>                        <select
                           value={selectedBranch?.id}
                           onChange={(e) => {
                             const selected = branches.find((b) => b.id.toString() === e.target.value);
@@ -776,8 +777,9 @@ const CenterDetail = () => {
 
                       {/* Major Dropdown */}
                       <div className="mt-4">
-                        <label className="text-sm font-medium text-gray-700">Select Major</label>
-                        <select
+                      <label className="text-sm font-medium text-gray-700">
+  {t("centerDetail.selectMajor")}
+</label>                        <select
                           value={selectedMajor?.id}
                           onChange={(e) => {
                             const selected = center.majors.find((m) => m.id.toString() === e.target.value);
@@ -797,9 +799,9 @@ const CenterDetail = () => {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Date Picker */}
                         <div>
-                          <label htmlFor="visitDay" className="block text-sm font-medium text-gray-700 mb-1">
-                            Select Date
-                          </label>
+                        <label htmlFor="visitDay" className="block text-sm font-medium text-gray-700 mb-1">
+  {t("centerDetail.selectDate")}
+</label>
                           <input
                             type="date"
                             id="visitDay"
@@ -813,9 +815,10 @@ const CenterDetail = () => {
 
                         {/* Time Picker */}
                         <div>
-                          <label htmlFor="visitHour" className="block text-sm font-medium text-gray-700 mb-1">
-                            Select Time
-                          </label>
+
+                        <label htmlFor="visitHour" className="block text-sm font-medium text-gray-700 mb-1">
+  {t("centerDetail.selectTime")}
+</label>
                           <select
                             id="visitHour"
                             value={visitHour}
@@ -851,7 +854,7 @@ const CenterDetail = () => {
                           }}
                           className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                          Cancel
+                          {t("centerDetail.cancel")}
                         </button>
                         <button
                           onClick={async (e) => {

@@ -312,7 +312,7 @@ export const Cards = () => {
               {t('ceo.subtitle')}
             </p>
 
-            <h1 className="text-4xl md:text-7xl font-bold">
+            <h1 className="text-2xl md:text-5xl font-bold">
               {t('ceo.title')}
             </h1>
           </motion.div>
@@ -321,7 +321,7 @@ export const Cards = () => {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-xl mt-4 md:mt-0"
+            className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-6 md:mr-10 md:text-lg mt-4 md:mt-0"
           >
             <div className="flex gap-2">
               <Link to="/" className="no-underline hover:underline text-white">
