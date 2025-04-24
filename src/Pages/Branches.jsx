@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MapPin, Phone, ArrowLeft, Clock, Mail, Globe, Map } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 const BranchDetail = () => {
   const { id } = useParams();
@@ -12,7 +13,7 @@ const BranchDetail = () => {
   const [error, setError] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [imageError, setImageError] = useState(false);
-
+  const { t } = useTranslation();
   useEffect(() => {
     const fetchBranch = async () => {
       try {
@@ -74,7 +75,7 @@ const BranchDetail = () => {
           onClick={() => navigate(-1)}
           className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
         >
-          Go back
+          {t("branchDetail.goBack")}
         </button>
       </div>
     );
@@ -83,12 +84,12 @@ const BranchDetail = () => {
   if (!branch) {
     return (
       <div className="container mx-auto p-4 mt-8 text-center">
-        <p>Branch not found</p>
+        <p>{t("branchDetail.notFound")}</p>
         <button 
           onClick={() => navigate(-1)}
           className="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
         >
-          Go back
+          {t("branchDetail.goBack")}
         </button>
       </div>
     );
@@ -101,7 +102,7 @@ const BranchDetail = () => {
         className="flex items-center text-purple-600 hover:text-purple-800 mb-6 transition"
       >
         <ArrowLeft className="h-5 w-5 mr-2" />
-        Back to Center
+        {t("branchDetail.backButton")}
       </Link>
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -117,9 +118,9 @@ const BranchDetail = () => {
         ) : (
           <div className="w-full h-64 bg-gray-200 flex items-center justify-center">
             {imageError ? (
-              <p className="text-gray-500">Image not available</p>
+              <p className="text-gray-500">{t("branchDetail.imageNotAvailable")}</p>
             ) : (
-              <p className="text-gray-500">No image provided</p>
+              <p className="text-gray-500">{t("branchDetail.noImage")}</p>
             )}
           </div>
         )}
@@ -145,8 +146,8 @@ const BranchDetail = () => {
             <div className="flex items-start">
               <MapPin className="h-5 w-5 mr-3 mt-1 text-purple-600 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-gray-700">Address</h3>
-                <p className="text-gray-600">{branch.address || "Not specified"}</p>
+                <h3 className="font-semibold text-gray-700">{t("branchDetail.addressLabel")}</h3>
+                <p className="text-gray-600">{branch.address || t("branchDetail.addressNotSpecified")}</p>
               </div>
             </div>
 
@@ -155,7 +156,7 @@ const BranchDetail = () => {
               <div className="flex items-start">
                 <Phone className="h-5 w-5 mr-3 mt-1 text-purple-600 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-gray-700">Phone</h3>
+                  <h3 className="font-semibold text-gray-700">{t("branchDetail.phoneLabel")}</h3>
                   <a 
                     href={`tel:${branch.phone}`} 
                     className="text-purple-600 hover:underline"
@@ -171,7 +172,7 @@ const BranchDetail = () => {
               <div className="flex items-start">
                 <Mail className="h-5 w-5 mr-3 mt-1 text-purple-600 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-gray-700">Email</h3>
+                  <h3 className="font-semibold text-gray-700">{t("branchDetail.emailLabel")}</h3>
                   <a 
                     href={`mailto:${branch.email}`} 
                     className="text-purple-600 hover:underline"
@@ -187,7 +188,7 @@ const BranchDetail = () => {
               <div className="flex items-start">
                 <Globe className="h-5 w-5 mr-3 mt-1 text-purple-600 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-gray-700">Website</h3>
+                  <h3 className="font-semibold text-gray-700">{t("branchDetail.websiteLabel")}</h3>
                   <a 
                     href={branch.website.startsWith('http') ? branch.website : `https://${branch.website}`}
                     target="_blank"
@@ -205,7 +206,7 @@ const BranchDetail = () => {
               <div className="flex items-start">
                 <Clock className="h-5 w-5 mr-3 mt-1 text-purple-600 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-gray-700">Working Hours</h3>
+                  <h3 className="font-semibold text-gray-700">{t("branchDetail.workingHoursLabel")}</h3>
                   <p className="text-gray-600">{branch.workingHours}</p>
                 </div>
               </div>

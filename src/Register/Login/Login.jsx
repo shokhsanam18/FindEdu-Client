@@ -24,8 +24,8 @@ import { Eye, EyeOff } from "lucide-react";
 const API_BASE = "https://findcourse.net.uz";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Invalid email" }),
-  password: z.string().min(6, { message: "Min 6 characters" }),
+  email: z.string().trim().email({ message: "Invalid email" }),
+  password: z.string().trim().min(6, { message: "Min 6 characters" }),
 });
 
 const Login = () => {

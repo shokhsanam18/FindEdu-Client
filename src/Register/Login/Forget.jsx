@@ -21,7 +21,7 @@ import { Button } from "../../components/ui/button";
 const API_BASE = "https://findcourse.net.uz/api/users";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Invalid email" }),
+  email: z.string().trim().email({ message: "Invalid email" }),
 });
 
 const Forget = () => {

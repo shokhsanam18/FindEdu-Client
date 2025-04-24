@@ -4,6 +4,15 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { ArrowLeftIcon, MapPinIcon, TrashIcon, PencilIcon, PlusIcon } from "@heroicons/react/24/outline";
+import {
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Button,
+  Typography,
+} from "@material-tailwind/react";
+import { useTranslation } from 'react-i18next';
 
 const API_BASE = "https://findcourse.net.uz/api";
 const ImageApi = `${API_BASE}/image`;
@@ -11,7 +20,7 @@ const ImageApi = `${API_BASE}/image`;
 const CenterEditForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   // Center state
   const [center, setCenter] = useState(null);
   const [newCenterData, setNewCenterData] = useState({
@@ -20,6 +29,8 @@ const CenterEditForm = () => {
     phone: "",
   });
   const [imageFile, setImageFile] = useState(null);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [branchToDelete, setBranchToDelete] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -159,15 +170,14 @@ const CenterEditForm = () => {
 
       // Build payload with only changed fields
       const payload = {};
-      if (newCenterData.name.trim() !== center.name.trim()) {
-        payload.name = newCenterData.name.trim();
+      if (newCenterData.name.trimEnd() !== center.name.trim()) {
+        payload.name = newCenterData.name.trimEnd();
       }
-      if (newCenterData.address.trim() !== center.address.trim()) {
-        payload.address = newCenterData.address.trim();
+      if (newCenterData.phone.replace(/\s+/g, '') !== center.phone.replace(/\s+/g, '')) {
+        payload.phone = newCenterData.phone.replace(/\s+/g, '');
       }
-
-      if (newCenterData.phone.trim() !== center.phone.trim()) {
-        payload.phone = newCenterData.phone.trim();
+      if (newCenterData.address.trimEnd() !== center.address.trim()) {
+        payload.address = newCenterData.address.trimEnd();
       }
       if (uploadedImageFilename) payload.image = uploadedImageFilename;
 
@@ -344,18 +354,15 @@ const CenterEditForm = () => {
       // Prepare branch data
       const branchData = {};
 
-      if (!editingBranchId || branchFormData.name.trim() !== originalBranch?.name?.trim()) {
-        branchData.name = branchFormData.name.trim();
+      if (!editingBranchId || branchFormData.name.trimEnd() !== originalBranch?.name?.trim()) {
+        branchData.name = branchFormData.name.trimEnd();
       }
-
-      if (!editingBranchId || branchFormData.phone.trim() !== originalBranch?.phone?.trim()) {
-        branchData.phone = branchFormData.phone.trim();
+      if (!editingBranchId || branchFormData.phone.replace(/\s+/g, '') !== originalBranch?.phone?.replace(/\s+/g, '')) {
+        branchData.phone = branchFormData.phone.replace(/\s+/g, '');
       }
-
-      if (!editingBranchId || branchFormData.address.trim() !== originalBranch?.address?.trim()) {
-        branchData.address = branchFormData.address.trim();
+      if (!editingBranchId || branchFormData.address.trimEnd() !== originalBranch?.address?.trim()) {
+        branchData.address = branchFormData.address.trimEnd();
       }
-
       if (uploadedImageFilename) {
         branchData.image = uploadedImageFilename;
       }
@@ -442,11 +449,12 @@ const CenterEditForm = () => {
     }
   };
 
-  const handleDeleteBranch = async (branchId) => {
-    if (!window.confirm("Are you sure you want to delete this branch?")) {
-      return;
-    }
+  const handleDeleteBranch = (branchId) => {
+    setBranchToDelete(branchId);
+    setOpenDeleteDialog(true);
+  };
 
+  const confirmDeleteBranch = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
@@ -454,34 +462,27 @@ const CenterEditForm = () => {
         return;
       }
 
-      await axios.delete(`${API_BASE}/filials/${branchId}`, {
+      await axios.delete(`${API_BASE}/filials/${branchToDelete}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
 
       toast.success("Branch deleted successfully!");
+      setOpenDeleteDialog(false);
+      setBranchToDelete(null);
 
-      // Refresh branches list
-      const branchesRes = await axios.get(`${API_BASE}/filials`, {
+      // Refresh list
+      const res = await axios.get(`${API_BASE}/filials`, {
         params: { centerId: id },
-        headers: { Authorization: `Bearer ${accessToken}` }
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
-      setBranches(branchesRes.data?.data || []);
 
+      setBranches(res.data?.data || []);
     } catch (err) {
       console.error("Error deleting branch:", err);
-      let errorMessage = "Failed to delete branch.";
-
-      if (err.response) {
-        if (err.response.status === 401) {
-          errorMessage = "Unauthorized - Please login again.";
-        } else if (err.response.data?.message) {
-          errorMessage = err.response.data.message;
-        }
-      }
-
-      toast.error(errorMessage);
+      toast.error("Failed to delete branch.");
+      setOpenDeleteDialog(false);
     }
   };
 
@@ -859,6 +860,34 @@ const CenterEditForm = () => {
           </div>
         </motion.div>
       </div>
+
+      <Dialog open={openDeleteDialog} handler={() => setOpenDeleteDialog(false)}>
+        <DialogHeader>Delete Branch</DialogHeader>
+        <DialogBody>
+          <Typography variant="paragraph" color="blue-gray">
+            Are you sure you want to delete this branch? This action cannot be undone.
+          </Typography>
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            variant="text"
+            color="blue-gray"
+            onClick={() => setOpenDeleteDialog(false)}
+            className="mr-2"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="gradient"
+            color="red"
+            onClick={confirmDeleteBranch}
+            className="flex items-center gap-2 bg-red-700"
+          >
+            <TrashIcon className="h-5 w-5" />
+            Delete
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </div>
   );
 };
