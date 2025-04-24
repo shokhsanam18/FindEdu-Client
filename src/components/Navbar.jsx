@@ -115,7 +115,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 py-4 px-[5%] flex flex-col gap-7 w-full z-40 bg-white shadow-md backdrop-blur-md">
+    <nav className="fixed top-0 left-0 py-4 px-[2%] flex flex-col gap-7 w-full z-40 bg-white shadow-md backdrop-blur-md">
       <div className="bg-white items-center justify-between flex">
         <div className="md:w-52 w-48 text-[#461773] lg:flex items-center hidden">
           <Link to="/" className="flex items-center">
@@ -183,9 +183,20 @@ export default function Navbar() {
           )}
 
           {user?.role === "CEO" && (
+            <div className="flex gap-4">
+                          <Link
+              to="/Appointment"
+              className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
+              onClick={() => window.scrollTo(0, 0)}
+            >
+              <CalendarIcon className="h-5 w-5" />
+              {t('navbar.appointments')}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
+            </Link>
             <div className="relative group">
+              
               <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300">
-                <ChartBarIcon className="h-5 w-5" />
+                {/* <ChartBarIcon className="h-5 w-5" /> */}
                 {t('navbar.ceo_dashboard')}
                 <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
               </button>
@@ -207,7 +218,7 @@ export default function Navbar() {
                   {t('navbar.my_centers')}
                 </Link>
               </div>
-            </div>
+            </div> </div>
           )}
         </div>
 <div className="flex flex-row gap-2">

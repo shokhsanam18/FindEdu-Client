@@ -258,6 +258,29 @@
       "error": "Не удалось загрузить информацию о филиале",
       "goBack": "Назад",
       "notFound": "Филиал не найден"
-    }
+    },
+    "appointments": {
+  "noAppointments": "У вас пока нет записей",
+  "bookNow": "Запишитесь на приём сейчас",
+  "unknownRegion": "Неизвестный регион",
+  "unknownCenter": "Неизвестный центр",
+  "unknownAddress": "Адрес не указан",
+  "unknownDate": "Дата не указана",
+  "unknownMajor": "Не указано",
+  "centerImageAlt": "Образовательный центр",
+  "address": "Адрес",
+  "visitDate": "Дата визита",
+  "major": "Направление",
+  "confirmDelete": "Подтвердите удаление",
+  "deleteConfirmationMessage": "Вы уверены, что хотите удалить эту запись?",
+  "deleteAppointment": "Удалить запись"
+},
+"common": {
+  "loading": "Загрузка...",
+  "delete": "Удалить",
+  "deleting": "Удаление...",
+  "cancel": "Отмена"
+}
+
   
 }

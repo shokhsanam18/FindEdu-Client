@@ -265,5 +265,36 @@
       "error": "Failed to load branch information",
       "goBack": "Go back",
       "notFound": "Branch not found"
+    },
+    "appointment": {
+    "hero": {
+      "title": "Your Appointments",
+      "subtitle": "Manage your education center visits",
+      "homeLink": "Home",
+      "favoritesLink": "Appointments"
     }
+  },
+  "appointments": {
+    "noAppointments": "You don't have any appointments yet",
+    "bookNow": "Book an appointment now",
+    "unknownRegion": "Unknown region",
+    "unknownCenter": "Unknown center",
+    "unknownAddress": "Address not specified",
+    "unknownDate": "Date not specified",
+    "unknownMajor": "Not specified",
+    "centerImageAlt": "Education center",
+    "address": "Address",
+    "visitDate": "Visit date",
+    "major": "Major",
+    "confirmDelete": "Confirm Deletion",
+    "deleteConfirmationMessage": "Are you sure you want to delete this appointment?",
+    "deleteAppointment": "Delete appointment"
+  },
+  "common": {
+    "loading": "Loading...",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "cancel": "Cancel"
+  }
+
 }
