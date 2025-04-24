@@ -11,13 +11,12 @@
 //     const handleResize = () => {
 //       if (window.innerWidth >= 720) closeSidebar();
 //     };
-  
+
 //     window.addEventListener("resize", handleResize);
-//     handleResize(); 
-  
+//     handleResize();
+
 //     return () => window.removeEventListener("resize", handleResize);
 //   }, [closeSidebar]);
-
 
 //   const pages = [
 //     {
@@ -87,14 +86,7 @@
 //     </>
 //   );
 // };
-
-
-
-
-
-
-
-
+import { useTranslation } from "react-i18next";
 import React, { useEffect } from "react";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -111,38 +103,37 @@ import {
 export const Sidebar = () => {
   const { isOpen, toggleSidebar, closeSidebar } = useSidebarSt();
   const user = useAuthStore((state) => state.user);
-
+  const { t } = useTranslation();
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 720) closeSidebar();
     };
-  
+
     window.addEventListener("resize", handleResize);
-    handleResize(); 
-  
+    handleResize();
+
     return () => window.removeEventListener("resize", handleResize);
   }, [closeSidebar]);
 
   const basePages = [
     {
-      title: "Home",
+      title: t("navbar.home"),
       href: "/",
       icon: null,
     },
     {
-      title: "About Us",
+      title: t("navbar.about"),
       href: "/About",
       icon: null,
     },
     {
-      title: "Resources",
+      title: t("navbar.resources"),
       href: "/Resources",
       icon: null,
     },
     {
-      title: "Favorites",
+      title: t("navbar.favorites"),
       href: "/Favorites",
-
     },
   ];
 
@@ -150,7 +141,7 @@ export const Sidebar = () => {
     ...(user?.role === "USER"
       ? [
           {
-            title: "My Appointments",
+            title: t("navbar.my_appointments"),
             href: "/Appointment",
             icon: <CalendarIcon className="h-5 w-5 mr-2" />,
           },
@@ -159,17 +150,17 @@ export const Sidebar = () => {
     ...(user?.role === "CEO"
       ? [
           {
-            title: "CEO Dashboard",
+            title: t("navbar.ceo_dashboard"),
             href: "#",
 
             subItems: [
               {
-                title: "Create Center",
+                title: t("ceo.title"),
                 href: "/Ceo",
                 icon: <PlusCircleIcon className="h-4 w-4 mr-2" />,
               },
               {
-                title: "My Centers",
+                title: t("navbar.my_centers"),
                 href: "/MyCenters",
                 icon: <BuildingOffice2Icon className="h-4 w-4 mr-2" />,
               },
