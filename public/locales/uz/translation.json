@@ -155,6 +155,17 @@
       "loginToRegister": "Darsga yozilish uchun iltimos, tizimga kiring.",
       "selectBothDateTime": "Iltimos, sana va 2 soatlik intervalni tanlang.",
       "registrationFailed": "Ro'yxatdan o'tish muvaffaqiyatsiz tugadi. Iltimos, qayta urinib ko'ring."
-    }
+    },     "footer": {
+      "math": "Matematika",
+      "marketing": "Marketing",
+      "english": "Ingliz tili",
+      "it": "IT",
+      "design": "Dizayn",
+      "business": " Biznes",
+      "centers": "O'quv Markazlar",
+      "contact": "Aloqa",
+      "comments": "Sharhlar",
+      "projects": "Loyihalar"
+          }
   
 }
