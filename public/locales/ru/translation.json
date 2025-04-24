@@ -260,29 +260,63 @@
       "error": "Не удалось загрузить информацию о филиале",
       "goBack": "Назад",
       "notFound": "Филиал не найден"
-    },
-    "appointments": {
-  "noAppointments": "У вас пока нет записей",
-  "bookNow": "Запишитесь на приём сейчас",
-  "unknownRegion": "Неизвестный регион",
-  "unknownCenter": "Неизвестный центр",
-  "unknownAddress": "Адрес не указан",
-  "unknownDate": "Дата не указана",
-  "unknownMajor": "Не указано",
-  "centerImageAlt": "Образовательный центр",
-  "address": "Адрес",
-  "visitDate": "Дата визита",
-  "major": "Направление",
-  "confirmDelete": "Подтвердите удаление",
-  "deleteConfirmationMessage": "Вы уверены, что хотите удалить эту запись?",
-  "deleteAppointment": "Удалить запись"
+    },"appointment": {
+  "hero": {
+    "title": "Uchrashuvlaringiz",
+    "subtitle": "Ta'lim markaziga tashriflaringizni boshqaring",
+    "homeLink": "Bosh sahifa",
+    "favoritesLink": "Uchrashuvlar"
+  }
+},
+"appointments": {
+  "noAppointments": "Sizda hali uchrashuvlar yo'q",
+  "bookNow": "Hozir uchrashuvni bron qiling",
+  "unknownRegion": "Noma'lum hudud",
+  "unknownCenter": "Noma'lum markaz",
+  "unknownAddress": "Manzil ko'rsatilmagan",
+  "unknownDate": "Sana ko'rsatilmagan",
+  "unknownMajor": "Ko'rsatilmagan",
+  "centerImageAlt": "Ta'lim markazi",
+  "address": "Manzil",
+  "visitDate": "Tashrif sanasi",
+  "major": "Yo'nalish",
+  "confirmDelete": "O'chirishni tasdiqlash",
+  "deleteConfirmationMessage": "Ushbu uchrashuvni o'chirishni xohlaysizmi?",
+  "deleteAppointment": "Uchrashuvni o'chirish"
 },
 "common": {
-  "loading": "Загрузка...",
-  "delete": "Удалить",
-  "deleting": "Удаление...",
-  "cancel": "Отмена"
-}
+  "loading": "Yuklanmoqda...",
+  "delete": "O'chirish",
+  "deleting": "O'chirilmoqda...",
+  "cancel": "Bekor qilish"
+},
 
-  
+  "centerEdit": {
+    "backToCenter": "Назад к деталям центра",
+    "editCenterInfo": "Редактировать информацию о центре",
+    "name": "Название",
+    "address": "Адрес",
+    "phone": "Телефон",
+    "saveChanges": "Сохранить изменения",
+    "processing": "Обработка...",
+    "branches": "Филиалы",
+    "addBranch": "Добавить филиал",
+    "editBranch": "Редактировать филиал",
+    "addNewBranch": "Добавить новый филиал",
+    "branchName": "Название филиала",
+    "manualName": "Разрешить ввод названия филиала вручную",
+    "phoneNumber": "Телефон",
+    "branchImage": "Изображение филиала",
+    "branchPreview": "Превью филиала",
+    "changeImage": "Изменить изображение",
+    "uploadImage": "Загрузить изображение",
+    "cancel": "Отмена",
+    "updateBranch": "Обновить филиал",
+    "createBranch": "Создать филиал",
+    "noBranches": "Для этого центра не найдено филиалов.",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "deleteBranch": "Удалить филиал",
+    "deleteConfirmation": "Вы уверены, что хотите удалить этот филиал? Это действие нельзя отменить."
+  }
 }
