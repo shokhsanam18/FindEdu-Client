@@ -30,15 +30,15 @@ export const Resources = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [categories, setCategories] = useState([]);
-const [resourceToDelete, setResourceToDelete] = useState(null);
-const [newResource, setNewResource] = useState({
-  categoryId: "", // Don't reference categories yet
-  name: "",
-  description: "",
-  media: "",
-  image: "",
-  imageFile: null,
-});
+  const [resourceToDelete, setResourceToDelete] = useState(null);
+  const [newResource, setNewResource] = useState({
+    categoryId: "", // Don't reference categories yet
+    name: "",
+    description: "",
+    media: "",
+    image: "",
+    imageFile: null,
+  });
   const [resources, setResources] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -143,7 +143,23 @@ const [newResource, setNewResource] = useState({
     fetchCategories();
   }, [activeFilter, searchTerm]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsModalOpen(false);
+      }
+    };
   
+    if (isModalOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+  
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isModalOpen]);
+
+
   useEffect(() => {
     if (categories.length > 0 && isModalOpen) {
       setNewResource(prev => ({
@@ -290,11 +306,11 @@ const [newResource, setNewResource] = useState({
           "Authorization": `Bearer ${token}`,
         },
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to delete resource");
       }
-  
+
       setResources(resources.filter(r => r.id !== resourceToDelete));
       toast.success("Resource deleted successfully");
     } catch (error) {
@@ -532,8 +548,14 @@ const [newResource, setNewResource] = useState({
 
           {/* Modal for Adding Resource */}
           {isModalOpen && (
-            <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-400 bg-opacity-50">
-              <div className="bg-white p-6 rounded-lg w-96">
+            <div
+              className="fixed inset-0 flex items-center justify-center z-50 bg-gray-400 bg-opacity-50"
+              onClick={() => setIsModalOpen(false)} // closes on backdrop click
+            >
+              <div
+                className="bg-white p-6 rounded-lg w-96"
+                onClick={(e) => e.stopPropagation()} // prevents modal clicks from closing it
+              >
                 <h2 className="text-xl font-semibold mb-4">{t("Resources.addNewResource")}</h2>
                 <form onSubmit={handleSubmit}>
                   {/* Category Selection */}
@@ -664,7 +686,7 @@ const [newResource, setNewResource] = useState({
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredResources.length > 0 ? (
               filteredResources.map((resource) => (
-                <div key={resource.id} className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow duration-300">
+                <div key={resource.id} className="flex flex-col h-full bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow duration-300">
                   {resource.image && (
                     <div className="h-48 overflow-hidden">
                       <img
@@ -674,7 +696,7 @@ const [newResource, setNewResource] = useState({
                       />
                     </div>
                   )}
-                  <div className="p-6">
+                  <div className="p-6 flex-1 flex flex-col justify-between">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="text-2xl">{getTypeIcon(resource.type)}</div>
@@ -713,10 +735,10 @@ const [newResource, setNewResource] = useState({
                     <div className="flex space-x-2">
                       {isUserResource(resource) && (
                         <button
-                        onClick={() => {
-                          setResourceToDelete(resource.id);
-                          setOpenDeleteDialog(true);
-                        }}
+                          onClick={() => {
+                            setResourceToDelete(resource.id);
+                            setOpenDeleteDialog(true);
+                          }}
                           className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700"
                         >
                           <FaTrash className="mr-1" /> {t("Resources.delete")}
@@ -767,32 +789,32 @@ const [newResource, setNewResource] = useState({
       </div>
 
       <Dialog open={openDeleteDialog} handler={() => setOpenDeleteDialog(false)}>
-  <DialogHeader>{t("Resources.confirmDeleteTitle") || "Confirm Deletion"}</DialogHeader>
-  <DialogBody>
-    <Typography variant="paragraph" color="blue-gray">
-      {t("Resources.confirmDeleteMessage") || "Are you sure you want to delete this resource? This action cannot be undone."}
-    </Typography>
-  </DialogBody>
-  <DialogFooter>
-    <Button
-      variant="text"
-      color="blue-gray"
-      onClick={() => setOpenDeleteDialog(false)}
-      className="mr-2"
-    >
-      {t("Resources.cancel") || "Cancel"}
-    </Button>
-    <Button
-      variant="gradient"
-      color="red"
-      onClick={handleDelete}
-      className="flex items-center gap-2 bg-red-700"
-    >
-      <FaTrash className="h-4 w-4" />
-      {t("Resources.confirm") || "Delete"}
-    </Button>
-  </DialogFooter>
-</Dialog>
+        <DialogHeader>{t("Resources.confirmDeleteTitle") || "Confirm Deletion"}</DialogHeader>
+        <DialogBody>
+          <Typography variant="paragraph" color="blue-gray">
+            {t("Resources.confirmDeleteMessage") || "Are you sure you want to delete this resource? This action cannot be undone."}
+          </Typography>
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            variant="text"
+            color="blue-gray"
+            onClick={() => setOpenDeleteDialog(false)}
+            className="mr-2"
+          >
+            {t("Resources.cancel") || "Cancel"}
+          </Button>
+          <Button
+            variant="gradient"
+            color="red"
+            onClick={handleDelete}
+            className="flex items-center gap-2 bg-red-700"
+          >
+            <FaTrash className="h-4 w-4" />
+            {t("Resources.confirm") || "Delete"}
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </div>
   );
 };
