@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useCardStore } from "../Store";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -45,11 +46,20 @@ const CenterEditForm = () => {
     name: "",
     phone: "",
     address: "",
-    image: null
+    image: null,
   });
   const [branchPreviewUrl, setBranchPreviewUrl] = useState(null);
   const [branchImageFile, setBranchImageFile] = useState(null);
   const [mainBranch, setMainBranch] = useState(null);
+
+
+  const { regions, fetchData } = useCardStore();
+
+  useEffect(() => {
+    if (regions.length === 0) {
+      fetchData(); // this fetches majors, regions, and centers
+    }
+  }, []);
 
   // Fetch center and branches
   useEffect(() => {
@@ -272,15 +282,18 @@ const CenterEditForm = () => {
   // Branch form handlers
   const handleBranchChange = (e) => {
     const { name, value } = e.target;
-
+  
     setBranchFormData((prev) => {
-      const updated = { ...prev, [name]: value };
-
+      const updated = {
+        ...prev,
+        [name]: name === "regionId" ? Number(value) : value, // 👈 convert regionId to number
+      };
+  
       if (name === "regionId" && !isManualBranchName) {
         const regionName = regions.find(r => r.id === Number(value))?.name || "";
         updated.name = regionName ? `${center.name} - ${regionName} branch` : `${center.name} branch`;
       }
-
+  
       return updated;
     });
   };
@@ -302,6 +315,7 @@ const CenterEditForm = () => {
       phone: "",
       address: "",
       image: null,
+      regionId: defaultRegionId,
     });
     setBranchPreviewUrl(null);
     setBranchImageFile(null);
@@ -402,7 +416,8 @@ const CenterEditForm = () => {
         } else {
           await axios.post(`${API_BASE}/filials`, {
             ...branchData,
-            centerId: id
+            centerId: Number(id),          // 👈 ensure centerId is number
+            regionId: branchFormData.regionId,  // 👈 required!
           }, {
             headers: {
               "Content-Type": "application/json",
@@ -719,6 +734,24 @@ const CenterEditForm = () => {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                       />
                     </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                      <select
+                        name="regionId"
+                        value={branchFormData.regionId}
+                        onChange={handleBranchChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                      >
+                        {regions.map(region => (
+                          <option key={region.id} value={region.id}>
+                            {region.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+
 
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
