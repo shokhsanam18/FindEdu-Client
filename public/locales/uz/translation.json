@@ -296,5 +296,39 @@
     "delete": "O'chirish",
     "deleting": "O'chirilmoqda...",
     "cancel": "Bekor qilish"
-  }
+  },
+  "centerEdit": {
+  "backToCenter": "Markaz tafsilotlariga qaytish",
+  "editCenterInfo": "Markaz ma'lumotlarini tahrirlash",
+  "name": "Nomi",
+  "address": "Manzil",
+  "phone": "Telefon raqami",
+  "saveChanges": "O'zgarishlarni saqlash",
+  "processing": "Qayta ishlanmoqda...",
+  "branches": "Filiallar",
+  "addBranch": "Filial qo‘shish",
+  "editBranch": "Filialni tahrirlash",
+  "addNewBranch": "Yangi filial qo‘shish",
+  "branchName": "Filial nomi",
+  "manualName": "Filial nomini o‘zim kiritaman",
+  "phoneNumber": "Telefon raqami",
+  "branchImage": "Filial rasmi",
+  "branchPreview": "Filial ko‘rinishi",
+  "changeImage": "Rasmni o‘zgartirish",
+  "uploadImage": "Rasm yuklash",
+  "cancel": "Bekor qilish",
+  "updateBranch": "Filialni yangilash",
+  "createBranch": "Filial yaratish",
+  "noBranches": "Ushbu markazga tegishli filiallar topilmadi.",
+  "edit": "Tahrirlash",
+  "delete": "O‘chirish",
+  "deleteBranch": "Filialni o‘chirish",
+  "deleteConfirmation": "Bu filialni o‘chirib tashlamoqchimisiz? Bu amalni qaytarib bo‘lmaydi.",
+  "proccessing": " Qayta ishlanmoqda...",
+  "title": "Filiallar",
+  "tryAgain": "Qaytadan urinib ko‘ring",
+  "error": "Xatolik",
+  "region": "Hudud"
+}
+
 }

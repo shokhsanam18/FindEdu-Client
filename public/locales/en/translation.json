@@ -332,7 +332,10 @@
       "edit": "Edit",
       "delete": "Delete",
       "deleteBranch": "Delete Branch",
-      "deleteConfirmation": "Are you sure you want to delete this branch? This action cannot be undone."
+      "deleteConfirmation": "Are you sure you want to delete this branch? This action cannot be undone.",
+      "tryAgain": "Try Again",
+      "error": "Error",
+      "region": "Region"
     }
   
 
