@@ -39,22 +39,46 @@ const Otp = () => {
 
   const handleOtpChange = (e, index) => {
     const value = e.target.value;
-    if (/[^0-9]/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    if (value && index < 4) {
-      inputRefs.current[index + 1].focus();
-    } else if (!value && index > 0) {
-      inputRefs.current[index - 1].focus();
+  
+    // Clear all on full paste
+    if (value.length === 5 && /^\d{5}$/.test(value)) {
+      const newOtp = value.split("");
+      setOtp(newOtp);
+      inputRefs.current[4].focus();
+      return;
+    }
+  
+    // Empty field (delete)
+    if (value === "") {
+      const newOtp = [...otp];
+      newOtp[index] = "";
+      setOtp(newOtp);
+      return;
+    }
+  
+    // Single digit input
+    if (/^\d$/.test(value)) {
+      const newOtp = [...otp];
+      newOtp[index] = value;
+      setOtp(newOtp);
+  
+      if (index < 4) {
+        inputRefs.current[index + 1].focus();
+      }
     }
   };
-
+  
   const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1].focus();
+    if (e.key === "Backspace") {
+      const newOtp = [...otp];
+      if (otp[index] === "") {
+        if (index > 0) {
+          inputRefs.current[index - 1].focus();
+        }
+      } else {
+        newOtp[index] = "";
+      }
+      setOtp(newOtp);
     }
   };
 
@@ -85,12 +109,28 @@ const Otp = () => {
     }
   };
 
+  const clearOtp = () => {
+    setOtp(["", "", "", "", ""]);
+    inputRefs.current[0]?.focus();
+  };
+  
   const resendOtp = async () => {
     try {
-      await axios.post(`${API_BASE}/resend-otp`, { email });
+      await axios.post(`${API_BASE}/send-otp`, { email });
       toast.success("New OTP sent to your email!");
+      clearOtp(); // 👈 Reset OTP input fields
     } catch (error) {
       toast.error("Failed to resend OTP. Please try again.");
+    }
+  };
+
+  const handleOtpPaste = (e) => {
+    const paste = e.clipboardData.getData("text");
+    if (/^\d{5}$/.test(paste)) {
+      const newOtp = paste.split("");
+      setOtp(newOtp);
+      inputRefs.current[4].focus(); // Focus last input
+      e.preventDefault(); // Stop default paste behavior
     }
   };
 
@@ -120,17 +160,18 @@ const Otp = () => {
           <div className="flex gap-3 justify-center mb-8">
             {otp.map((digit, index) => (
               <input
-                key={index}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleOtpChange(e, index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                ref={(el) => (inputRefs.current[index] = el)}
-                className="w-12 h-14 text-2xl text-center border-2 border-gray-300 rounded-lg 
-                          focus:border-[#461773] focus:ring-2 focus:ring-[#46177333]"
-              />
+              key={index}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={digit}
+              onChange={(e) => handleOtpChange(e, index)}
+              onPaste={(e) => handleOtpPaste(e)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
+              ref={(el) => (inputRefs.current[index] = el)}
+              className="w-12 h-14 text-2xl text-center border-2 border-gray-300 rounded-lg 
+                        focus:border-[#461773] focus:ring-2 focus:ring-[#46177333]"
+            />
             ))}
           </div>
 

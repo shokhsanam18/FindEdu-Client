@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useCardStore } from "../Store";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import {
   Button,
   Typography,
 } from "@material-tailwind/react";
+import { useTranslation } from 'react-i18next';
 
 const API_BASE = "https://findcourse.net.uz/api";
 const ImageApi = `${API_BASE}/image`;
@@ -19,7 +21,7 @@ const ImageApi = `${API_BASE}/image`;
 const CenterEditForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   // Center state
   const [center, setCenter] = useState(null);
   const [newCenterData, setNewCenterData] = useState({
@@ -44,11 +46,20 @@ const CenterEditForm = () => {
     name: "",
     phone: "",
     address: "",
-    image: null
+    image: null,
   });
   const [branchPreviewUrl, setBranchPreviewUrl] = useState(null);
   const [branchImageFile, setBranchImageFile] = useState(null);
   const [mainBranch, setMainBranch] = useState(null);
+
+
+  const { regions, fetchData } = useCardStore();
+
+  useEffect(() => {
+    if (regions.length === 0) {
+      fetchData(); // this fetches majors, regions, and centers
+    }
+  }, []);
 
   // Fetch center and branches
   useEffect(() => {
@@ -119,10 +130,10 @@ const CenterEditForm = () => {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB");
-      return;
-    }
+    // if (file.size > 5 * 1024 * 1024) {
+    //   toast.error("Image size should be less than 5MB");
+    //   return;
+    // }
 
     setImageFile(file);
 
@@ -169,15 +180,14 @@ const CenterEditForm = () => {
 
       // Build payload with only changed fields
       const payload = {};
-      if (newCenterData.name.trim() !== center.name.trim()) {
-        payload.name = newCenterData.name.trim();
+      if (newCenterData.name.trimEnd() !== center.name.trim()) {
+        payload.name = newCenterData.name.trimEnd();
       }
-      if (newCenterData.address.trim() !== center.address.trim()) {
-        payload.address = newCenterData.address.trim();
+      if (newCenterData.phone.replace(/\s+/g, '') !== center.phone.replace(/\s+/g, '')) {
+        payload.phone = newCenterData.phone.replace(/\s+/g, '');
       }
-
-      if (newCenterData.phone.trim() !== center.phone.trim()) {
-        payload.phone = newCenterData.phone.trim();
+      if (newCenterData.address.trimEnd() !== center.address.trim()) {
+        payload.address = newCenterData.address.trimEnd();
       }
       if (uploadedImageFilename) payload.image = uploadedImageFilename;
 
@@ -255,10 +265,10 @@ const CenterEditForm = () => {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB");
-      return;
-    }
+    // if (file.size > 5 * 1024 * 1024) {
+    //   toast.error("Image size should be less than 5MB");
+    //   return;
+    // }
 
     setBranchImageFile(file);
 
@@ -272,15 +282,18 @@ const CenterEditForm = () => {
   // Branch form handlers
   const handleBranchChange = (e) => {
     const { name, value } = e.target;
-
+  
     setBranchFormData((prev) => {
-      const updated = { ...prev, [name]: value };
-
+      const updated = {
+        ...prev,
+        [name]: name === "regionId" ? Number(value) : value, // 👈 convert regionId to number
+      };
+  
       if (name === "regionId" && !isManualBranchName) {
         const regionName = regions.find(r => r.id === Number(value))?.name || "";
         updated.name = regionName ? `${center.name} - ${regionName} branch` : `${center.name} branch`;
       }
-
+  
       return updated;
     });
   };
@@ -302,6 +315,7 @@ const CenterEditForm = () => {
       phone: "",
       address: "",
       image: null,
+      regionId: defaultRegionId,
     });
     setBranchPreviewUrl(null);
     setBranchImageFile(null);
@@ -354,18 +368,15 @@ const CenterEditForm = () => {
       // Prepare branch data
       const branchData = {};
 
-      if (!editingBranchId || branchFormData.name.trim() !== originalBranch?.name?.trim()) {
-        branchData.name = branchFormData.name.trim();
+      if (!editingBranchId || branchFormData.name.trimEnd() !== originalBranch?.name?.trim()) {
+        branchData.name = branchFormData.name.trimEnd();
       }
-
-      if (!editingBranchId || branchFormData.phone.trim() !== originalBranch?.phone?.trim()) {
-        branchData.phone = branchFormData.phone.trim();
+      if (!editingBranchId || branchFormData.phone.replace(/\s+/g, '') !== originalBranch?.phone?.replace(/\s+/g, '')) {
+        branchData.phone = branchFormData.phone.replace(/\s+/g, '');
       }
-
-      if (!editingBranchId || branchFormData.address.trim() !== originalBranch?.address?.trim()) {
-        branchData.address = branchFormData.address.trim();
+      if (!editingBranchId || branchFormData.address.trimEnd() !== originalBranch?.address?.trim()) {
+        branchData.address = branchFormData.address.trimEnd();
       }
-
       if (uploadedImageFilename) {
         branchData.image = uploadedImageFilename;
       }
@@ -405,7 +416,8 @@ const CenterEditForm = () => {
         } else {
           await axios.post(`${API_BASE}/filials`, {
             ...branchData,
-            centerId: id
+            centerId: Number(id),          // 👈 ensure centerId is number
+            regionId: branchFormData.regionId,  // 👈 required!
           }, {
             headers: {
               "Content-Type": "application/json",
@@ -501,13 +513,13 @@ const CenterEditForm = () => {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
-          <h2 className="text-2xl font-bold text-red-500 mb-4">Error</h2>
+          <h2 className="text-2xl font-bold text-red-500 mb-4">{t("centerEdit.error")}</h2>
           <p className="text-gray-700 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
           >
-            Try Again
+            {t("centerEdit.tryAgain")}
           </button>
         </div>
       </div>
@@ -523,7 +535,7 @@ const CenterEditForm = () => {
             className="inline-flex items-center text-[#441774] hover:text-purple-800 transition-colors"
           >
             <ArrowLeftIcon className="h-5 w-5 mr-2" />
-            Back to Center Details
+            {t("centerEdit.backToCenter")}
           </Link>
         </div>
 
@@ -589,7 +601,7 @@ const CenterEditForm = () => {
 
             {/* Form Section */}
             <div className="lg:w-3/5 xl:w-1/2 p-6 md:p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Edit Center Information</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("centerEdit.editCenterInfo")}</h2>
 
               <form className="space-y-4">
                 {["name", "address", "phone"].map((field) => (
@@ -643,10 +655,10 @@ const CenterEditForm = () => {
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           ></path>
                         </svg>
-                        Processing...
+                        {t("centerEdit.processing")}
                       </span>
                     ) : (
-                      "Save Changes"
+                    <span>{t("centerEdit.saveChanges")}</span>
                     )}
                   </button>
                 </div>
@@ -664,13 +676,13 @@ const CenterEditForm = () => {
         >
           <div className="p-6 md:p-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Branches</h2>
+              <h2 className="text-2xl font-bold text-gray-800">{t("centerEdit.branches")}</h2>
               <button
                 onClick={handleNewBranchClick}
                 className="flex items-center px-4 py-2 bg-[#441774] text-white rounded-lg hover:bg-purple-800 transition"
               >
                 <PlusIcon className="h-5 w-5 mr-1" />
-                Add Branch
+                {t("centerEdit.addBranch")}
               </button>
             </div>
 
@@ -683,14 +695,14 @@ const CenterEditForm = () => {
                 transition={{ duration: 0.3 }}
                 className="mb-8 p-6 bg-gray-50 rounded-lg"
               >
-                <h3 className="text-xl font-semibold text-gray-700 mb-4">
-                  {editingBranchId ? "Edit Branch" : "Add New Branch"}
-                </h3>
+                <div className="text-xl font-semibold text-gray-700 mb-4">
+                  {editingBranchId ? <span>{t("centerEdit.editBranch")}</span> : <span>{t("centerEdit.addNewBranch")}</span>}
+                </div>
 
                 <form className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t("centerEdit.branchName")}</label>
                       <input
                         type="text"
                         name="name"
@@ -707,13 +719,13 @@ const CenterEditForm = () => {
                           onChange={() => setIsManualBranchName(prev => !prev)}
                         />
                         <label htmlFor="manualBranchEdit" className="text-sm text-gray-600">
-                          Let me enter branch name manually
+                          {t("centerEdit.manualName")}
                         </label>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t("centerEdit.phoneNumber")}</label>
                       <input
                         type="tel"
                         name="phone"
@@ -723,8 +735,26 @@ const CenterEditForm = () => {
                       />
                     </div>
 
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t("centerEdit.region")}</label>
+                      <select
+                        name="regionId"
+                        value={branchFormData.regionId}
+                        onChange={handleBranchChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                      >
+                        {regions.map(region => (
+                          <option key={region.id} value={region.id}>
+                            {region.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+
+
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t("centerEdit.address")}</label>
                       <input
                         type="text"
                         name="address"
@@ -736,7 +766,7 @@ const CenterEditForm = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Branch Image</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t("centerEdit.branchImage")}</label>
                     <div className="flex items-center space-x-4">
                       {branchPreviewUrl && (
                         <div className="w-16 h-16 rounded-md overflow-hidden">
@@ -754,9 +784,9 @@ const CenterEditForm = () => {
                           className="hidden"
                           accept="image/*"
                         />
-                        <span className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
-                          {branchPreviewUrl ? "Change Image" : "Upload Image"}
-                        </span>
+                        <div className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                          {branchPreviewUrl ? <span>{t("centerEdit.changeImage")}</span> : <span>{t("centerEdit.uploadImage")}</span>}
+                        </div>
                       </label>
                     </div>
                   </div>
@@ -767,7 +797,7 @@ const CenterEditForm = () => {
                       onClick={() => setShowBranchForm(false)}
                       className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
                     >
-                      Cancel
+                      {t("centerEdit.cancel")}
                     </button>
                     <button
                       type="submit"
@@ -800,10 +830,10 @@ const CenterEditForm = () => {
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             ></path>
                           </svg>
-                          Processing...
+                          {t("centerEdit.processing")}
                         </span>
                       ) : (
-                        editingBranchId ? "Update Branch" : "Create Branch"
+                        editingBranchId ? <span>{t("centerEdit.updateBranch")}</span> : <span>{t("centerEdit.createBranch")}</span>
                       )}
                     </button>
                   </div>
@@ -814,7 +844,7 @@ const CenterEditForm = () => {
             {/* Branches List */}
             {branches.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-500">No branches found for this center.</p>
+                <p className="text-gray-500">{t("centerEdit.noBranches")}</p>
               </div>
             ) : (
               <div className="flex flex-wrap gap-4">
@@ -865,10 +895,10 @@ const CenterEditForm = () => {
       </div>
 
       <Dialog open={openDeleteDialog} handler={() => setOpenDeleteDialog(false)}>
-        <DialogHeader>Delete Branch</DialogHeader>
+        <DialogHeader>{t("centerEdit.deleteBranch")}</DialogHeader>
         <DialogBody>
           <Typography variant="paragraph" color="blue-gray">
-            Are you sure you want to delete this branch? This action cannot be undone.
+            {t("centerEdit.deleteConfirmation")}
           </Typography>
         </DialogBody>
         <DialogFooter>
@@ -878,7 +908,7 @@ const CenterEditForm = () => {
             onClick={() => setOpenDeleteDialog(false)}
             className="mr-2"
           >
-            Cancel
+            {t("centerEdit.cancel")}
           </Button>
           <Button
             variant="gradient"
@@ -887,7 +917,7 @@ const CenterEditForm = () => {
             className="flex items-center gap-2 bg-red-700"
           >
             <TrashIcon className="h-5 w-5" />
-            Delete
+            {t("centerEdit.delete")}
           </Button>
         </DialogFooter>
       </Dialog>

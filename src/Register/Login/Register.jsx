@@ -28,11 +28,11 @@ import { Eye, EyeOff } from "lucide-react";
 const API_BASE = "https://findcourse.net.uz/api";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, { message: "Required" }),
-  lastName: z.string().min(2, { message: "Required" }),
-  email: z.string().email({ message: "Invalid email" }),
-  phone: z.string().min(12, { message: "Invalid phone" }),
-  password: z.string().min(6, { message: "Min 6 characters" }),
+  firstName: z.string().trim().min(1, { message: "First name is required" }),
+  lastName: z.string().trim().min(1, { message: "Last name is required" }),
+  email: z.string().trim().email({ message: "Invalid email" }),
+  phone: z.string().trim().min(12, { message: "Invalid phone" }),
+  password: z.string().trim().min(6, { message: "Min 6 characters" }),
   role: z.enum(["USER", "CEO"]),
   image: z.any().optional(),
 });

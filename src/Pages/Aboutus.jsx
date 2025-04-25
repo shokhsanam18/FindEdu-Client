@@ -5,6 +5,7 @@ import mission from "/public/mission.png";
 import students from "/public/students.png";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+
 import {
   FaQuoteLeft,
   FaUserGraduate,
@@ -12,7 +13,7 @@ import {
   FaTrophy,
 } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
-
+import { useAuthStore, useImpactStore } from "../Store";
 import everest from "/public/everest.png";
 import najot from "/public/najot.png";
 import inter from "/public/inter.png";
@@ -22,64 +23,64 @@ import kings from "/public/kings.png";
 import result from "/public/result.png";
 
 const logos = [
-  { 
-    src: everest, 
-    width: 250, 
-    height: 180, 
+  {
+    src: everest,
+    width: 250,
+    height: 180,
     link: "https://www.everesteducation.com/",
     alt: "Everest Education",
     className: ""
   },
-  { 
-    src: najot, 
-    width: 220, 
-    height: 160, 
+  {
+    src: najot,
+    width: 220,
+    height: 160,
     link: "https://najottalim.uz/",
     alt: "Najot Ta'lim",
     className: ""
   },
-  { 
-    src: inter, 
-    width: 290, 
-    height: 80, 
+  {
+    src: inter,
+    width: 290,
+    height: 80,
     link: "https://www.inter-nationes.uz/",
     alt: "Inter Nationes",
     className: "mt-14"
   },
-  { 
-    src: cambridge, 
-    width: 250, 
-    height: 180, 
+  {
+    src: cambridge,
+    width: 250,
+    height: 180,
     link: "https://www.cambridge.uz/",
     alt: "Cambridge",
     className: ""
   },
-  { 
-    src: thompson, 
-    width: 250, 
-    height: 230, 
+  {
+    src: thompson,
+    width: 250,
+    height: 230,
     link: "https://thompsonreuters.com/",
     alt: "Thompson Reuters",
     className: ""
   },
-  { 
-    src: kings, 
-    width: 160, 
-    height: 140, 
+  {
+    src: kings,
+    width: 160,
+    height: 140,
     link: "https://www.kingseducation.uz/",
     alt: "Kings Education",
     className: "mt-10"
   },
-  { 
-    src: result, 
-    width: 300, 
-    height: 80, 
+  {
+    src: result,
+    width: 300,
+    height: 80,
     link: "https://www.result.school.uz/",
     alt: "Result School",
     className: "mt-13"
   },
-  { 
-    text: "PROWEB", 
+  {
+    text: "PROWEB",
     link: "https://proweb.uz/",
     alt: "Proweb",
     className: "text-5xl font-bold mt-16"
@@ -107,16 +108,16 @@ const Counter = ({ target, label, icon: Icon }) => {
   return (
     <motion.div
       className="flex flex-col items-center bg-gray-100 p-6 rounded-lg shadow-lg"
-      initial={{ opacity: 0, y: 20 }} 
-      whileInView={{ opacity: 1, y: 0 }} 
-      transition={{ duration: 0.6 }} 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
       viewport={{ once: true }}
     >
       <Icon className="text-[#461773] text-4xl mb-3" />
       <motion.h3
-        className="text-4xl font-bold text-gray-900" 
-        initial={{ opacity: 0 }} 
-        whileInView={{ opacity: 1 }}  
+        className="text-4xl font-bold text-gray-900"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.2 }}
       >
         {count.toLocaleString()}+
@@ -150,7 +151,9 @@ const ScrollingLogos = () => {
     <div className="overflow-hidden py-10 w-full">
       <motion.div
         ref={containerRef}
-        className="flex"
+        className="flex cursor-grab active:cursor-grabbing"
+        drag="x"
+        dragConstraints={{ left: -1000, right: 0 }} // adjusts automatically
         animate={{
           x: ['0%', `-${100 / duplicatedLogos.length * logos.length}%`],
         }}
@@ -197,13 +200,19 @@ const ScrollingLogos = () => {
 
 const About = () => {
   const { t } = useTranslation();
+  const { user } = useAuthStore();
+  const { data: impact, fetchImpact } = useImpactStore();
+
+  useEffect(() => {
+    fetchImpact();
+  }, []);
 
   return (
     <div className="overflow-x-hidden mt-">
       {/* Hero Section */}
       <motion.div
-        initial={{ opacity: 0, y: -50 }} 
-        animate={{ opacity: 1, y: 0 }} 
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-4 md:p-6 min-h-[60vh] text-[#34115a] bg-cover bg-center"
         style={{ backgroundImage: `url(${aboutus})` }}
@@ -211,8 +220,8 @@ const About = () => {
         <div className="absolute inset-0 bg-white bg-opacity-65"></div>
 
         <motion.div
-          initial={{ opacity: 0, x: -50 }} 
-          animate={{ opacity: 1, x: 0 }} 
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
           className="relative z-10 max-w-3xl px-4 md:px-8 text-start mt-16 md:mt-0"
         >
@@ -221,8 +230,8 @@ const About = () => {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, x: 50 }} 
-          animate={{ opacity: 1, x: 0 }} 
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
           className="relative z-10 flex flex-col md:flex-row gap-1 md:gap-2 ml-4 md:mr-10 md:text-xl mt-4 md:mt-0"
         >
@@ -299,34 +308,31 @@ const About = () => {
         </motion.div>
 
         {/* Impact Section */}
-        <div className="relative py-10 md:py-15 bg-gradient-to-b from-white to-gray-100 text-center">
-          <motion.h2
-            className="text-3xl md:text-5xl font-semibold text-[#461773] mb-8 md:mb-14"
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            {t('navbar.impactTitle')}
-          </motion.h2>
+        {user && user?.role === "ADMIN" && (
+  <div className="relative py-10 md:py-15 bg-gradient-to-b from-white to-gray-100 text-center">
+    <motion.h2
+      className="text-3xl md:text-5xl font-semibold text-[#461773] mb-8 md:mb-14"
+      initial={{ opacity: 0, y: -20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+    >
+      {t('navbar.impactTitle')}
+    </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 justify-center items-center mx-auto max-w-4xl px-4 md:px-0">
-            <Counter
-              target={250}
-              label={t('navbar.registeredUsers')}
-              icon={FaUserGraduate}
-            />
-            <Counter 
-              target={120} 
-              label={t('navbar.educationCenters')} 
-              icon={FaSchool} 
-            />
-            <Counter 
-              target={80} 
-              label={t('navbar.successStories')} 
-              icon={FaTrophy} 
-            />
-          </div>
-        </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 justify-center items-center mx-auto max-w-4xl px-4 md:px-0">
+      <Counter
+        target={impact.users}
+        label={t('navbar.registeredUsers')}
+        icon={FaUserGraduate}
+      />
+      <Counter
+        target={impact.centers}
+        label={t('navbar.educationCenters')}
+        icon={FaSchool}
+      />
+    </div>
+  </div>
+)}
 
         {/* Mission Section */}
         <div className="relative py-12 md:py-20 bg-gradient-to-b from-gray-100 to-white text-center">
@@ -353,12 +359,12 @@ const About = () => {
               <p className="text-gray-600 mt-3 md:mt-4 leading-relaxed">
                 {t('navbar.missionDescription')}
               </p>
-              <Link to="/register">
+              <Link to={user ? "/" : "/register"}>
                 <button
                   className="mt-4 md:mt-6 px-8 md:px-14 py-3 md:py-4 bg-[#461773] text-white font-semibold rounded-full shadow-lg 
-                  hover:bg-[#775fb0] cursor-pointer transition w-full md:w-auto mx-auto block md:inline"
+    hover:bg-[#775fb0] cursor-pointer transition w-full md:w-auto mx-auto block md:inline"
                 >
-                  {t('navbar.registerButton')}
+                  {user ? t('navbar.viewMoreButton') : t('navbar.registerButton')}
                 </button>
               </Link>
             </motion.div>
@@ -403,12 +409,12 @@ const About = () => {
               <p className="text-gray-600 mt-3 md:mt-4 leading-relaxed">
                 {t('navbar.visionDescription')}
               </p>
-              <Link to="/register">
+              <Link to={user ? "/" : "/register"}>
                 <button
                   className="mt-4 md:mt-6 px-8 md:px-14 py-3 md:py-4 bg-[#461773] text-white font-semibold rounded-full shadow-lg 
-                  hover:bg-[#775fb0] cursor-pointer transition w-full md:w-auto mx-auto block md:inline"
+    hover:bg-[#775fb0] cursor-pointer transition w-full md:w-auto mx-auto block md:inline"
                 >
-                  {t('navbar.registerButton')}
+                  {user ? t('navbar.viewMoreButton') : t('navbar.registerButton')}
                 </button>
               </Link>
             </motion.div>

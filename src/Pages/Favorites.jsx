@@ -8,6 +8,7 @@ import {
   HeartIcon as HeartOutline,
   HeartIcon as HeartSolid,
 } from "@heroicons/react/24/solid";
+import { useTranslation } from 'react-i18next';
 
 const ImageApi = "https://findcourse.net.uz/api/image";
 
@@ -18,7 +19,7 @@ const Favorites = () => {
   const searchTerm = useSearchStore((state) => state.searchTerm);
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const fetchLikedCenters = async (userId) => {
     try {
       setLoading(true);
@@ -123,10 +124,10 @@ const Favorites = () => {
           className="relative z-10 max-w-2xl px-3 text-center md:px-6 md:text-start mt-2 md:mt-8"
         >
           <p className="text-lg md:text-xl mt-6 md:mt-0 font-light">
-            Discover Most Loved Learning Spaces
+          {t("favorites.hero.subtitle")}
           </p>
           <h1 className="text-4xl md:text-5xl font-bold mt-2 md:mt-4 bg-clip-text text-[#34115a]">
-            Favorite Centers
+          {t("favorites.hero.title")}
           </h1>
         </motion.div>
         <motion.div
@@ -135,9 +136,9 @@ const Favorites = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="relative z-10 flex gap-2 ml-6 md:mr-10 text-xl mt-4 md:mt-0"
         >
-          <Link to="/" className="hover:underline text-white">Home</Link>
+          <Link to="/" className="hover:underline text-white">{t("favorites.hero.homeLink")}</Link>
           <span>|</span>
-          <Link to="/favorites" className="hover:underline text-[#2d0e4e]">Favorites</Link>
+          <Link to="/favorites" className="hover:underline text-[#2d0e4e]">  {t("favorites.hero.favoritesLink")}</Link>
         </motion.div>
       </motion.div>
 
@@ -148,7 +149,7 @@ const Favorites = () => {
           </div>
         ) : filteredFavorites.length === 0 ? (
           <div className="flex justify-center items-center min-h-[200px]">
-            <p className="text-gray-600 text-lg">You haven't liked any centers yet.</p>
+            <p className="text-gray-600 text-lg"> {t("favorites.empty")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
