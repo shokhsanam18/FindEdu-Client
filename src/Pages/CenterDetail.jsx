@@ -158,6 +158,9 @@ const CenterDetail = () => {
         setSelectedMajor(centerData.majors?.[0] || null);
 
         await fetchCommentsByCenter(id);
+        const latestComments = useCommentStore.getState().comments;
+        const updatedRating = calculateAverageRating(latestComments);
+        setCenter((prev) => ({ ...prev, rating: updatedRating }));
       } catch (err) {
         setError("Failed to load center info");
         console.error(err);
@@ -226,6 +229,9 @@ const CenterDetail = () => {
 
       // 👇 Refresh comments after posting
       await fetchCommentsByCenter(id);
+      const latestComments = useCommentStore.getState().comments;
+      const updatedRating = calculateAverageRating(latestComments);
+      setCenter((prev) => ({ ...prev, rating: updatedRating }));
     } catch (err) {
       console.error("Failed to post comment:", err);
     } finally {
@@ -244,10 +250,19 @@ const CenterDetail = () => {
 
       // 👇 Refresh comments after updating
       await fetchCommentsByCenter(id);
+      const latestComments = useCommentStore.getState().comments;
+      const updatedRating = calculateAverageRating(latestComments);
+      setCenter((prev) => ({ ...prev, rating: updatedRating }));
       cancelEditing();
     } catch (err) {
       console.error("Failed to update comment", err);
     }
+  };
+
+  const calculateAverageRating = (commentsArray) => {
+    if (!commentsArray.length) return 0;
+    const total = commentsArray.reduce((sum, c) => sum + c.star, 0);
+    return total / commentsArray.length;
   };
 
 
@@ -260,6 +275,9 @@ const CenterDetail = () => {
     try {
       await deleteComment(commentToDelete);
       await fetchCommentsByCenter(id); // Refresh
+      const latestComments = useCommentStore.getState().comments;
+      const updatedRating = calculateAverageRating(latestComments);
+      setCenter((prev) => ({ ...prev, rating: updatedRating }));
       setDeleteDialogOpen(false);
       setCommentToDelete(null);
     } catch (err) {
