@@ -14,9 +14,9 @@
     "login": "Kirish",
     "register": "Roʻyxatdan oʻtish",
     "languages": {
-      "en": "",
-      "ru": "",
-      "uz": ""
+      "en": "EN",
+      "ru": "RU",
+      "uz": "UZ"
     },
     "heroSubtitle": "Eng yaxshi ta'lim markazlarini topishda yordam beramiz!",
     "heroTitle": "Biz haqimizda",
