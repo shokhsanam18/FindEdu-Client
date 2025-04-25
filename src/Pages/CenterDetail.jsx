@@ -333,11 +333,20 @@ const CenterDetail = () => {
   }
 
   const PostRegisteration = async (finalVisitDate) => {
+    const parsedFilialId = parseInt(selectedBranch?.id, 10);
+
     const result = await createReception({
       centerId: center.id,
-      filialId: selectedBranch?.id,
+      filialId: Number.isInteger(parsedFilialId) ? parsedFilialId : null,
       majorId: selectedMajor?.id,
-      visitDate: combinedDateTime,
+      visitDate: `${visitDay}T${visitHour}`,
+    });
+
+    console.log("🧾 Submitting reception with:", {
+      centerId: center.id,
+      filialId: Number.isInteger(parsedFilialId) ? parsedFilialId : null,
+      majorId: selectedMajor?.id,
+      visitDate: `${visitDay}T${visitHour}`,
     });
 
     if (result.success) {
@@ -1278,9 +1287,19 @@ const CenterDetail = () => {
                             setReservationError(null);
                             setIsSubmittingReservation(true);
 
+                            const parsedFilialId = parseInt(selectedBranch?.id, 10);
+
                             const result = await createReception({
                               centerId: center.id,
-                              filialId: selectedBranch?.id,
+                              filialId: Number.isInteger(parsedFilialId) ? parsedFilialId : null,
+                              majorId: selectedMajor?.id,
+                              visitDate: `${visitDay}T${visitHour}`,
+                            });
+
+
+                            console.log("🧾 Submitting reception with:", {
+                              centerId: center.id,
+                              filialId: Number.isInteger(parsedFilialId) ? parsedFilialId : null,
                               majorId: selectedMajor?.id,
                               visitDate: `${visitDay}T${visitHour}`,
                             });
