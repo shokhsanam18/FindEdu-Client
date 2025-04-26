@@ -14,9 +14,9 @@
     "login": "Войти",
     "register": "Регистрация",
     "languages": {
-      "en": "EN",
-      "ru": "RU",
-      "uz": "UZ"
+      "en": "English",
+      "ru": "Русский",
+      "uz": "O'zbekcha"
     },
     "heroSubtitle": "Мы помогаем вам найти лучшие образовательные центры!",
     "heroTitle": "О нас",
