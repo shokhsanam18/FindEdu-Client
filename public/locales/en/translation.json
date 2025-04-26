@@ -14,9 +14,9 @@
     "login": "Login",
     "register": "Register",
     "languages": {
-      "en": "",
-      "ru": "",
-      "uz": ""
+      "en": "English",
+      "ru": "Русский",
+      "uz": "O'zbekcha"
     },
     "heroSubtitle": "Helping You Find the Best Education Centers!",
     "heroTitle": "About Us",
