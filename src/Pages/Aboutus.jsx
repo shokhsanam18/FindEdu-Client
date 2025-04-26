@@ -333,6 +333,8 @@ const About = () => {
     </div>
   </div>
 )}
+
+
         <div className="relative py-15 bg-gradient-to-b from-white to-gray-100 text-center">
           <motion.h2
             className="text-5xl font-semibold text-[#461773] mb-14"
@@ -340,17 +342,17 @@ const About = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            Our Impact
+            {t('navbar.impactTitle')}
           </motion.h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center mx-auto max-w-4xl">
             <Counter
               target={250}
-              label="Registered Users"
+              label= {t('navbar.registeredUsers')}
               icon={FaUserGraduate}
             />
-            <Counter target={120} label="Education Centers" icon={FaSchool} />
-            <Counter target={80} label="Success Stories" icon={FaTrophy} />
+            <Counter target={120} label= {t('navbar.educationCenters')} icon={FaSchool} />
+            <Counter target={80} label= {t('navbar.successStories')} icon={FaTrophy} />
           </div>
         </div>
         {/* Mission Section */}
