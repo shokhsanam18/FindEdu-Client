@@ -1,5 +1,3 @@
-
-
 import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect, useContext } from "react";
 import { FaSearch, FaBook, FaVideo, FaFilePdf, FaStar, FaDownload, FaTrash } from "react-icons/fa";
@@ -32,7 +30,7 @@ export const Resources = () => {
   const [categories, setCategories] = useState([]);
   const [resourceToDelete, setResourceToDelete] = useState(null);
   const [newResource, setNewResource] = useState({
-    categoryId: "", // Don't reference categories yet
+    categoryId: "",
     name: "",
     description: "",
     media: "",
@@ -67,7 +65,6 @@ export const Resources = () => {
     return resource.userId === currentUser?.id;
   };
 
-  // Fetch resources with pagination
   const fetchResources = async (page = 1) => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -107,7 +104,6 @@ export const Resources = () => {
     }
   };
 
-  // Fetch categories
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -120,7 +116,6 @@ export const Resources = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // Ensure category images use the correct API endpoint
         const categoriesWithImages = data.data.map(category => ({
           ...category,
           image: category.image ? `${IMAGE_BASE_URL}/${category.image}` : null
@@ -133,7 +128,6 @@ export const Resources = () => {
     }
   };
 
-  // Handle page change
   const handlePageChange = (page) => {
     fetchResources(page);
   };
@@ -149,11 +143,11 @@ export const Resources = () => {
         setIsModalOpen(false);
       }
     };
-  
+
     if (isModalOpen) {
       window.addEventListener("keydown", handleKeyDown);
     }
-  
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
@@ -183,7 +177,7 @@ export const Resources = () => {
       setNewResource(prev => ({
         ...prev,
         imageFile: file,
-        image: "" // Clear the URL when a file is selected
+        image: ""
       }));
     }
   };
@@ -208,7 +202,7 @@ export const Resources = () => {
       }
 
       const data = await response.json();
-      return data.data; // Returns the filename
+      return data.data;
     } catch (error) {
       console.error("Error uploading image:", error);
       toast.error(error.message || "Failed to upload image");
@@ -239,7 +233,6 @@ export const Resources = () => {
       return;
     }
 
-    // Validate that either image URL or file is provided, but not both
     if (!newResource.image && !newResource.imageFile) {
       toast.error("Please provide either an image URL or upload an image file");
       return;
@@ -250,7 +243,6 @@ export const Resources = () => {
     try {
       let imageUrl = newResource.image;
 
-      // If image file is provided, upload it and get the URL
       if (newResource.imageFile) {
         const filename = await uploadImage(newResource.imageFile);
         imageUrl = `${IMAGE_BASE_URL}/${filename}`;
@@ -322,7 +314,6 @@ export const Resources = () => {
     }
   };
 
-  // Filter resources client-side for additional filtering
   const filteredResources = resources.filter(resource => {
     const matchesSearch = searchTerm
       ? resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -346,7 +337,6 @@ export const Resources = () => {
     }
   };
 
-  // Generate pagination buttons
   const totalPages = Math.ceil(pagination.totalItems / pagination.itemsPerPage);
   const renderPaginationButtons = () => {
     const buttons = [];
@@ -462,7 +452,6 @@ export const Resources = () => {
 
       <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 mt-5">
         <div className="max-w-7xl mx-auto">
-          {/* Search and Filter Section */}
           <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="relative flex-grow">
@@ -479,11 +468,9 @@ export const Resources = () => {
               </div>
             </div>
 
-            {/* Categories Filter - Full card size images */}
             <div className="mt-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">{t("Resources.filterByCategory")}</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {/* All Resources Button */}
                 <button
                   onClick={() => setActiveFilter("all")}
                   className={`flex flex-col items-center p-0 rounded-lg overflow-hidden ${activeFilter === "all" ? "ring-2 ring-blue-500" : ""} hover:shadow-md transition-all`}
@@ -494,7 +481,6 @@ export const Resources = () => {
                   <span className="text-sm font-medium p-2">{t("Resources.allResources")}</span>
                 </button>
 
-                {/* My Resources Button (if logged in) */}
                 {isLoggedIn && (
                   <button
                     onClick={() => setActiveFilter("myResources")}
@@ -507,7 +493,6 @@ export const Resources = () => {
                   </button>
                 )}
 
-                {/* Category Buttons */}
                 {categories.map(category => (
                   <button
                     key={category.id}
@@ -538,7 +523,6 @@ export const Resources = () => {
             </div>
           </div>
 
-          {/* Add Resource Button */}
           <button
             onClick={handleAddResourceClick}
             className="px-4 py-2 bg-[#451774] text-white text-sm rounded-lg hover:bg-[#3a115aba] transition duration-300 mx-auto block mb-8"
@@ -546,19 +530,17 @@ export const Resources = () => {
             {t("Resources.addResource")}
           </button>
 
-          {/* Modal for Adding Resource */}
           {isModalOpen && (
             <div
               className="fixed inset-0 flex items-center justify-center z-50 bg-gray-400 bg-opacity-50"
-              onClick={() => setIsModalOpen(false)} // closes on backdrop click
+              onClick={() => setIsModalOpen(false)}
             >
               <div
                 className="bg-white p-6 rounded-lg w-96"
-                onClick={(e) => e.stopPropagation()} // prevents modal clicks from closing it
+                onClick={(e) => e.stopPropagation()}
               >
                 <h2 className="text-xl font-semibold mb-4">{t("Resources.addNewResource")}</h2>
                 <form onSubmit={handleSubmit}>
-                  {/* Category Selection */}
                   <select
                     name="categoryId"
                     value={newResource.categoryId}
@@ -581,7 +563,6 @@ export const Resources = () => {
                     )}
                   </select>
 
-                  {/* Resource Name */}
                   <input
                     type="text"
                     name="name"
@@ -592,7 +573,6 @@ export const Resources = () => {
                     required
                   />
 
-                  {/* Description */}
                   <textarea
                     name="description"
                     placeholder={t("Resources.Modaldescription")}
@@ -601,7 +581,6 @@ export const Resources = () => {
                     className="block w-full mb-2 p-2 border border-gray-300 rounded"
                   />
 
-                  {/* Media URL */}
                   <input
                     type="url"
                     name="media"
@@ -612,7 +591,6 @@ export const Resources = () => {
                     required
                   />
 
-                  {/* Image Upload - URL or File */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t("Resources.image")}</label>
                     <input
@@ -622,7 +600,6 @@ export const Resources = () => {
                       value={newResource.image}
                       onChange={(e) => {
                         handleInputChange(e);
-                        // Clear file if URL is entered
                         if (e.target.value) {
                           setNewResource(prev => ({ ...prev, imageFile: null }));
                         }
@@ -649,7 +626,6 @@ export const Resources = () => {
                     )}
                   </div>
 
-                  {/* Buttons */}
                   <div className="flex justify-end space-x-2">
                     <button
                       type="button"
@@ -682,7 +658,6 @@ export const Resources = () => {
             </div>
           )}
 
-          {/* Resources Grid */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredResources.length > 0 ? (
               filteredResources.map((resource) => (
@@ -705,8 +680,6 @@ export const Resources = () => {
                         </span>
                       </div>
                       <div className="flex items-center text-yellow-500">
-                        {/* <FaStar className="mr-1" />
-                        <span className="text-sm font-medium text-gray-700">{resource.rating || "N/A"}</span> */}
                       </div>
                     </div>
                     <div className="mt-4">
@@ -716,7 +689,6 @@ export const Resources = () => {
                     </div>
                     <div className="mt-6 flex items-center justify-between">
                       <div className="flex items-center text-sm text-gray-500">
-                        {/* <span>{resource.downloads?.toLocaleString() || "0"} downloads</span> */}
                       </div>
                       <div className="text-sm text-gray-500">
                         {new Date(resource.createdAt).toLocaleDateString()}
@@ -763,7 +735,6 @@ export const Resources = () => {
             )}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="mt-12 flex justify-center">
               <nav className="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">

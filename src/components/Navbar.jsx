@@ -75,21 +75,21 @@ export default function Navbar() {
   const profileMenuItems = [
     ...(user?.role === "CEO"
       ? [
-          {
-            label: t('navbar.my_centers'),
-            icon: BuildingOffice2Icon,
-            link: "/MyCenters",
-          },
-        ]
+        {
+          label: t('navbar.my_centers'),
+          icon: BuildingOffice2Icon,
+          link: "/MyCenters",
+        },
+      ]
       : user?.role === "USER"
-      ? [
+        ? [
           {
             label: t('navbar.my_appointments'),
             icon: CalendarIcon,
             link: "/Appointment",
           },
         ]
-      : []),
+        : []),
     {
       label: t('navbar.sign_out'),
       icon: PowerIcon,
@@ -97,22 +97,21 @@ export default function Navbar() {
   ];
 
   const languageMenuItems = [
-    { 
-      code: 'uz', 
-      name: t('navbar.languages.uz'), 
-      flag: <ReactCountryFlag countryCode="UZ" svg style={{ width: '1.5em', height: '1.5em' }} /> 
+    {
+      code: 'en',
+      name: t('navbar.languages.en'),
+      flag: <ReactCountryFlag countryCode="GB" svg style={{ width: '1.5em', height: '1.5em' }} />
     },
-    { 
-      code: 'en', 
-      name: t('navbar.languages.en'), 
-      flag: <ReactCountryFlag countryCode="GB" svg style={{ width: '1.5em', height: '1.5em' }} /> 
+    {
+      code: 'ru',
+      name: t('navbar.languages.ru'),
+      flag: <ReactCountryFlag countryCode="RU" svg style={{ width: '1.5em', height: '1.5em' }} />
     },
-    { 
-      code: 'ru', 
-      name: t('navbar.languages.ru'), 
-      flag: <ReactCountryFlag countryCode="RU" svg style={{ width: '1.5em', height: '1.5em' }} /> 
+    {
+      code: 'uz',
+      name: t('navbar.languages.uz'),
+      flag: <ReactCountryFlag countryCode="UZ" svg style={{ width: '1.5em', height: '1.5em' }} />
     },
-
   ];
 
   return (
@@ -125,8 +124,8 @@ export default function Navbar() {
         </div>
 
         <div className="lg:hidden">
-          <button 
-            className="hover:text-slate-600" 
+          <button
+            className="hover:text-slate-600"
             onClick={toggleSidebar}
           >
             <AlignJustify />
@@ -170,7 +169,7 @@ export default function Navbar() {
             {t('navbar.favorites')}
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          
+
           {user?.role === "USER" && (
             <Link
               to="/Appointment"
@@ -185,185 +184,179 @@ export default function Navbar() {
 
           {user?.role === "CEO" && (
             <div className="flex gap-4">
-                          <Link
-              to="/Appointment"
-              className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
-              onClick={() => window.scrollTo(0, 0)}
-            >
-              <CalendarIcon className="h-5 w-5" />
-              {t('navbar.appointments')}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <div className="relative group">
-              
-              <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300">
-                {/* <ChartBarIcon className="h-5 w-5" /> */}
-                {t('navbar.ceo_dashboard')}
-                <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
-              </button>
-              <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                <Link
-                  to="/Ceo"
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]"
-                  onClick={() => window.scrollTo(0, 0)}
-                >
-                  <PlusCircleIcon className="h-4 w-4" />
-                  {t('navbar.create_center')}
-                </Link>
-                <Link
-                  to="/MyCenters"
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]"
-                  onClick={() => window.scrollTo(0, 0)}
-                >
-                  <BuildingOffice2Icon className="h-4 w-4" />
-                  {t('navbar.my_centers')}
-                </Link>
-              </div>
-            </div> </div>
+              <Link
+                to="/Appointment"
+                className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 relative group"
+                onClick={() => window.scrollTo(0, 0)}
+              >
+                <CalendarIcon className="h-5 w-5" />
+                {t('navbar.appointments')}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#461773] transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+              <div className="relative group">
+
+                <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300">
+                  {t('navbar.ceo_dashboard')}
+                  <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+                </button>
+                <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                  <Link
+                    to="/Ceo"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]"
+                    onClick={() => window.scrollTo(0, 0)}
+                  >
+                    <PlusCircleIcon className="h-4 w-4" />
+                    {t('navbar.create_center')}
+                  </Link>
+                  <Link
+                    to="/MyCenters"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]"
+                    onClick={() => window.scrollTo(0, 0)}
+                  >
+                    <BuildingOffice2Icon className="h-4 w-4" />
+                    {t('navbar.my_centers')}
+                  </Link>
+                </div>
+              </div> </div>
           )}
         </div>
-<div className="flex flex-row gap-3">
-            {/* Language Selector */}
-            <div className="relative group mt-2">
-  <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 text-l">
-    {i18n.language === 'en' && (
-      <ReactCountryFlag 
-        countryCode="GB" 
-        svg 
-        style={{ 
-          width: '1.5em', 
-          height: '1.5em',
-          marginRight: '8px'
-        }} 
-      />
-    )}
-    {i18n.language === 'ru' && (
-      <ReactCountryFlag 
-        countryCode="RU" 
-        svg 
-        style={{ 
-          width: '1.5em', 
-          height: '1.5em',
-          marginRight: '8px'
-        }} 
-      />
-    )}
-    {i18n.language === 'uz' && (
-      <ReactCountryFlag 
-        countryCode="UZ" 
-        svg 
-        style={{ 
-          width: '1.5em', 
-          height: '1.5em',
-          marginRight: '8px'
-        }} 
-      />
-    )}
-    {i18n.language.toUpperCase()}
-    <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
-  </button>
-  
-  <div className="absolute left-0 w-24 bg-white rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-    {languageMenuItems.map(({ code, name }) => (
-      <button
-        key={code}
-        onClick={() => changeLanguage(code)}
-        className={`w-full px-4 py-2 text-sm text-left ${
-          i18n.language === code 
-            ? 'bg-[#efd8ff] text-[#461773]' 
-            : 'text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]'
-        }`}
-      >
-        {t(`navbar.languages.${code}`)}
-      </button>
-    ))}
-  </div>
-</div>
-        {isLoggedIn ? (
-          <div className="relative group">
-            <button className="p-0 flex items-center hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff] gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto">
-              <Avatar
-                variant="circular"
-                size="sm"
-                alt="User profile"
-                className="border border-purple-900 p-0.5"
-                src={
-                  profileImageUrl ||
-                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJKOCxJ4PWSjccLHucBQ-AlNhpiVx2ASk10lFfiNrG-QBOwwYkSGolTVZuKMZd7VcaKNk&usqp=CAU"
-                }
-              />
-              <motion.p className="">
-                {user?.data?.firstName} {user?.data?.lastName}
-              </motion.p>
-              <ChevronDownIcon
-                strokeWidth={2.5}
-                className={`h-3 w-3 transition-transform group-hover:rotate-180`}
-              />
+        <div className="flex flex-row gap-2">
+          <div className="relative group mt-2">
+            <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 text-xl">
+              {i18n.language === 'en' && (
+                <ReactCountryFlag
+                  countryCode="GB"
+                  svg
+                  style={{
+                    width: '1.5em',
+                    height: '1.5em',
+                    marginRight: '8px'
+                  }}
+                />
+              )}
+              {i18n.language === 'ru' && (
+                <ReactCountryFlag
+                  countryCode="RU"
+                  svg
+                  style={{
+                    width: '1.5em',
+                    height: '1.5em',
+                    marginRight: '8px'
+                  }}
+                />
+              )}
+              {i18n.language === 'uz' && (
+                <ReactCountryFlag
+                  countryCode="UZ"
+                  svg
+                  style={{
+                    width: '1.5em',
+                    height: '1.5em',
+                    marginRight: '8px'
+                  }}
+                />
+              )}
+              {t(`navbar.languages.${i18n.language}`)}
+              <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
             </button>
-            
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-              <div className="py-2 px-4">
-                <Typography variant="small" className="font-semibold text-[#290a3f]">
-                  {user?.data?.firstName} {user?.data?.lastName}
-                </Typography>
-                <Typography variant="small" className="text-gray-600 text-xs">
-                  {user?.data?.email}
-                </Typography>
-                <Link to="/profile">
-                  <button
-                    className="flex items-center gap-1 mt-2 text-[#461773] hover:bg-[#efd8ff] w-full px-2 py-2 rounded text-sm"
-                  >
-                    <PencilIcon className="h-3 w-3" />
-                    {t('navbar.edit_profile')}
-                  </button>
-                </Link>
-              </div>
-              
-              {profileMenuItems.map(({ label, icon, link }, key) => {
-                const isLastItem = key === profileMenuItems.length - 1;
-                if (!isLastItem) return null;
-                
-                return (
-                  <div key={label} className="border-t border-gray-100 px-2">
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-2 w-full px-2 py-2 text-sm text-red-500 hover:bg-red-50 rounded"
-                    >
-                      {React.createElement(icon, {
-                        className: "h-4 w-4",
-                        strokeWidth: 2,
-                      })}
-                      {label}
-                    </button>
-                  </div>
-                );
-              })}
+            <div className="absolute left-0  w-12  bg-white rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+              {languageMenuItems.map(({ code, name, flag }) => (
+                <button
+                  key={code}
+                  onClick={() => changeLanguage(code)}
+                  className={`flex items-center gap-2 w-full px-4 py-2 text-sm text-left justify-center  text-center${i18n.language === code ? 'bg-[#efd8ff] text-[#461773]' : 'text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]'}`}
+                >
+                  <span className="text-xl ">{flag}</span>
+                  {name}
+                </button>
+              ))}
             </div>
           </div>
-        ) : (
-          <div className="flex gap-3 md:gap-4">
-            <Buton
-              variant="outline"
-              className="relative overflow-hidden border-[#461773] text-[#461773] hover:text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full transition-all duration-300 group"
-              asChild
-            >
-              <Link to="/Login">
-                <span className="relative z-10">{t('navbar.login')}</span>
-                <span className="absolute inset-0 bg-[#461773] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full z-0"></span>
-              </Link>
-            </Buton>
+          {isLoggedIn ? (
+            <div className="relative group">
+              <button className="p-0 flex items-center hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff] gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto">
+                <Avatar
+                  variant="circular"
+                  size="sm"
+                  alt="User profile"
+                  className="border border-purple-900 p-0.5"
+                  src={
+                    profileImageUrl ||
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJKOCxJ4PWSjccLHucBQ-AlNhpiVx2ASk10lFfiNrG-QBOwwYkSGolTVZuKMZd7VcaKNk&usqp=CAU"
+                  }
+                />
+                <motion.p className="">
+                  {user?.data?.firstName} {user?.data?.lastName}
+                </motion.p>
+                <ChevronDownIcon
+                  strokeWidth={2.5}
+                  className={`h-3 w-3 transition-transform group-hover:rotate-180`}
+                />
+              </button>
 
-            <Buton
-              asChild
-              className="relative overflow-hidden bg-[#461773] hover:bg-[#3a1260] text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full shadow-lg hover:shadow-[0_4px_15px_rgba(70,23,115,0.3)] transition-all duration-300"
-            >
-              <Link to="/Register">
-                <span className="relative z-10">{t('navbar.register')}</span>
-                <span className="absolute inset-0 bg-gradient-to-r from-[#5a1d99] to-[#461773] opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full"></span>
-              </Link>
-            </Buton>
-          </div>
-        )}
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+                <div className="py-2 px-4">
+                  <Typography variant="small" className="font-semibold text-[#290a3f]">
+                    {user?.data?.firstName} {user?.data?.lastName}
+                  </Typography>
+                  <Typography variant="small" className="text-gray-600 text-xs">
+                    {user?.data?.email}
+                  </Typography>
+                  <Link to="/profile">
+                    <button
+                      className="flex items-center gap-1 mt-2 text-[#461773] hover:bg-[#efd8ff] w-full px-2 py-2 rounded text-sm"
+                    >
+                      <PencilIcon className="h-3 w-3" />
+                      {t('navbar.edit_profile')}
+                    </button>
+                  </Link>
+                </div>
+
+                {profileMenuItems.map(({ label, icon, link }, key) => {
+                  const isLastItem = key === profileMenuItems.length - 1;
+                  if (!isLastItem) return null;
+
+                  return (
+                    <div key={label} className="border-t border-gray-100 px-2">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 w-full px-2 py-2 text-sm text-red-500 hover:bg-red-50 rounded"
+                      >
+                        {React.createElement(icon, {
+                          className: "h-4 w-4",
+                          strokeWidth: 2,
+                        })}
+                        {label}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="flex gap-3 md:gap-4">
+              <Buton
+                variant="outline"
+                className="relative overflow-hidden border-[#461773] text-[#461773] hover:text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full transition-all duration-300 group"
+                asChild
+              >
+                <Link to="/Login">
+                  <span className="relative z-10">{t('navbar.login')}</span>
+                  <span className="absolute inset-0 bg-[#461773] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full z-0"></span>
+                </Link>
+              </Buton>
+
+              <Buton
+                asChild
+                className="relative overflow-hidden bg-[#461773] hover:bg-[#3a1260] text-white text-sm md:text-base font-medium px-5 py-2 md:px-6 md:py-3 rounded-full shadow-lg hover:shadow-[0_4px_15px_rgba(70,23,115,0.3)] transition-all duration-300"
+              >
+                <Link to="/Register">
+                  <span className="relative z-10">{t('navbar.register')}</span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-[#5a1d99] to-[#461773] opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-full"></span>
+                </Link>
+              </Buton>
+            </div>
+          )}
 
         </div>
       </div>

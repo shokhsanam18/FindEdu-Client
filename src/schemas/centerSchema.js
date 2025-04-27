@@ -1,4 +1,3 @@
-// src/schemas/centerSchema.js
 import { z } from "zod";
 
 export const centerSchema = z.object({

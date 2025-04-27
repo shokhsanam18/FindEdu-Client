@@ -103,13 +103,13 @@ export default function CeoPage() {
       if (updated.length > 0) {
         setSelectedCenterId(updated[0].id);
       } else {
-        setSelectedCenterId(null); // if none exist after deletion
+        setSelectedCenterId(null);
       }
     };
 
-    updateCenters(); // initial fetch
+    updateCenters();
 
-    window.addEventListener("focus", updateCenters); // refetch on tab focus
+    window.addEventListener("focus", updateCenters);
 
     return () => {
       window.removeEventListener("focus", updateCenters);
@@ -203,7 +203,6 @@ export default function CeoPage() {
     let centerId = null;
 
     try {
-      // Step 1: Upload Image
       const uploadData = new FormData();
       uploadData.append("image", centerImageFile);
 
@@ -227,12 +226,11 @@ export default function CeoPage() {
     }
 
     try {
-      // Step 2: Create Center
       const centerData = {
         name: data.name.trimEnd(),
         regionId: data.regionId,
         address: data.address.trimEnd(),
-        phone: data.phone.replace(/\s+/g, ''), // removes all spaces
+        phone: data.phone.replace(/\s+/g, ''),
         majorsId: data.majorsId,
         image: imageUrl,
       };
@@ -270,7 +268,6 @@ export default function CeoPage() {
         address: data.address,
         image: imageUrl,
       });
-      // Step 3: Create Filial
       await axios.post(
         "https://findcourse.net.uz/api/filials",
         {
@@ -332,7 +329,6 @@ export default function CeoPage() {
       const centerName = myCenters.find(c => c.id === Number(selectedCenterId))?.name || 'Center';
       formData.name = `${centerName} - ${regionName} branch`;
 
-      // Try to upload image but don't fail if it doesn't work
       try {
         const uploadData = new FormData();
         uploadData.append("image", filialImageFile);
@@ -383,7 +379,6 @@ export default function CeoPage() {
 
       const allFilials = response.data.data || [];
 
-      // Sort so that the main branch comes first
       const sorted = allFilials.sort((a, b) => {
         const isMainA = a.name?.toLowerCase().includes("main branch");
         const isMainB = b.name?.toLowerCase().includes("main branch");
@@ -474,7 +469,6 @@ export default function CeoPage() {
           <Toaster theme="light" position="top-right" richColors />
 
           <div className="flex flex-col gap-6 w-full max-w-3xl border-y-green-900">
-            {/* Center Form */}
             <div className="bg-white shadow-lg rounded-lg p-7 w-full mb-8">
               <h2 className="text-4xl font-bold text-center text-purple-900 mb-6">
                 {t("ceoPage.centerForm.title")}
@@ -703,7 +697,6 @@ export default function CeoPage() {
               </form>
             </div>
 
-            {/* Branch Form and List */}
             <div className="bg-white shadow-lg rounded-lg p-7 w-full mb-8">
               <h2 className="text-4xl font-bold text-center text-purple-900 mb-6">
                 {Number(selectedCenterId) ? "Add Branch" : "Branches"}

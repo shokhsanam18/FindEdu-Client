@@ -57,7 +57,7 @@ const VerifyOtp = () => {
       );
       toast.error(
         error.response?.data?.message ||
-          "Invalid OTP or error resetting password."
+        "Invalid OTP or error resetting password."
       );
     }
   };

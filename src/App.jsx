@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-// import Register from "./Register/Login/Register.jsx";
 import Login from "./Register/Login/Login.jsx";
 import { Layout } from "./components/Layout.jsx";
 import Forget from "./Register/Login/Forget.jsx";

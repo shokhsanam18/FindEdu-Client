@@ -38,7 +38,6 @@ const CenterEditForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isManualBranchName, setIsManualBranchName] = useState(false);
   const [originalBranch, setOriginalBranch] = useState(null);
-  // Branches state
   const [branches, setBranches] = useState([]);
   const [showBranchForm, setShowBranchForm] = useState(false);
   const [editingBranchId, setEditingBranchId] = useState(null);
@@ -57,11 +56,10 @@ const CenterEditForm = () => {
 
   useEffect(() => {
     if (regions.length === 0) {
-      fetchData(); // this fetches majors, regions, and centers
+      fetchData();
     }
   }, []);
 
-  // Fetch center and branches
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -120,7 +118,6 @@ const CenterEditForm = () => {
     }
   }, [branchFormData.regionId, center?.name, isManualBranchName, showBranchForm]);
 
-  // Center image handler
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -129,11 +126,6 @@ const CenterEditForm = () => {
       toast.error("Please select an image file");
       return;
     }
-
-    // if (file.size > 5 * 1024 * 1024) {
-    //   toast.error("Image size should be less than 5MB");
-    //   return;
-    // }
 
     setImageFile(file);
 
@@ -144,7 +136,6 @@ const CenterEditForm = () => {
     reader.readAsDataURL(file);
   };
 
-  // Center form handlers
   const handleCenterChange = (e) => {
     const { name, value } = e.target;
     setNewCenterData((prev) => ({ ...prev, [name]: value }));
@@ -163,7 +154,6 @@ const CenterEditForm = () => {
         return;
       }
 
-      // Upload image if selected
       if (imageFile) {
         const formData = new FormData();
         formData.append("image", imageFile);
@@ -178,7 +168,6 @@ const CenterEditForm = () => {
         uploadedImageFilename = uploadRes.data?.data;
       }
 
-      // Build payload with only changed fields
       const payload = {};
       if (newCenterData.name.trimEnd() !== center.name.trim()) {
         payload.name = newCenterData.name.trimEnd();
@@ -201,7 +190,6 @@ const CenterEditForm = () => {
         toast.success("Center updated successfully!");
 
 
-        // Sync main branch
         if (mainBranch?.id) {
           const branchPayload = {};
 
@@ -255,7 +243,6 @@ const CenterEditForm = () => {
     }
   };
 
-  // Branch image handler
   const handleBranchImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -265,10 +252,6 @@ const CenterEditForm = () => {
       return;
     }
 
-    // if (file.size > 5 * 1024 * 1024) {
-    //   toast.error("Image size should be less than 5MB");
-    //   return;
-    // }
 
     setBranchImageFile(file);
 
@@ -279,21 +262,20 @@ const CenterEditForm = () => {
     reader.readAsDataURL(file);
   };
 
-  // Branch form handlers
   const handleBranchChange = (e) => {
     const { name, value } = e.target;
-  
+
     setBranchFormData((prev) => {
       const updated = {
         ...prev,
-        [name]: name === "regionId" ? Number(value) : value, // 👈 convert regionId to number
+        [name]: name === "regionId" ? Number(value) : value,
       };
-  
+
       if (name === "regionId" && !isManualBranchName) {
         const regionName = regions.find(r => r.id === Number(value))?.name || "";
         updated.name = regionName ? `${center.name} - ${regionName} branch` : `${center.name} branch`;
       }
-  
+
       return updated;
     });
   };
@@ -324,7 +306,7 @@ const CenterEditForm = () => {
   const handleEditBranchClick = (branch) => {
     setShowBranchForm(true);
     setEditingBranchId(branch.id);
-    setOriginalBranch(branch); // 👈 store the original branch
+    setOriginalBranch(branch);
 
     setBranchFormData({
       name: branch.name || "",
@@ -350,7 +332,6 @@ const CenterEditForm = () => {
         return;
       }
 
-      // Upload image if selected
       if (branchImageFile) {
         const formData = new FormData();
         formData.append("image", branchImageFile);
@@ -365,7 +346,6 @@ const CenterEditForm = () => {
         uploadedImageFilename = uploadRes.data?.data;
       }
 
-      // Prepare branch data
       const branchData = {};
 
       if (!editingBranchId || branchFormData.name.trimEnd() !== originalBranch?.name?.trim()) {
@@ -381,7 +361,6 @@ const CenterEditForm = () => {
         branchData.image = uploadedImageFilename;
       }
 
-      // If no changes, notify and return
       if (editingBranchId && Object.keys(branchData).length === 0) {
         toast.info("No changes detected.");
         setIsSubmitting(false);
@@ -397,10 +376,9 @@ const CenterEditForm = () => {
           toast.success("Branch updated successfully!");
 
 
-          // If editing main branch, also update center
           if (editingBranchId === mainBranch?.id) {
             const centerPayload = {
-              name: branchFormData.name.split(" - ")[0], // Just the center name
+              name: branchFormData.name.split(" - ")[0],
               phone: branchFormData.phone,
               address: branchFormData.address,
             };
@@ -416,8 +394,8 @@ const CenterEditForm = () => {
         } else {
           await axios.post(`${API_BASE}/filials`, {
             ...branchData,
-            centerId: Number(id),          // 👈 ensure centerId is number
-            regionId: branchFormData.regionId,  // 👈 required!
+            centerId: Number(id),
+            regionId: branchFormData.regionId,
           }, {
             headers: {
               "Content-Type": "application/json",
@@ -429,14 +407,12 @@ const CenterEditForm = () => {
 
       }
 
-      // Refresh branches list
       const branchesRes = await axios.get(`${API_BASE}/filials`, {
         params: { centerId: id },
         headers: { Authorization: `Bearer ${accessToken}` }
       });
       setBranches(branchesRes.data?.data || []);
 
-      // Reset form
       setShowBranchForm(false);
       setEditingBranchId(null);
 
@@ -487,7 +463,6 @@ const CenterEditForm = () => {
       setOpenDeleteDialog(false);
       setBranchToDelete(null);
 
-      // Refresh list
       const res = await axios.get(`${API_BASE}/filials`, {
         params: { centerId: id },
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -539,7 +514,6 @@ const CenterEditForm = () => {
           </Link>
         </div>
 
-        {/* Center Edit Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -547,7 +521,6 @@ const CenterEditForm = () => {
           className="bg-white rounded-xl shadow-lg overflow-hidden mb-8"
         >
           <div className="flex flex-col lg:flex-row">
-            {/* Image Section */}
             <div className="lg:w-2/5 xl:w-1/2 relative">
               <div className="h-64 lg:h-full w-full">
                 {previewUrl ? (
@@ -599,7 +572,6 @@ const CenterEditForm = () => {
               </div>
             </div>
 
-            {/* Form Section */}
             <div className="lg:w-3/5 xl:w-1/2 p-6 md:p-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">{t("centerEdit.editCenterInfo")}</h2>
 
@@ -658,7 +630,7 @@ const CenterEditForm = () => {
                         {t("centerEdit.processing")}
                       </span>
                     ) : (
-                    <span>{t("centerEdit.saveChanges")}</span>
+                      <span>{t("centerEdit.saveChanges")}</span>
                     )}
                   </button>
                 </div>
@@ -667,7 +639,6 @@ const CenterEditForm = () => {
           </div>
         </motion.div>
 
-        {/* Branches Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -686,7 +657,6 @@ const CenterEditForm = () => {
               </button>
             </div>
 
-            {/* Branch Form (Conditional) */}
             {showBranchForm && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
@@ -841,7 +811,6 @@ const CenterEditForm = () => {
               </motion.div>
             )}
 
-            {/* Branches List */}
             {branches.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-gray-500">{t("centerEdit.noBranches")}</p>

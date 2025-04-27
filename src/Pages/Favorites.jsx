@@ -124,10 +124,10 @@ const Favorites = () => {
           className="relative z-10 max-w-2xl px-3 text-center md:px-6 md:text-start mt-2 md:mt-8"
         >
           <p className="text-lg md:text-xl mt-6 md:mt-0 font-light">
-          {t("favorites.hero.subtitle")}
+            {t("favorites.hero.subtitle")}
           </p>
           <h1 className="text-4xl md:text-5xl font-bold mt-2 md:mt-4 bg-clip-text text-[#34115a]">
-          {t("favorites.hero.title")}
+            {t("favorites.hero.title")}
           </h1>
         </motion.div>
         <motion.div
@@ -183,7 +183,7 @@ const Favorites = () => {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={(e) => {
-                        e.preventDefault(); // prevent navigating to center
+                        e.preventDefault();
                         handleLikeToggle(center.id);
                       }}
                     >
