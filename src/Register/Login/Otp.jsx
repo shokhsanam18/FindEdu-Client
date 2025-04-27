@@ -118,7 +118,7 @@ const Otp = () => {
     try {
       await axios.post(`${API_BASE}/send-otp`, { email });
       toast.success("New OTP sent to your email!");
-      clearOtp(); // 👈 Reset OTP input fields
+      clearOtp();
     } catch (error) {
       toast.error("Failed to resend OTP. Please try again.");
     }
@@ -129,8 +129,8 @@ const Otp = () => {
     if (/^\d{5}$/.test(paste)) {
       const newOtp = paste.split("");
       setOtp(newOtp);
-      inputRefs.current[4].focus(); // Focus last input
-      e.preventDefault(); // Stop default paste behavior
+      inputRefs.current[4].focus(); 
+      e.preventDefault(); 
     }
   };
 

@@ -213,8 +213,7 @@ export const Cards = () => {
   useEffect(() => {
     if (isMyCentersPage) {
       setAllCenters(myCenters);
-      setFilteredCenters(myCenters);
-      setLoading(false); // <== Always stop loading regardless of length
+      setFilteredCenters
     }
   }, [isMyCentersPage, myCenters]);
 
@@ -272,10 +271,9 @@ export const Cards = () => {
       toast.success(t('modal.deletedSuccess') || "Center deleted successfully");
       setAllCenters(prev => prev.filter(c => c.id !== centerId));
       setFilteredCenters(prev => prev.filter(c => c.id !== centerId));
-      await fetchMyCenters(); // Refresh the list
+      await fetchMyCenters();
 
 
-      // Redirect if nothing is left
       if (useMyCentersStore.getState().myCenters.length === 0) {
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -288,7 +286,7 @@ export const Cards = () => {
                 <button
                   onClick={() => {
                     toast.dismiss(t);
-                    navigate("/ceo"); // Redirect to create a new center
+                    navigate("/ceo");
                   }}
                   className="px-3 py-1 text-white bg-purple-600 rounded hover:bg-purple-700 transition"
                 >
@@ -297,7 +295,7 @@ export const Cards = () => {
                 <button
                   onClick={() => {
                     toast.dismiss(t);
-                    navigate("/"); // Go home
+                    navigate("/");
                   }}
                   className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
                 >

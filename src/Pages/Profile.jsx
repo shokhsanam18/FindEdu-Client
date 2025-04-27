@@ -1,4 +1,3 @@
-// src/pages/Profile.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../Store";
@@ -56,7 +55,7 @@ export default function Profile() {
         phone: user.data.phone || "",
         image: user.data.image || "",
       });
-      
+
       if (user.data.image) {
         fetchImage(user.data.image);
       }
@@ -66,15 +65,13 @@ export default function Profile() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     let cleaned = value;
-  
-    // Remove all spaces for phone
+
     if (name === "phone") {
       cleaned = value.replace(/\s+/g, '');
     } else {
-      // Trim for everything else
-      cleaned = value.trimStart(); // Remove spaces from the beginning
+      cleaned = value.trimStart();
     }
-  
+
     setFormData((prev) => ({
       ...prev,
       [name]: cleaned,
@@ -85,10 +82,10 @@ export default function Profile() {
     e.preventDefault();
     try {
       await updateUser(user.data.id, {
-  firstName: formData.firstName.trim(),
-  lastName: formData.lastName.trim(),
-  phone: formData.phone.replace(/\s+/g, '')
-});
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        phone: formData.phone.replace(/\s+/g, '')
+      });
       setEditMode(false);
       fetchUserData();
     } catch (error) {

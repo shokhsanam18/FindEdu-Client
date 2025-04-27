@@ -57,45 +57,6 @@ export const Footer = () => {
             </ul>
           </div>
         </div>
-        {/* <div className="mb-6 md:mb-0">
-          <ul className="mt-4 space-y-4 ">
-            <li>
-              <a href="#" className="hover:underline">
-                Asosiy
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:underline">
-                O‘quv markazlar
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:underline">
-                Loyiha haqida
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div className="mb-6 md:mb-0">
-          <ul className=" mt-4 space-y-4">
-            <li>
-              <a href="#" className="hover:underline">
-                Bog‘lanish
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:underline">
-                Izoh qoldirish
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:underline">
-                Boshqa loyihalar
-              </a>
-            </li>
-          </ul>
-        </div> */}
 
         <div className="flex flex-col md:flex-row md:space-x-6 gap-4">
           <div className="mb-6 md:mb-0">

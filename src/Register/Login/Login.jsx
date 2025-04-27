@@ -31,7 +31,7 @@ const formSchema = z.object({
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm({
     resolver: zodResolver(formSchema),

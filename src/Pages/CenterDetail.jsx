@@ -62,10 +62,9 @@ const CenterDetail = () => {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedMajor, setSelectedMajor] = useState(null);
 
-  // Registration modal state
   const [showReservationModal, setShowReservationModal] = useState(false);
-  const [visitDay, setVisitDay] = useState(""); // YYYY-MM-DD
-  const [visitHour, setVisitHour] = useState(""); // HH:MM
+  const [visitDay, setVisitDay] = useState("");
+  const [visitHour, setVisitHour] = useState("");
   const [isSubmittingReservation, setIsSubmittingReservation] = useState(false);
   const { createReception } = useReceptionStore();
   const [reservationError, setReservationError] = useState(null);
@@ -99,24 +98,20 @@ const CenterDetail = () => {
       try {
         setLoading(true);
 
-        // Fetch center
         const centerRes = await axios.get(`${API_BASE}/api/centers/${id}`);
         const centerData = centerRes.data?.data;
         console.log(centerData)
 
-        // Fetch majors
         const majorsRes = await axios.get(`${API_BASE}/api/major/query`);
         const majorsData = majorsRes.data?.data || [];
         console.log(majorsData)
 
-        // Fetch branches (filials)
         const filialRes = await axios.get(`${API_BASE}/api/filials`, {
           params: { centerId: centerData.id },
         });
         const filials = filialRes.data?.data || [];
         console.log(filials)
 
-        // Construct dynamic branch list
         let dynamicBranches = filials.map((filial) => {
           const regionName = filial.region?.name || `Region ${filial.regionId}`;
           const isMainBranch = filial.name?.toLowerCase().includes("main branch");
@@ -131,13 +126,11 @@ const CenterDetail = () => {
           };
         });
 
-        // Move main branch to the top based on name or any indicator
         dynamicBranches = [
           ...dynamicBranches.filter((b) => b.name?.toLowerCase().includes("main")),
           ...dynamicBranches.filter((b) => !b.name?.toLowerCase().includes("main")),
         ];
 
-        // Calculate avg rating
         const comments = centerData.comments || [];
         const avgRating =
           comments.length > 0
@@ -148,7 +141,7 @@ const CenterDetail = () => {
           ...centerData,
           rating: avgRating,
           imageUrl: centerData.image ? `${ImageApi}/${centerData.image}` : null,
-          majors: centerData.majors || [], // ← Add this
+          majors: centerData.majors || [],
         });
 
         console.log(centerData)
@@ -200,10 +193,8 @@ const CenterDetail = () => {
 
   const handleBranchClick = (branch) => {
     if (branch.id === "main") {
-      // If it's the main branch, stay on the same page
       setSelectedBranch(branch);
     } else {
-      // Navigate to the branch detail page
       navigate(`/branches/${branch.id}`);
     }
   };
@@ -227,7 +218,6 @@ const CenterDetail = () => {
       });
       setNewComment({ text: "", star: 5 });
 
-      // 👇 Refresh comments after posting
       await fetchCommentsByCenter(id);
       const latestComments = useCommentStore.getState().comments;
       const updatedRating = calculateAverageRating(latestComments);
@@ -248,7 +238,6 @@ const CenterDetail = () => {
         star: editCommentStar,
       });
 
-      // 👇 Refresh comments after updating
       await fetchCommentsByCenter(id);
       const latestComments = useCommentStore.getState().comments;
       const updatedRating = calculateAverageRating(latestComments);
@@ -274,7 +263,7 @@ const CenterDetail = () => {
   const confirmDeleteComment = async () => {
     try {
       await deleteComment(commentToDelete);
-      await fetchCommentsByCenter(id); // Refresh
+      await fetchCommentsByCenter(id);
       const latestComments = useCommentStore.getState().comments;
       const updatedRating = calculateAverageRating(latestComments);
       setCenter((prev) => ({ ...prev, rating: updatedRating }));
@@ -350,7 +339,7 @@ const CenterDetail = () => {
     });
 
     if (result.success) {
-      await fetchUserData(); // 🔁 refresh user data so appointments update
+      await fetchUserData();
       setReservationSuccess(true);
     } else {
       setReservationError("Failed to register. Please try again.");
@@ -361,7 +350,6 @@ const CenterDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 mt-22 md:mt-20">
-      {/* Back button */}
       <div className="container mx-auto px-4 mt-8 text-xl">
         <Link
           to="/"
@@ -372,7 +360,6 @@ const CenterDetail = () => {
         </Link>
       </div>
 
-      {/* Main content */}
       <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row  ">
         {isMobile ? (
           <motion.div
@@ -381,9 +368,7 @@ const CenterDetail = () => {
             transition={{ duration: 0.5 }}
             className="flex rounded-xl shadow-lg overflow-hidden flex-col md:flex-row w-full bg-white"
           >
-            {/* Left column with image and branches */}
             <div className="md:w-2/5 flex flex-col px-4 ">
-              {/* Center image */}
               <div className="relative w-full h-64 sm:h-100 overflow-hidden">
                 {center.imageUrl ? (
                   <img
@@ -415,7 +400,6 @@ const CenterDetail = () => {
                 </motion.button>
               </div>
 
-              {/* Main info */}
               <div>
                 <div className="flex items-center justify-between">
                   <h1 className="text-3xl font-bold text-gray-900">
@@ -469,12 +453,10 @@ const CenterDetail = () => {
               </div>
             </div>
 
-            {/* Right column with details */}
             <div className="md:w-2/3 p-6 md:p-8">
               <div className="flex flex-col">
 
 
-                {/* Branches section */}
                 <div className=" bg-white border-t">
                   <h3 className="font-medium text-xl mt-5 mb-3">{t("centerDetail.ourBranches")}</h3>
                   <div className="space-y-3">
@@ -551,14 +533,12 @@ const CenterDetail = () => {
                 </div>
 
 
-                {/* Comments section */}
                 <div className="mt-5">
                   <h2 className="text-xl font-semibold text-gray-900 flex items-center">
                     <MessageSquare className="h-5 w-5 mr-2" />
                     {t("centerDetail.comments")} ({comments.length})
                   </h2>
 
-                  {/* Comment form */}
                   <form onSubmit={handleCommentSubmit} className="mt-4">
                     <div className="flex flex-col space-y-2">
                       <textarea
@@ -566,7 +546,7 @@ const CenterDetail = () => {
                         onChange={(e) => setNewComment({ ...newComment, text: e.target.value })}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault(); // prevent new line
+                            e.preventDefault();
                             handleCommentSubmit(e);
                           }
                         }}
@@ -606,7 +586,6 @@ const CenterDetail = () => {
                     </div>
                   </form>
 
-                  {/* Comments list */}
                   <div className="mt-6 space-y-4">
                     {comments.length === 0 ? (
                       <p className="text-gray-500">{t("centerDetail.noComments")}</p>
@@ -737,9 +716,7 @@ const CenterDetail = () => {
             transition={{ duration: 0.5 }}
             className="flex rounded-xl shadow-lg overflow-hidden flex-col md:flex-row w-full bg-white"
           >
-            {/* Left column with image and branches */}
             <div className="md:w-2/5 flex flex-col ">
-              {/* Center image */}
               <div className="relative w-full h-64 sm:h-100 overflow-hidden">
                 {center.imageUrl ? (
                   <img
@@ -771,7 +748,6 @@ const CenterDetail = () => {
                 </motion.button>
               </div>
 
-              {/* Branches section */}
               <div className="p-4 bg-white border-t">
                 <h3 className="font-medium text-xl mb-3">{t("centerDetail.ourBranches")}</h3>
                 <div className="space-y-3">
@@ -848,10 +824,8 @@ const CenterDetail = () => {
               </div>
             </div>
 
-            {/* Right column with details */}
             <div className="md:w-2/3 p-6 md:p-8">
               <div className="flex flex-col">
-                {/* Main info */}
                 <div>
                   <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold text-gray-900">
@@ -904,14 +878,12 @@ const CenterDetail = () => {
                   </div>
                 </div>
 
-                {/* Comments section */}
                 <div className="mt-10">
                   <h2 className="text-xl font-semibold text-gray-900 flex items-center">
                     <MessageSquare className="h-5 w-5 mr-2" />
                     {t("centerDetail.comments")} ({comments.length})
                   </h2>
 
-                  {/* Comment form */}
                   <form onSubmit={handleCommentSubmit} className="mt-4">
                     <div className="flex flex-col space-y-2">
                       <textarea
@@ -919,7 +891,7 @@ const CenterDetail = () => {
                         onChange={(e) => setNewComment({ ...newComment, text: e.target.value })}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault(); // prevent new line
+                            e.preventDefault();
                             handleCommentSubmit(e);
                           }
                         }}
@@ -959,7 +931,6 @@ const CenterDetail = () => {
                     </div>
                   </form>
 
-                  {/* Comments list */}
                   <div className="mt-6 space-y-4">
                     {comments.length === 0 ? (
                       <p className="text-gray-500">{t("centerDetail.noComments")}</p>
@@ -1086,7 +1057,6 @@ const CenterDetail = () => {
         )}
       </div>
 
-      {/* Registration Modal */}
       {showReservationModal && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
@@ -1102,10 +1072,9 @@ const CenterDetail = () => {
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2 }}
             className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden"
-            onClick={(e) => e.stopPropagation()} // Prevent modal from closing when clicking inside
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="relative">
-              {/* Modal header */}
               <div className="p-6 bg-[#441774] text-white">
                 <div className="flex justify-between items-center">
                   <h3 className="text-xl font-bold">{t("centerDetail.classRegistration")}</h3>
@@ -1125,7 +1094,6 @@ const CenterDetail = () => {
                 </p>
               </div>
 
-              {/* Modal body */}
               <div className="p-6">
                 {reservationSuccess ? (
                   <div className="text-center py-6">
@@ -1174,7 +1142,6 @@ const CenterDetail = () => {
                 ) : (
                   <form>
                     <div className="space-y-6">
-                      {/* Branch Dropdown */}
                       <div>
                         <label className="text-sm font-medium text-gray-700">
                           {t("centerDetail.selectBranch")}
@@ -1194,7 +1161,6 @@ const CenterDetail = () => {
                         </select>
                       </div>
 
-                      {/* Major Dropdown */}
                       <div className="mt-4">
                         <label className="text-sm font-medium text-gray-700">
                           {t("centerDetail.selectMajor")}
@@ -1216,7 +1182,6 @@ const CenterDetail = () => {
 
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* Date Picker */}
                         <div>
                           <label htmlFor="visitDay" className="block text-sm font-medium text-gray-700 mb-1">
                             {t("centerDetail.selectDate")}
@@ -1232,7 +1197,6 @@ const CenterDetail = () => {
                           />
                         </div>
 
-                        {/* Time Picker */}
                         <div>
 
                           <label htmlFor="visitHour" className="block text-sm font-medium text-gray-700 mb-1">
@@ -1307,7 +1271,7 @@ const CenterDetail = () => {
                             setIsSubmittingReservation(false);
 
                             if (result.success) {
-                              await fetchUserData(); // 🔁 refresh user data so appointments update
+                              await fetchUserData();
                               setReservationSuccess(true);
                             } else {
                               setReservationError("Failed to register. Please try again.");

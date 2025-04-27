@@ -20,7 +20,7 @@ const BranchDetail = () => {
         setLoading(true);
         const response = await axios.get(`https://findcourse.net.uz/api/filials/${id}`);
         setBranch(response.data?.data);
-        
+
         if (response.data?.data?.regionId) {
           try {
             const regionResponse = await axios.get(`https://findcourse.net.uz/api/regions/${response.data.data.regionId}`);
@@ -71,7 +71,7 @@ const BranchDetail = () => {
     return (
       <div className="container mx-auto p-4 mt-8 text-center">
         <p className="text-red-600 mb-4">{error}</p>
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
         >
@@ -85,7 +85,7 @@ const BranchDetail = () => {
     return (
       <div className="container mx-auto p-4 mt-8 text-center">
         <p>{t("branchDetail.notFound")}</p>
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
         >
@@ -97,8 +97,8 @@ const BranchDetail = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-4xl mt-28">
-      <Link 
-        to={`/centers/${branch.centerId || ''}`} 
+      <Link
+        to={`/centers/${branch.centerId || ''}`}
         className="flex items-center text-purple-600 hover:text-purple-800 mb-6 transition"
       >
         <ArrowLeft className="h-5 w-5 mr-2" />
@@ -106,11 +106,10 @@ const BranchDetail = () => {
       </Link>
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        {/* Branch Image - Wider and taller */}
         {imageUrl && !imageError ? (
           <div className="w-full h-96 overflow-hidden">
-            <img 
-              src={imageUrl} 
+            <img
+              src={imageUrl}
               alt={`${branch.name || branch.region?.name} branch`}
               className="w-full h-full object-contain"
             />
@@ -136,13 +135,12 @@ const BranchDetail = () => {
               <span>{region?.name || branch.region?.name}</span>
             </div>
           )}
-          
+
           {branch.description && (
             <p className="text-gray-600 mb-6">{branch.description}</p>
           )}
 
           <div className="space-y-4">
-            {/* Address */}
             <div className="flex items-start">
               <MapPin className="h-5 w-5 mr-3 mt-1 text-purple-600 flex-shrink-0" />
               <div>
@@ -151,14 +149,13 @@ const BranchDetail = () => {
               </div>
             </div>
 
-            {/* Phone */}
             {branch.phone && (
               <div className="flex items-start">
                 <Phone className="h-5 w-5 mr-3 mt-1 text-purple-600 flex-shrink-0" />
                 <div>
                   <h3 className="font-semibold text-gray-700">{t("branchDetail.phoneLabel")}</h3>
-                  <a 
-                    href={`tel:${branch.phone}`} 
+                  <a
+                    href={`tel:${branch.phone}`}
                     className="text-purple-600 hover:underline"
                   >
                     {branch.phone}
@@ -167,14 +164,13 @@ const BranchDetail = () => {
               </div>
             )}
 
-            {/* Email */}
             {branch.email && (
               <div className="flex items-start">
                 <Mail className="h-5 w-5 mr-3 mt-1 text-purple-600 flex-shrink-0" />
                 <div>
                   <h3 className="font-semibold text-gray-700">{t("branchDetail.emailLabel")}</h3>
-                  <a 
-                    href={`mailto:${branch.email}`} 
+                  <a
+                    href={`mailto:${branch.email}`}
                     className="text-purple-600 hover:underline"
                   >
                     {branch.email}
@@ -183,13 +179,12 @@ const BranchDetail = () => {
               </div>
             )}
 
-            {/* Website */}
             {branch.website && (
               <div className="flex items-start">
                 <Globe className="h-5 w-5 mr-3 mt-1 text-purple-600 flex-shrink-0" />
                 <div>
                   <h3 className="font-semibold text-gray-700">{t("branchDetail.websiteLabel")}</h3>
-                  <a 
+                  <a
                     href={branch.website.startsWith('http') ? branch.website : `https://${branch.website}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -201,7 +196,6 @@ const BranchDetail = () => {
               </div>
             )}
 
-            {/* Working Hours */}
             {branch.workingHours && (
               <div className="flex items-start">
                 <Clock className="h-5 w-5 mr-3 mt-1 text-purple-600 flex-shrink-0" />

@@ -153,7 +153,7 @@ const ScrollingLogos = () => {
         ref={containerRef}
         className="flex cursor-grab active:cursor-grabbing"
         drag="x"
-        dragConstraints={{ left: -1000, right: 0 }} // adjusts automatically
+        dragConstraints={{ left: -1000, right: 0 }}
         animate={{
           x: ['0%', `-${100 / duplicatedLogos.length * logos.length}%`],
         }}
@@ -209,7 +209,6 @@ const About = () => {
 
   return (
     <div className="overflow-x-hidden mt-">
-      {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -245,9 +244,7 @@ const About = () => {
         </motion.div>
       </motion.div>
 
-      {/* Main Content */}
       <div className="bg-gray-100 py-8 md:py-10">
-        {/* Success Section */}
         <motion.div
           className="text-center px-4 md:px-12"
           initial={{ opacity: 0, y: 20 }}
@@ -307,34 +304,32 @@ const About = () => {
           </div>
         </motion.div>
 
-        {/* Impact Section */}
         {user && user?.role === "ADMIN" && (
-  <div className="relative py-10 md:py-15 bg-gradient-to-b from-white to-gray-100 text-center">
-    <motion.h2
-      className="text-3xl md:text-5xl font-semibold text-[#461773] mb-8 md:mb-14"
-      initial={{ opacity: 0, y: -20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-    >
-      {t('navbar.impactTitle')}
-    </motion.h2>
+          <div className="relative py-10 md:py-15 bg-gradient-to-b from-white to-gray-100 text-center">
+            <motion.h2
+              className="text-3xl md:text-5xl font-semibold text-[#461773] mb-8 md:mb-14"
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              {t('navbar.impactTitle')}
+            </motion.h2>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 justify-center items-center mx-auto max-w-4xl px-4 md:px-0">
-      <Counter
-        target={impact.users}
-        label={t('navbar.registeredUsers')}
-        icon={FaUserGraduate}
-      />
-      <Counter
-        target={impact.centers}
-        label={t('navbar.educationCenters')}
-        icon={FaSchool}
-      />
-    </div>
-  </div>
-)}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 justify-center items-center mx-auto max-w-4xl px-4 md:px-0">
+              <Counter
+                target={impact.users}
+                label={t('navbar.registeredUsers')}
+                icon={FaUserGraduate}
+              />
+              <Counter
+                target={impact.centers}
+                label={t('navbar.educationCenters')}
+                icon={FaSchool}
+              />
+            </div>
+          </div>
+        )}
 
-        {/* Mission Section */}
         <div className="relative py-12 md:py-20 bg-gradient-to-b from-gray-100 to-white text-center">
           <motion.h2
             className="text-3xl md:text-5xl font-semibold text-[#461773]"
@@ -384,7 +379,6 @@ const About = () => {
           </div>
         </div>
 
-        {/* Vision Section */}
         <div className="relative py-12 md:py-20 bg-gradient-to-b from-white to-gray-100 text-center px-4 md:px-0">
           <motion.h2
             className="text-3xl md:text-5xl font-semibold text-[#461773]"

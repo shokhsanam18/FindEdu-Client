@@ -9,7 +9,6 @@ export const useAuthStore = create((set, get) => ({
   accessToken: localStorage.getItem("accessToken") || null,
   refreshToken: localStorage.getItem("refreshToken") || null,
   profileImageUrl: null,
-  // Add these to your useAuthStore in Store.js
   updateUser: async (userId, userData) => {
     try {
       const token = await get().refreshTokenFunc(false);
@@ -27,7 +26,7 @@ export const useAuthStore = create((set, get) => ({
       );
 
       toast.success("Profile updated successfully");
-      await get().fetchUserData(); // Refresh user data
+      await get().fetchUserData(); 
       return data;
     } catch (error) {
       console.error("Update user error:", error);
@@ -60,7 +59,7 @@ export const useAuthStore = create((set, get) => ({
   },
   fetchUserData: async () => {
     try {
-      const token = await get().refreshTokenFunc(false); // don't logout immediately on missing token
+      const token = await get().refreshTokenFunc(false);
       if (!token) return null;
 
       const { data } = await axios.get(`${API_BASE}/users/mydata`, {
@@ -79,7 +78,6 @@ export const useAuthStore = create((set, get) => ({
 
       const userData = { ...data, role };
       set({ user: userData });
-      // console.log(userData);
       return userData;
     } catch (error) {
       console.warn(
@@ -319,7 +317,6 @@ export const useLikedStore = create(
 
         try {
           if (existing) {
-            // Unlike
             await axios.delete(`${API_BASE}/liked/${existing.id}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
@@ -327,7 +324,6 @@ export const useLikedStore = create(
               likedItems: likedItems.filter((item) => item.centerId !== centerId),
             });
           } else {
-            // Like
             const res = await axios.post(
               `${API_BASE}/liked`,
               { centerId },
@@ -605,7 +601,6 @@ export const useMyCentersStore = create((set) => ({
 
       set({ myCenters: processed });
     } catch (error) {
-      // Handle 404 as "no centers yet", everything else as an error
       if (error.response?.status === 404) {
         set({ myCenters: [] });
         console.warn("ℹ️ No centers found (404), treating as empty.");
@@ -642,7 +637,6 @@ export const useReceptionStore = create((set, get) => ({
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // ✅ Only return result — no toast
       get().fetchReceptions();
       return { success: true, data: res.data };
     } catch (error) {
@@ -726,11 +720,11 @@ export const useImpactStore = create((set) => ({
       const [usersRes, centersRes] = await Promise.all([
         axios.get(`${API_BASE}/users`, {
           headers: { Authorization: `Bearer ${token}` },
-          params: { take: 10000 }, // ✅ only take
+          params: { take: 10000 }, 
         }),
         axios.get(`${API_BASE}/centers`, {
           headers: { Authorization: `Bearer ${token}` },
-          params: { take: 1000 }, // ✅ only take
+          params: { take: 1000 },
         }),
       ]);
 
