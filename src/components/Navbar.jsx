@@ -97,21 +97,37 @@ export default function Navbar() {
   ];
 
   const languageMenuItems = [
+<<<<<<< HEAD
     {
       code: 'en',
       name: t('navbar.languages.en'),
       flag: <ReactCountryFlag countryCode="GB" svg style={{ width: '1.5em', height: '1.5em' }} />
+=======
+    { 
+      code: 'uz', 
+      name: t('navbar.languages.uz'), 
+      flag: <ReactCountryFlag countryCode="UZ" svg style={{ width: '1.5em', height: '1.5em' }} /> 
+    },
+    { 
+      code: 'en', 
+      name: t('navbar.languages.en'), 
+      flag: <ReactCountryFlag countryCode="GB" svg style={{ width: '1.5em', height: '1.5em' }} /> 
+>>>>>>> b8f65bba36c29d4bcb3f3b8b33b313985e65d3f9
     },
     {
       code: 'ru',
       name: t('navbar.languages.ru'),
       flag: <ReactCountryFlag countryCode="RU" svg style={{ width: '1.5em', height: '1.5em' }} />
     },
+<<<<<<< HEAD
     {
       code: 'uz',
       name: t('navbar.languages.uz'),
       flag: <ReactCountryFlag countryCode="UZ" svg style={{ width: '1.5em', height: '1.5em' }} />
     },
+=======
+
+>>>>>>> b8f65bba36c29d4bcb3f3b8b33b313985e65d3f9
   ];
 
   return (
@@ -220,6 +236,7 @@ export default function Navbar() {
               </div> </div>
           )}
         </div>
+<<<<<<< HEAD
         <div className="flex flex-row gap-2">
           <div className="relative group mt-2">
             <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 text-xl">
@@ -286,6 +303,90 @@ export default function Navbar() {
                   }
                 />
                 <motion.p className="">
+=======
+<div className="flex flex-row gap-3">
+            {/* Language Selector */}
+            <div className="relative group mt-2">
+  <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 text-l">
+    {i18n.language === 'en' && (
+      <ReactCountryFlag 
+        countryCode="GB" 
+        svg 
+        style={{ 
+          width: '1.5em', 
+          height: '1.5em',
+          marginRight: '8px'
+        }} 
+      />
+    )}
+    {i18n.language === 'ru' && (
+      <ReactCountryFlag 
+        countryCode="RU" 
+        svg 
+        style={{ 
+          width: '1.5em', 
+          height: '1.5em',
+          marginRight: '8px'
+        }} 
+      />
+    )}
+    {i18n.language === 'uz' && (
+      <ReactCountryFlag 
+        countryCode="UZ" 
+        svg 
+        style={{ 
+          width: '1.5em', 
+          height: '1.5em',
+          marginRight: '8px'
+        }} 
+      />
+    )}
+    {i18n.language.toUpperCase()}
+    <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+  </button>
+  
+  <div className="absolute left-0 w-24 bg-white rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+    {languageMenuItems.map(({ code, name }) => (
+      <button
+        key={code}
+        onClick={() => changeLanguage(code)}
+        className={`w-full px-4 py-2 text-sm text-left ${
+          i18n.language === code 
+            ? 'bg-[#efd8ff] text-[#461773]' 
+            : 'text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]'
+        }`}
+      >
+        {t(`navbar.languages.${code}`)}
+      </button>
+    ))}
+  </div>
+</div>
+        {isLoggedIn ? (
+          <div className="relative group">
+            <button className="p-0 flex items-center hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff] gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto">
+              <Avatar
+                variant="circular"
+                size="sm"
+                alt="User profile"
+                className="border border-purple-900 p-0.5"
+                src={
+                  profileImageUrl ||
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJKOCxJ4PWSjccLHucBQ-AlNhpiVx2ASk10lFfiNrG-QBOwwYkSGolTVZuKMZd7VcaKNk&usqp=CAU"
+                }
+              />
+              <motion.p className="">
+                {user?.data?.firstName} {user?.data?.lastName}
+              </motion.p>
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`h-3 w-3 transition-transform group-hover:rotate-180`}
+              />
+            </button>
+            
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+              <div className="py-2 px-4">
+                <Typography variant="small" className="font-semibold text-[#290a3f]">
+>>>>>>> b8f65bba36c29d4bcb3f3b8b33b313985e65d3f9
                   {user?.data?.firstName} {user?.data?.lastName}
                 </motion.p>
                 <ChevronDownIcon

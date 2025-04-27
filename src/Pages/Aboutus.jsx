@@ -330,6 +330,31 @@ const About = () => {
           </div>
         )}
 
+<<<<<<< HEAD
+=======
+
+        <div className="relative py-15 bg-gradient-to-b from-white to-gray-100 text-center">
+          <motion.h2
+            className="text-5xl font-semibold text-[#461773] mb-14"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            {t('navbar.impactTitle')}
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center items-center mx-auto max-w-4xl">
+            <Counter
+              target={250}
+              label= {t('navbar.registeredUsers')}
+              icon={FaUserGraduate}
+            />
+            <Counter target={120} label= {t('navbar.educationCenters')} icon={FaSchool} />
+            <Counter target={80} label= {t('navbar.successStories')} icon={FaTrophy} />
+          </div>
+        </div>
+        {/* Mission Section */}
+>>>>>>> b8f65bba36c29d4bcb3f3b8b33b313985e65d3f9
         <div className="relative py-12 md:py-20 bg-gradient-to-b from-gray-100 to-white text-center">
           <motion.h2
             className="text-3xl md:text-5xl font-semibold text-[#461773]"
