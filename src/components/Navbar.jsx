@@ -222,7 +222,7 @@ export default function Navbar() {
         </div>
         <div className="flex flex-row gap-2">
           <div className="relative group mt-2">
-            <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 text-xl">
+            <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 ">
               {i18n.language === 'en' && (
                 <ReactCountryFlag
                   countryCode="GB"
@@ -259,12 +259,12 @@ export default function Navbar() {
               {t(`navbar.languages.${i18n.language}`)}
               <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
             </button>
-            <div className="absolute left-0  w-12  bg-white rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+            <div className="absolute left-8  w-22  bg-white rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
               {languageMenuItems.map(({ code, name, flag }) => (
                 <button
                   key={code}
                   onClick={() => changeLanguage(code)}
-                  className={`flex items-center gap-2 w-full px-4 py-2 text-sm text-left justify-center  text-center${i18n.language === code ? 'bg-[#efd8ff] text-[#461773]' : 'text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]'}`}
+                  className={`flex items-center gap-2 w-full px-4 py-2 text-sm text-center justify-center  text-center${i18n.language === code ? 'bg-[#efd8ff] text-[#461773]' : 'text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]'}`}
                 >
                   <span className="text-xl ">{flag}</span>
                   {name}
