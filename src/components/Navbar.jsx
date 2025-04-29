@@ -98,9 +98,9 @@ export default function Navbar() {
 
   const languageMenuItems = [
     {
-      code: 'en',
-      name: t('navbar.languages.en'),
-      flag: <ReactCountryFlag countryCode="GB" svg style={{ width: '1.5em', height: '1.5em' }} />
+      code: 'uz',
+      name: t('navbar.languages.uz'),
+      flag: <ReactCountryFlag countryCode="UZ" svg style={{ width: '1.5em', height: '1.5em' }} />
     },
     {
       code: 'ru',
@@ -108,10 +108,12 @@ export default function Navbar() {
       flag: <ReactCountryFlag countryCode="RU" svg style={{ width: '1.5em', height: '1.5em' }} />
     },
     {
-      code: 'uz',
-      name: t('navbar.languages.uz'),
-      flag: <ReactCountryFlag countryCode="UZ" svg style={{ width: '1.5em', height: '1.5em' }} />
+      code: 'en',
+      name: t('navbar.languages.en'),
+      flag: <ReactCountryFlag countryCode="GB" svg style={{ width: '1.5em', height: '1.5em' }} />
     },
+
+
   ];
 
   return (
@@ -221,57 +223,61 @@ export default function Navbar() {
           )}
         </div>
         <div className="flex flex-row gap-2">
-          <div className="relative group mt-2">
-            <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300 ">
-              {i18n.language === 'en' && (
-                <ReactCountryFlag
-                  countryCode="GB"
-                  svg
-                  style={{
-                    width: '1.5em',
-                    height: '1.5em',
-                    marginRight: '8px'
-                  }}
-                />
-              )}
-              {i18n.language === 'ru' && (
-                <ReactCountryFlag
-                  countryCode="RU"
-                  svg
-                  style={{
-                    width: '1.5em',
-                    height: '1.5em',
-                    marginRight: '8px'
-                  }}
-                />
-              )}
-              {i18n.language === 'uz' && (
-                <ReactCountryFlag
-                  countryCode="UZ"
-                  svg
-                  style={{
-                    width: '1.5em',
-                    height: '1.5em',
-                    marginRight: '8px'
-                  }}
-                />
-              )}
-              {t(`navbar.languages.${i18n.language}`)}
-              <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
-            </button>
-            <div className="absolute left-8  w-22  bg-white rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-              {languageMenuItems.map(({ code, name, flag }) => (
-                <button
-                  key={code}
-                  onClick={() => changeLanguage(code)}
-                  className={`flex items-center gap-2 w-full px-4 py-2 text-sm text-center justify-center  text-center${i18n.language === code ? 'bg-[#efd8ff] text-[#461773]' : 'text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]'}`}
-                >
-                  <span className="text-xl ">{flag}</span>
-                  {name}
-                </button>
-              ))}
-            </div>
-          </div>
+        <div className="relative group mt-1.5">
+  <button className="flex items-center gap-1 text-gray-600 hover:text-[#461773] font-medium transition-colors duration-300">
+    {i18n.language === 'en' && (
+      <ReactCountryFlag
+        countryCode="GB"
+        svg
+        style={{
+          width: '1.5em',
+          height: '1.5em',
+          marginRight: '8px'
+        }}
+      />
+    )}
+    {i18n.language === 'ru' && (
+      <ReactCountryFlag
+        countryCode="RU"
+        svg
+        style={{
+          width: '1.5em',
+          height: '1.5em',
+          marginRight: '8px'
+        }}
+      />
+    )}
+    {i18n.language === 'uz' && (
+      <ReactCountryFlag
+        countryCode="UZ"
+        svg
+        style={{
+          width: '1.5em',
+          height: '1.5em',
+          marginRight: '8px'
+        }}
+      />
+    )}
+    {t(`navbar.languages.${i18n.language}`)}
+    <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+  </button>
+  <div className="absolute left-8 w-22 bg-white rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+    {languageMenuItems.map(({ code, name, flag }) => (
+      <button
+        key={code}
+        onClick={() => changeLanguage(code)}
+        className={`flex items-center gap-2 w-full px-4 py-2 text-sm text-center justify-center ${
+          i18n.language === code 
+            ? 'bg-[#efd8ff] text-[#461773]' 
+            : 'text-gray-700 hover:bg-[#efd8ff] hover:text-[#461773]'
+        }`}
+      >
+        <span className="text-xl">{flag}</span>
+        {name}
+      </button>
+    ))}
+  </div>
+</div>
           {isLoggedIn ? (
             <div className="relative group">
               <button className="p-0 flex items-center hover:bg-[#efd8ff] focus:bg-[#efd8ff] active:bg-[#efd8ff] gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto">
