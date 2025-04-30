@@ -213,7 +213,8 @@ export const Cards = () => {
   useEffect(() => {
     if (isMyCentersPage) {
       setAllCenters(myCenters);
-      setFilteredCenters
+      setFilteredCenters(myCenters);
+      setLoading(false);
     }
   }, [isMyCentersPage, myCenters]);
 
