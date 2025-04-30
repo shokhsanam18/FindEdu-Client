@@ -264,6 +264,14 @@
     "goBack": "Назад",
     "notFound": "Филиал не найден"
   },
+  "appointment": {
+    "hero": {
+      "title": "Ваши записи",
+      "subtitle": "Управляйте посещениями образовательного центра",
+      "homeLink": "Главная",
+      "favoritesLink": "Записи"
+    }
+  },
   "appointments": {
     "noAppointments": "У вас пока нет записей",
     "bookNow": "Запишитесь на приём сейчас",

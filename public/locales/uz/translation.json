@@ -275,6 +275,14 @@
     "goBack": "Orqaga",
     "notFound": "Filial topilmadi"
   },
+  "appointment": {
+    "hero": {
+      "title": "Sizning navbatlaringiz",
+      "subtitle": "Ta'lim markaziga tashriflaringizni boshqaring",
+      "homeLink": "Bosh sahifa",
+      "favoritesLink": "Navbatlar"
+    }
+  },
   "appointments": {
     "noAppointments": "Sizda hali uchrashuvlar yo'q",
     "bookNow": "Hozir uchrashuvni bron qiling",
